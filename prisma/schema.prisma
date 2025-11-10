@@ -89,6 +89,8 @@ model Workspace {
   owner    User      @relation("UserWorkspaces", fields: [ownerId], references: [id])
 
   members   WorkspaceMember[]
+  collections Collection[]
+  
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now()) @updatedAt
 
@@ -114,4 +116,16 @@ model WorkspaceMember {
   updatedAt   DateTime  @default(now()) @updatedAt
 
   @@unique([userId, workspaceId])
+}
+
+model Collection {
+  id          String    @id @default(cuid())
+  name        String
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+
+  @@unique([name, workspaceId])
 }
