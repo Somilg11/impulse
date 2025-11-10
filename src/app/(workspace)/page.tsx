@@ -1,9 +1,9 @@
-import { currentuser } from "@/modules/authentication/actions";
+import { currentUser } from "@/modules/authentication/actions";
 import UserButton from "@/modules/authentication/components/user-button";
 
 
 export default async function Home() {
-  const user = await currentuser();
+  const user = await currentUser();
   return (
     <>
       <div className="flex h-screen flex-col items-center justify-center">
