@@ -25,11 +25,12 @@ interface RequestRun {
   id: string;
   requestId?: string;
   status?: number;
-  statusText?: string;
-  headers?: HeadersMap;
-  body?: string | object | null;
+  statusText?: string | null;
+  headers?: HeadersMap | any;
+  body?: any;
   durationMs?: number;
-  createdAt?: string;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 }
 
 interface Result {
@@ -41,8 +42,9 @@ interface Result {
 
 export interface ResponseData {
   success: boolean;
-  requestRun: RequestRun;
+  requestRun?: RequestRun;
   result?: Result;
+  error?: string;
 }
 
 interface Props {
@@ -98,7 +100,7 @@ const ResponseViewer = ({ responseData }: Props) => {
 
   const status: number | undefined =
     responseData.result?.status ?? responseData.requestRun?.status;
-  const statusText: string | undefined =
+  const statusText: string | null | undefined =
     responseData.result?.statusText ?? responseData.requestRun?.statusText;
   const duration: number | undefined =
     responseData.result?.duration ?? responseData.requestRun?.durationMs;
@@ -203,7 +205,7 @@ const ResponseViewer = ({ responseData }: Props) => {
                       className="ml-2 text-xs bg-zinc-700"
                     >
                       {
-                        Object.keys(responseData.requestRun.headers ?? {})
+                        Object.keys(responseData.requestRun?.headers ?? {})
                           .length
                       }
                     </Badge>
@@ -311,7 +313,7 @@ const ResponseViewer = ({ responseData }: Props) => {
                   <div className="p-6">
                     <div className="space-y-3">
                       {Object.entries(
-                        responseData.requestRun.headers ?? {}
+                        responseData.requestRun?.headers ?? {}
                       ).map(([key, value]) => (
                         <div
                           key={key}
@@ -322,7 +324,7 @@ const ResponseViewer = ({ responseData }: Props) => {
                               {key}
                             </div>
                             <div className="text-gray-300 text-sm break-all">
-                              {value}
+                              {String(value)}
                             </div>
                           </div>
                           <Button
