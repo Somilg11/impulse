@@ -29,8 +29,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  workspaces    Workspace[] @relation("UserWorkspaces")
-  memberships   WorkspaceMember[]
+  workspaces  Workspace[]       @relation("UserWorkspaces")
+  memberships WorkspaceMember[]
 
   @@unique([email])
   @@map("user")
@@ -82,17 +82,17 @@ model Verification {
 }
 
 model Workspace {
-  id        String    @id @default(cuid())
-  name      String
+  id          String  @id @default(cuid())
+  name        String
   description String?
-  ownerId   String
-  owner    User      @relation("UserWorkspaces", fields: [ownerId], references: [id])
+  ownerId     String
+  owner       User    @relation("UserWorkspaces", fields: [ownerId], references: [id])
 
-  members   WorkspaceMember[]
+  members     WorkspaceMember[]
   collections Collection[]
-  
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@unique([name, ownerId])
 }
@@ -104,28 +104,57 @@ enum MEMBER_ROLE {
 }
 
 model WorkspaceMember {
-  id          String    @id @default(cuid())
-  role       MEMBER_ROLE @default(ADMIN)
+  id   String      @id @default(cuid())
+  role MEMBER_ROLE @default(ADMIN)
 
   userId      String
   workspaceId String
   user        User      @relation(fields: [userId], references: [id])
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@unique([userId, workspaceId])
 }
 
 model Collection {
-  id          String    @id @default(cuid())
-  name        String
+  id   String @id @default(cuid())
+  name String
 
   workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId],references: [id], onDelete: Cascade)
+
+  requests Request[]
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now()) @updatedAt
 
   @@unique([name, workspaceId])
+}
+
+enum REST_METHOD {
+  GET
+  POST
+  PUT
+  PATCH
+  DELETE
+}
+
+model Request {
+  id     String      @id @default(cuid())
+  name   String
+  method REST_METHOD @default(GET)
+  url    String
+  parameters Json?
+  headers Json?
+
+  body Json?
+  response Json?
+
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
