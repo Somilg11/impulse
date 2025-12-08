@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 "use client";
 
 import {
@@ -7,7 +6,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { useWorkspaceStore } from "@/modules/layout/store";
-// import RequestPlayground from "@/modules/request/components/request-playground";
+import RequestPlayground from "@/modules/request/components/request-playground";
 
 import TabbedSidebar from "@/modules/collections/components/sidebar";
 
@@ -29,8 +28,7 @@ const Page = () => {
 return (
   <ResizablePanelGroup direction="horizontal">
     <ResizablePanel defaultSize={65} minSize={40}>
-        {/* <RequestPlayground /> */}
-        <h1>Request Playground</h1>
+        <RequestPlayground />
     </ResizablePanel>
 
     <ResizableHandle withHandle />
