@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useRequestPlaygroundStore } from "../store/useRequestStore";
 import { Sparkle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-// import { useSuggestRequestName } from "@/modules/ai/hooks/ai-suggestion";
+import { useSuggestRequestName } from "@/modules/ai/hooks/ai-suggestion";
 import { Input } from "@/components/ui/input";
 
 const AddNameModal = ({
@@ -18,7 +18,7 @@ const AddNameModal = ({
   tabId: string;
 }) => {
   const { updateTab, tabs, markUnsaved } = useRequestPlaygroundStore();
-//   const {mutateAsync , data , isPending , isError} = useSuggestRequestName();
+  const {mutateAsync , data , isPending , isError} = useSuggestRequestName();
   const tab = tabs.find((t) => t.id === tabId);
 
   const [name, setName] = useState(tab?.title || "");
@@ -62,7 +62,7 @@ const AddNameModal = ({
             onChange={(e) => setName(e.target.value)}
           />
 
-           {/* <Button 
+           <Button 
           variant={"outline"} 
           size={"icon"} 
           onClick={async () => {
@@ -87,7 +87,7 @@ const AddNameModal = ({
           disabled={isPending}
         >
           <Sparkles className="h-5 w-5 text-blue-500" />
-        </Button> */}
+        </Button>
         </div>
         {suggestions.length > 0 && (
           <div className="flex flex-col gap-2">

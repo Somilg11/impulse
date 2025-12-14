@@ -1,36 +1,138 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Impulse ⚡
 
-## Getting Started
+> **Next-Gen API Development & Testing Platform**
 
-First, run the development server:
+Impulse is a modern, high-performance API testing and development environment built for the AI era. It combines the utility of traditional tools like Postman with advanced AI capabilities, realtime collaboration, and a sleek, developer-centric UI.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+![Project Status](https://img.shields.io/badge/status-active-success.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+![Next.js](https://img.shields.io/badge/Next.js-16.0-black)
+
+## ✨ Key Features
+
+- **🚀 Smart API Client**: Full-featured HTTP client supporting GET, POST, PUT, DELETE, PATCH, and more.
+- **🤖 AI-Powered**:
+    -   **Smart Naming**: AI automatically suggests descriptive names for your requests based on context.
+    -   **JSON Generation**: Generate complex JSON bodies from natural language prompts.
+- **⚡ Realtime Collaboration**: (In Progress) Work with your team in real-time.
+- **🏢 Workspace Management**: Organize your projects into workspaces with role-based access control.
+- **📁 Collections**: Group related requests for better organization.
+- **🌗 Dark Mode**: Beautiful, dark-themed UI designed for long coding sessions.
+- **🔐 Secure Authentication**: Robust auth system supporting GitHub and Google OAuth.
+- **🛡️ Type-Safe**: Built with end-to-end type safety using TypeScript, Zod, and Prisma.
+
+## 🛠️ Tech Stack
+
+Impulse is built with a modern, production-grade stack:
+
+### Core
+-   **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+-   **Language**: [TypeScript](https://www.typescriptlang.org/)
+-   **Database**: [PostgreSQL](https://www.postgresql.org/)
+-   **ORM**: [Prisma](https://www.prisma.io/)
+
+### Frontend & UI
+-   **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+-   **Components**: [Shadcn UI](https://ui.shadcn.com/) (Radix Primitives)
+-   **Icons**: [Lucide React](https://lucide.dev/)
+-   **Editor**: [Monaco Editor](https://microsoft.github.io/monaco-editor/)
+-   **State Management**: [Zustand](https://github.com/pmndrs/zustand) & [TanStack Query](https://tanstack.com/query/latest)
+
+### Backend & Services
+-   **Auth**: [Better Auth](https://www.better-auth.com/)
+-   **AI**: [Google Gemini 2.0 Flash](https://deepmind.google/technologies/gemini/) via Vercel AI SDK
+-   **Validation**: [Zod](https://zod.dev/)
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+-   Node.js (v18+)
+-   Docker (for local database)
+-   npm or pnpm
+
+### Installation
+
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/yourusername/impulse.git
+    cd impulse
+    ```
+
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Environment Setup**
+    Create a `.env` file in the root directory and add the following variables:
+
+    ```env
+    # Database
+    DATABASE_URL="postgresql://user:password@localhost:5432/impulse?schema=public"
+
+    # Auth (Better Auth)
+    BETTER_AUTH_SECRET="your_generated_secret"
+    GITHUB_CLIENT_ID="your_github_id"
+    GITHUB_CLIENT_SECRET="your_github_secret"
+    GOOGLE_CLIENT_ID="your_google_id"
+    GOOGLE_CLIENT_SECRET="your_google_secret"
+
+    # AI (Google Gemini)
+    GOOGLE_GENERATIVE_AI_API_KEY="your_gemini_api_key"
+
+    # App
+    NEXT_PUBLIC_APP_URL="http://localhost:3000"
+    ```
+
+4.  **Start Database**
+    ```bash
+    docker compose up -d
+    ```
+
+5.  **Run Migrations**
+    ```bash
+    npx prisma migrate dev
+    ```
+
+6.  **Start Development Server**
+    ```bash
+    npm run dev
+    ```
+
+    Visit `http://localhost:3000` to see the app in action.
+
+## 📂 Project Structure
+
+The project follows a modular architecture in `src/modules`:
+
+```
+src/
+├── app/                 # Next.js App Router pages
+├── components/          # Shared UI components
+├── lib/                 # Core utilities (DB, Env, API clients)
+├── modules/             # Feature-based modules
+│   ├── ai/              # AI integration logic
+│   ├── authentication/  # Auth components and actions
+│   ├── collections/     # Collection management
+│   ├── invites/         # Workspace invitation system
+│   ├── realtime/        # WebSocket/Realtime logic
+│   ├── request/         # Request builder & execution
+│   └── workspace/       # Workspace & member management
+└── styles/              # Global styles
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🤝 Contributing
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1.  Fork the project
+2.  Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
-## Learn More
+## 📄 License
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

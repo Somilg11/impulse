@@ -31,17 +31,17 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryProvider>
-        <ThemeProvider
+          <ThemeProvider
             attribute="class"
             defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
           >
             <HotkeysProviders>
-            {children}
+              {children}
             </HotkeysProviders>
           </ThemeProvider>
-          </QueryProvider>
+        </QueryProvider>
       </body>
     </html>
   );
