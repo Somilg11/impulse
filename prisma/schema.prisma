@@ -32,6 +32,8 @@ model User {
   workspaces  Workspace[]       @relation("UserWorkspaces")
   memberships WorkspaceMember[]
 
+  workspaceInvites WorkspaceInvite[]
+
   @@unique([email])
   @@map("user")
 }
@@ -89,6 +91,7 @@ model Workspace {
   owner       User    @relation("UserWorkspaces", fields: [ownerId], references: [id])
 
   members     WorkspaceMember[]
+  invites     WorkspaceInvite[]
   collections Collection[]
 
   createdAt DateTime @default(now())
@@ -101,6 +104,20 @@ enum MEMBER_ROLE {
   ADMIN
   EDITOR
   VIEWER
+}
+
+model WorkspaceInvite {
+  id String @id @default(cuid())
+  workspaceId String
+  token String @unique
+  expiresAt DateTime?
+  createdById String
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model WorkspaceMember {
