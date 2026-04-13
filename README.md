@@ -1,138 +1,99 @@
-# Impulse ⚡
+# Impulse — The Agentic API Collaboration Platform
 
-> **Next-Gen API Development & Testing Platform**
+![Impulse Banner](https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2670&auto=format&fit=crop)
 
-Impulse is a modern, high-performance API testing and development environment built for the AI era. It combines the utility of traditional tools like Postman with advanced AI capabilities, realtime collaboration, and a sleek, developer-centric UI.
-
-![Project Status](https://img.shields.io/badge/status-active-success.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
-![Next.js](https://img.shields.io/badge/Next.js-16.0-black)
+Impulse is a high-performance, collaborative API development platform designed for modern teams. Built with a focus on speed, aesthetics, and agentic workflows, it provides a unified environment for REST testing, Realtime/WebSocket debugging, and team-wide documentation.
 
 ## ✨ Key Features
 
-- **🚀 Smart API Client**: Full-featured HTTP client supporting GET, POST, PUT, DELETE, PATCH, and more.
-- **🤖 AI-Powered**:
-    -   **Smart Naming**: AI automatically suggests descriptive names for your requests based on context.
-    -   **JSON Generation**: Generate complex JSON bodies from natural language prompts.
-- **⚡ Realtime Collaboration**: (In Progress) Work with your team in real-time.
-- **🏢 Workspace Management**: Organize your projects into workspaces with role-based access control.
-- **📁 Collections**: Group related requests for better organization.
-- **🌗 Dark Mode**: Beautiful, dark-themed UI designed for long coding sessions.
-- **🔐 Secure Authentication**: Robust auth system supporting GitHub and Google OAuth.
-- **🛡️ Type-Safe**: Built with end-to-end type safety using TypeScript, Zod, and Prisma.
+### 🚀 Advanced REST Client
+- **Dynamic Request Builder**: Support for all HTTP methods (GET, POST, PUT, DELETE, PATCH).
+- **Embedded Monaco Editor**: Experience VS Code-grade editing for JSON bodies and headers.
+- **AI-Powered Suggestions**: Automatically suggest request names and structure based on your endpoint.
+- **Response History**: Track and compare response times, sizes, and headers over time.
+
+### 🔌 Realtime WebSocket Debugger
+- **Live Stream**: Monitor incoming and outgoing WebSocket messages in a structured log table.
+- **Message Editor**: Send complex JSON payloads with auto-formatting and syntax highlighting.
+- **Connection Management**: Handle auto-reconnection and status tracking with ease.
+
+### 👥 Collaborative Workspaces
+- **Team Isolation**: Organize projects into shared workspaces.
+- **Invite System**: Scale your team with secure, token-based invitation links.
+- **Role-Based Access**: Manage permissions with Admin, Editor, and Viewer roles.
+
+### 📂 Collection Management & Import
+- **Instant Migration**: Seamlessly import your existing collections from **Postman v2.1** or native Impulse JSON formats.
+- **Folder Organization**: Group requests into logical collections for better discoverability.
+
+### ⌨️ Developer Experience
+- **Command Palette (Cmd+K)**: Instant global search for documentation and collections.
+- **Mobile Responsive**: Access your workspaces and test APIs from any device.
+- **Documentation Hub**: Unified documentation page with search and quick-start guides.
+
+---
 
 ## 🛠️ Tech Stack
 
-Impulse is built with a modern, production-grade stack:
+- **Framework**: [Next.js 14+](https://nextjs.org) (App Router)
+- **Database**: [Prisma](https://prisma.io) with PostgreSQL
+- **Authentication**: [Better Auth](https://better-auth.com)
+- **UI Components**: [Radix UI](https://www.radix-ui.com) & [Tailwind CSS](https://tailwindcss.com)
+- **State Management**: [Zustand](https://zustand-demo.pmnd.rs) & [TanStack Query](https://tanstack.com/query)
+- **Icons**: [Lucide React](https://lucide.dev)
 
-### Core
--   **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
--   **Language**: [TypeScript](https://www.typescriptlang.org/)
--   **Database**: [PostgreSQL](https://www.postgresql.org/)
--   **ORM**: [Prisma](https://www.prisma.io/)
-
-### Frontend & UI
--   **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
--   **Components**: [Shadcn UI](https://ui.shadcn.com/) (Radix Primitives)
--   **Icons**: [Lucide React](https://lucide.dev/)
--   **Editor**: [Monaco Editor](https://microsoft.github.io/monaco-editor/)
--   **State Management**: [Zustand](https://github.com/pmndrs/zustand) & [TanStack Query](https://tanstack.com/query/latest)
-
-### Backend & Services
--   **Auth**: [Better Auth](https://www.better-auth.com/)
--   **AI**: [Google Gemini 2.0 Flash](https://deepmind.google/technologies/gemini/) via Vercel AI SDK
--   **Validation**: [Zod](https://zod.dev/)
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-
--   Node.js (v18+)
--   Docker (for local database)
--   npm or pnpm
+- Node.js 18+ 
+- PostgreSQL database
 
 ### Installation
 
-1.  **Clone the repository**
-    ```bash
-    git clone https://github.com/yourusername/impulse.git
-    cd impulse
-    ```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Somilg11/impulse.git
+   cd impulse
+   ```
 
-2.  **Install dependencies**
-    ```bash
-    npm install
-    ```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-3.  **Environment Setup**
-    Create a `.env` file in the root directory and add the following variables:
+3. **Configure Environment Variables**
+   Create a `.env` file in the root directory:
+   ```env
+   DATABASE_URL="postgresql://user:password@localhost:5432/impulse"
+   BETTER_AUTH_SECRET="your-secret-here"
+   NEXT_PUBLIC_APP_URL="http://localhost:3000"
+   ```
 
-    ```env
-    # Database
-    DATABASE_URL="postgresql://user:password@localhost:5432/impulse?schema=public"
+4. **Initialize Database**
+   ```bash
+   npx prisma db push
+   ```
 
-    # Auth (Better Auth)
-    BETTER_AUTH_SECRET="your_generated_secret"
-    GITHUB_CLIENT_ID="your_github_id"
-    GITHUB_CLIENT_SECRET="your_github_secret"
-    GOOGLE_CLIENT_ID="your_google_id"
-    GOOGLE_CLIENT_SECRET="your_google_secret"
+5. **Run the Development Server**
+   ```bash
+   npm run dev
+   ```
 
-    # AI (Google Gemini)
-    GOOGLE_GENERATIVE_AI_API_KEY="your_gemini_api_key"
+---
 
-    # App
-    NEXT_PUBLIC_APP_URL="http://localhost:3000"
-    ```
+## 📖 Architecture & API
 
-4.  **Start Database**
-    ```bash
-    docker compose up -d
-    ```
+Impulse follows a modular architecture for scalability:
 
-5.  **Run Migrations**
-    ```bash
-    npx prisma migrate dev
-    ```
+- **/src/modules/request**: Handles the core REST client logic and editor state.
+- **/src/modules/realtime**: Manages WebSocket connections via a global Zustland store.
+- **/src/modules/collections**: Controls the organization and importing of API requests.
+- **/src/app/api/ai**: Internal endpoints for AI-assisted workflow optimizations.
 
-6.  **Start Development Server**
-    ```bash
-    npm run dev
-    ```
+---
 
-    Visit `http://localhost:3000` to see the app in action.
+## 🛡️ License
 
-## 📂 Project Structure
-
-The project follows a modular architecture in `src/modules`:
-
-```
-src/
-├── app/                 # Next.js App Router pages
-├── components/          # Shared UI components
-├── lib/                 # Core utilities (DB, Env, API clients)
-├── modules/             # Feature-based modules
-│   ├── ai/              # AI integration logic
-│   ├── authentication/  # Auth components and actions
-│   ├── collections/     # Collection management
-│   ├── invites/         # Workspace invitation system
-│   ├── realtime/        # WebSocket/Realtime logic
-│   ├── request/         # Request builder & execution
-│   └── workspace/       # Workspace & member management
-└── styles/              # Global styles
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1.  Fork the project
-2.  Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Built with ❤️ by Somil Gupta. This project is open for contribution and community feedback.

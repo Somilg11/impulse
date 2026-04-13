@@ -10,11 +10,11 @@ export default function TabBar() {
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
 
-  const requestColorMap: Record<string, string> = {
-    GET: "text-green-500",
-    POST: "text-blue-500",
-    PUT: "text-yellow-500",
-    DELETE: "text-red-500",
+  const methodColorMap: Record<string, string> = {
+    GET: "text-green-400 bg-green-400/10",
+    POST: "text-amber-400 bg-amber-400/10",
+    PUT: "text-blue-400 bg-blue-400/10",
+    DELETE: "text-red-400 bg-red-400/10",
   };
 
   const onDoubleClick = (tabId: string) => {
@@ -24,45 +24,45 @@ export default function TabBar() {
 
   return (
     <>
-      <div className="flex items-center border-b border-zinc-800 bg-zinc-900">
+      <div className="flex items-center border-b border-[#1e2330] bg-[#0e1117] h-9 overflow-x-auto no-scrollbar shrink-0">
         {tabs.map((tab) => (
           <div
             key={tab.id}
             onDoubleClick={() => onDoubleClick(tab.id)}
             onClick={() => setActiveTab(tab.id)}
-            className={`group px-4 py-2 flex items-center gap-2 cursor-pointer ${activeTabId === tab.id
-                ? "bg-zinc-800 text-white border-t-2 border-blue-500 rounded-sm mx-2 my-2"
-                : "text-zinc-400 hover:text-white"
+            className={`group h-full px-3 flex items-center gap-2 cursor-pointer transition-all relative shrink-0 border-r border-[#1e2330] ${activeTabId === tab.id
+                ? "bg-[#161b26] text-white"
+                : "text-zinc-500 hover:text-zinc-300 hover:bg-[#161b26]/50"
               }`}
           >
-            <span
-              className={`font-semibold ${requestColorMap[tab.method] || "text-gray-500"
-                }`}
-            >
+            {activeTabId === tab.id && (
+              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-blue-500" />
+            )}
+            
+            <span className={`text-[9px] font-bold px-1 py-0.5 rounded ${methodColorMap[tab.method] || "text-zinc-500 bg-zinc-500/10"}`}>
               {tab.method}
             </span>
 
-            <p className="max-w-xs truncate font-semibold flex items-center gap-1">
+            <p className="max-w-[100px] sm:max-w-[140px] truncate text-xs">
               {tab.title}
-              {tab.unsavedChanges && (
-                <span className="text-red-500 group-hover:hidden transition-all ease-in-out
-                ">•</span>
-              )}
             </p>
 
+            {tab.unsavedChanges && (
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
+            )}
+
             <X
-              className="hidden group-hover:inline w-4 h-4 ml-2 hover:text-red-500 transition-all ease-in-out"
+              className="w-3 h-3 text-zinc-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
                 closeTab(tab.id);
               }}
             />
           </div>
-
         ))}
         <button
           onClick={addTab}
-          className="px-3 py-2 text-zinc-400 hover:text-white"
+          className="h-full px-3 flex items-center justify-center text-zinc-500 hover:text-zinc-300 hover:bg-[#161b26]/50 transition-all text-sm"
         >
           +
         </button>

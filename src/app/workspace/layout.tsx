@@ -13,12 +13,13 @@ const RootLayout = async ( { children }: { children: React.ReactNode } ) => {
     <>
     {/* @ts-expect-error */}
     <Header user={user} />
-    <main className='max-h-[calc(100vh-4rem)] h-[calc(100vh-4rem)] flex flex-1 overflow-hidden'>
+    <main className='max-h-[calc(100vh-3rem)] md:max-h-[calc(100vh-3rem)] h-[calc(100vh-3rem)] flex overflow-hidden bg-[#0e1117]'>
         <div className='flex h-full w-full'>
-            <div className='w-12 border-zinc-800 bg-zinc-900'>
+            {/* Left icon rail - hidden on mobile */}
+            <div className='hidden md:flex w-11 border-r border-[#1e2330] bg-[#0e1117] shrink-0 flex-col'>
                 <TabbedLeftPanel />
             </div>
-            <div className='flex-1 bg-zinc-900'>
+            <div className='flex-1 bg-[#0e1117] min-w-0'>
                 {children}
             </div>
         </div>

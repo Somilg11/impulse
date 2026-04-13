@@ -1,9 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Hint } from "@/components/ui/hint";
 import { Loader, Plus, User } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import CreateWorkspace from "./create-workspace";
 import {
@@ -32,45 +31,43 @@ const WorkSpace = () => {
 
  
   if (isLoading) {
-    return <Loader className="animate-spin size-4 text-blue-400" />;
+    return <Loader className="animate-spin size-3.5 text-zinc-400" />;
   }
 
   if (!workspaces || workspaces.length === 0) {
-    return <div>No workspace found</div>;
+    return <div className="text-xs text-zinc-500">No workspace</div>;
   }
 
   return (
     <>
-      <Hint label="Change Workspace">
-        <Select
-          value={selectedWorkspace?.id}
-          onValueChange={(id) => {
-            const ws = workspaces.find((w) => w.id === id);
-            if (ws) setSelectedWorkspace(ws);
-          }}
-        >
-          <SelectTrigger className="border border-blue-400 bg-blue-400/10 hover:bg-blue-400/20 text-blue-400 hover:text-blue-300 flex flex-row items-center space-x-1">
-            <User className="size-4 text-blue-400" />
-            <span className="text-sm text-blue-400 font-semibold">
-              <SelectValue placeholder="Select workspace" />
-            </span>
-          </SelectTrigger>
-          <SelectContent>
-            {workspaces.map((ws) => (
-              <SelectItem key={ws.id} value={ws.id}>
-                {ws.name}
-              </SelectItem>
-            ))}
-            <Separator className="my-1" />
-            <div className="p-2 flex flex-row justify-between items-center">
-              <span className="text-sm font-semibold text-zinc-600">My Workspaces</span>
-              <Button size="icon" variant="outline" onClick={() => setIsModalOpen(true)}>
-                <Plus size={16} className="text-blue-400" />
-              </Button>
-            </div>
-          </SelectContent>
-        </Select>
-      </Hint>
+      <Select
+        value={selectedWorkspace?.id}
+        onValueChange={(id) => {
+          const ws = workspaces.find((w) => w.id === id);
+          if (ws) setSelectedWorkspace(ws);
+        }}
+      >
+        <SelectTrigger className="border border-[#1e2330] bg-[#161b26] hover:bg-[#1e2330] text-zinc-300 flex flex-row items-center gap-1.5 rounded-lg h-7 px-3 transition-all w-auto min-w-0">
+          <div className="bg-blue-600 text-white text-[9px] font-bold w-4 h-4 rounded flex items-center justify-center shrink-0">W</div>
+          <span className="text-xs font-medium truncate max-w-[120px]">
+            <SelectValue placeholder="Workspace" />
+          </span>
+        </SelectTrigger>
+        <SelectContent className="bg-[#161b26] border border-[#1e2330] text-zinc-300 rounded-lg shadow-2xl">
+          {workspaces.map((ws) => (
+            <SelectItem key={ws.id} value={ws.id} className="hover:bg-[#1e2330] cursor-pointer rounded text-xs">
+              {ws.name}
+            </SelectItem>
+          ))}
+          <Separator className="my-1.5 bg-[#1e2330]" />
+          <div className="p-1.5 px-2 flex flex-row justify-between items-center">
+            <span className="text-[10px] text-zinc-500">Workspaces</span>
+            <Button size="icon" variant="ghost" className="h-5 w-5 rounded hover:bg-[#1e2330]" onClick={() => setIsModalOpen(true)}>
+              <Plus size={12} className="text-zinc-400" />
+            </Button>
+          </div>
+        </SelectContent>
+      </Select>
 
       <CreateWorkspace isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
     </>

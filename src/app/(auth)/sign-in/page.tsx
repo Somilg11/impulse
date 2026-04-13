@@ -22,7 +22,7 @@ const LoginPage = () => {
           <div className='mt-6 grid grid-cols-1 gap-3'>
             <Button variant='outline' className='w-full' onClick={() => signIn.social({
               provider: 'github',
-              callbackURL: "/"
+              callbackURL: "/workspace"
             })}>
               <Github className='mr-2 h-4 w-4' />
               Sign in with GitHub
@@ -32,7 +32,7 @@ const LoginPage = () => {
           <div className='mt-6 grid grid-cols-1 gap-3'>
             <Button variant='outline' className='w-full' onClick={() => signIn.social({
               provider: 'google',
-              callbackURL: "/"
+              callbackURL: "/workspace"
             })}>
               <Chrome className='mr-2 h-4 w-4' />
               Sign in with Google

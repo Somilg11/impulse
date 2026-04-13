@@ -108,13 +108,13 @@ const ResponseViewer = ({ responseData }: Props) => {
   const rawBody = responseData.requestRun?.body;
 
   return (
-    <div className="w-full bg-zinc-950 text-white p-6">
+    <div className="w-full bg-[#0e1117] text-white p-3 md:p-4">
       <div className="w-full mx-auto">
         {/* Status Header */}
-        <Card className="bg-zinc-900 border-zinc-800 mb-6">
+        <Card className="bg-[#161b26] border-[#1e2330] mb-4">
           <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-3 md:gap-4">
                 <div className="flex items-center gap-2">
                   <span className="text-gray-400">Status:</span>
                   <Badge
@@ -138,7 +138,7 @@ const ResponseViewer = ({ responseData }: Props) => {
                   <span className="text-green-300">{formatBytes(size)}</span>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 <Button
                   size="sm"
                   variant="ghost"
@@ -168,7 +168,7 @@ const ResponseViewer = ({ responseData }: Props) => {
         </Card>
 
         {/* Response Tabs */}
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="bg-[#161b26] border-[#1e2330]">
           <CardHeader className="pb-3">
             <CardTitle className="text-gray-200">Response Body</CardTitle>
           </CardHeader>
@@ -178,7 +178,7 @@ const ResponseViewer = ({ responseData }: Props) => {
               onValueChange={setActiveTab}
               className="w-full"
             >
-              <div className="px-6 border-b border-zinc-800">
+              <div className="px-3 md:px-4 border-b border-[#1e2330]">
                 <TabsList className="bg-transparent p-0 h-auto">
                   <TabsTrigger
                     value="json"

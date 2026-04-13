@@ -1,7 +1,11 @@
 import { Archive, Upload } from 'lucide-react'
 import React from 'react'
 
-const EmptyCollections = () => {
+interface EmptyCollectionsProps {
+    onImport?: () => void;
+}
+
+const EmptyCollections = ({ onImport }: EmptyCollectionsProps) => {
     return (
         <div className="flex-1 flex flex-col items-center justify-center p-8">
             <>
@@ -15,7 +19,10 @@ const EmptyCollections = () => {
                     Import or create a collection
                 </p>
                 <div className="space-y-3 w-full max-w-xs">
-                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center space-x-2">
+                    <button 
+                        onClick={onImport}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center space-x-2"
+                    >
                         <Upload className="w-4 h-4" />
                         <span>Import</span>
                     </button>

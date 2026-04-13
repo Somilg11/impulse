@@ -136,13 +136,20 @@ const RealtimeMessageEditor = () => {
   
 
   return (
-    <div className="flex flex-col space-y-4 bg-zinc-800 rounded-lg p-4">
+    <div className="flex flex-col space-y-4 bg-[#161b26] border border-[#1e2330] rounded-xl p-5 shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-white">Message Editor</h3>
+      <div className="flex items-center justify-between border-b border-[#1e2330] pb-3 mb-1">
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 bg-blue-500/10 rounded-md">
+            <Send size={16} className="text-blue-400" />
+          </div>
+          <h3 className="text-sm font-bold text-zinc-100 tracking-tight">Message Editor</h3>
+        </div>
         <div className="flex items-center gap-2">
-          <span className={`text-xs px-2 py-1 rounded ${
-            status === 'connected' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+          <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${
+            status === 'connected' 
+              ? 'bg-green-500/5 border-green-500/20 text-green-500' 
+              : 'bg-zinc-500/5 border-zinc-500/20 text-zinc-500'
           }`}>
             {status === 'connected' ? 'Connected' : 'Disconnected'}
           </span>
@@ -151,18 +158,19 @@ const RealtimeMessageEditor = () => {
 
     
       {/* Editor */}
-      <div className="relative">
-        <div className="border border-zinc-700 rounded-lg overflow-hidden">
+      <div className="relative group">
+        <div className="border border-[#1e2330] rounded-lg overflow-hidden bg-[#0e1117]">
           {/* Monaco Editor */}
           <Editor
-            height="150px"
+            height="180px"
             language="json"
             theme="vs-dark"
             value={draftMessage}
             onChange={(value) => setDraftMessage(value || '')}
             onMount={handleEditorDidMount}
             options={{
-              fontSize: 14,
+              fontSize: 13,
+              fontFamily: 'JetBrains Mono, Menlo, Monaco, Courier New, monospace',
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
               wordWrap: 'on',
@@ -173,64 +181,74 @@ const RealtimeMessageEditor = () => {
               insertSpaces: true,
               folding: true,
               lineNumbers: 'on',
-              renderWhitespace: 'boundary',
+              renderWhitespace: 'none',
               cursorStyle: 'line',
               contextmenu: true,
-              mouseWheelZoom: false
+              mouseWheelZoom: false,
+              lineDecorationsWidth: 0,
+              lineNumbersMinChars: 3,
+              padding: { top: 12, bottom: 12 }
             }}
             loading={
-              <div className="w-full h-64 bg-zinc-900 flex items-center justify-center">
-                <div className="text-zinc-400 text-sm">Loading Monaco Editor...</div>
+              <div className="w-full h-40 bg-[#0e1117] flex items-center justify-center">
+                <div className="text-zinc-600 text-xs animate-pulse">Initializing Editor...</div>
               </div>
             }
           />
         </div>
         
         {/* Editor Actions */}
-        <div className="absolute top-2 right-2 flex gap-1 opacity-70 hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 flex gap-1 opaque md:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <Button
             size="sm"
-            variant="ghost"
+            variant="secondary"
             onClick={handleFormatJSON}
-            className="h-6 w-6 p-0 text-zinc-400 hover:text-white hover:bg-zinc-700"
+            className="h-7 w-7 p-0 bg-[#1e2330] border border-[#1e2330] text-zinc-400 hover:text-white hover:bg-[#2a303c]"
+            title="Format JSON"
           >
-            <RefreshCw size={12} />
+            <RefreshCw size={13} />
           </Button>
           <Button
             size="sm"
-            variant="ghost"
+            variant="secondary"
             onClick={handleCopyMessage}
-            className="h-6 w-6 p-0 text-zinc-400 hover:text-white hover:bg-zinc-700"
+            className="h-7 w-7 p-0 bg-[#1e2330] border border-[#1e2330] text-zinc-400 hover:text-white hover:bg-[#2a303c]"
+            title="Copy Message"
           >
-            <Copy size={12} />
+            <Copy size={13} />
           </Button>
           <Button
             size="sm"
-            variant="ghost"
+            variant="secondary"
             onClick={handleClearMessage}
-            className="h-6 w-6 p-0 text-zinc-400 hover:text-white hover:bg-zinc-700"
+            className="h-7 w-7 p-0 bg-[#1e2330] border border-[#1e2330] text-zinc-400 hover:text-red-400 hover:bg-[#2a303c]"
+            title="Clear Editor"
           >
-            <Trash2 size={12} />
+            <Trash2 size={13} />
           </Button>
         </div>
       </div>
 
       {/* Send Button and Info */}
-      <div className="flex items-center justify-between">
-        <div className="text-xs text-zinc-400">
-          Press Ctrl+Enter to send • JSON auto-validation enabled
+      <div className="flex items-center justify-between pt-1">
+        <div className="text-[11px] text-zinc-500 font-medium">
+          <span className="text-zinc-400 mr-2">⌘ + Enter</span> to send fast
         </div>
         <Button
           onClick={handleSendMessage}
           disabled={status !== 'connected' || isSending}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-medium"
+          className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-9 px-6 shadow-lg shadow-blue-500/10 transition-all active:scale-95"
         >
-          <Send size={16} className="mr-2" />
-          {isSending ? 'Sending...' : 'Send Message'}
+          {isSending ? (
+            <RefreshCw size={14} className="mr-2 animate-spin" />
+          ) : (
+            <Send size={14} className="mr-2" />
+          )}
+          {isSending ? 'Sending...' : 'Send'}
         </Button>
       </div>
 
-            <RealtimeClientServerLogsTable />
+      <RealtimeClientServerLogsTable />
     </div>
   )
 }

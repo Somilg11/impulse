@@ -2,11 +2,12 @@
 import { useState } from 'react'
 import { useCollections } from '../hooks/collections'
 import { MEMBER_ROLE } from '@prisma/client';
-import { Archive, Clock, Code, ExternalLink, HelpCircle, Loader, Plus, Search, Share2 } from 'lucide-react';
+import { Archive, Clock, Code, ExternalLink, HelpCircle, Loader, Plus, Search, Share2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CreateCollection from './create-collection';
 import EmptyCollections from './empty-collections';
 import CollectionFolder from './collection-folder';
+import ImportModal from './import-modal';
 
 type Member = {
     id: string;
@@ -33,110 +34,75 @@ interface Props {
 }
 
 const TabbedSidebar = ({ currentWorkspace }: Props) => {
-    const [activeTab, setActiveTab] = useState('Collections');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const { data: collections, isLoading, isError } = useCollections(currentWorkspace?.id);
 
-
-
     if (isLoading) return (
-        <div className="flex-1 flex items-center justify-center">
-            <Loader className="w-6 h-6 text-blue-400 animate-spin" />
+        <div className="flex-1 flex items-center justify-center bg-[#0e1117]">
+            <Loader className="w-5 h-5 text-zinc-500 animate-spin" />
         </div>
     );
 
-    const sidebarItems = [
-        { icon: Archive, label: 'Collections' },
-        { icon: Clock, label: 'History' },
-        { icon: Share2, label: 'Share' },
-        { icon: Code, label: 'Code' }
-    ];
-
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case 'Collections':
-                return (
-                    <div className="h-full bg-zinc-950 text-zinc-100 flex flex-col">
-
-                        <div className="flex items-center justify-between p-4 border-b border-zinc-800">
-                            <div className="flex items-center space-x-2">
-                                <span className="text-sm text-zinc-400">{currentWorkspace?.name}</span>
-                                <span className="text-zinc-600">›</span>
-                                <span className="text-sm font-medium">Collections</span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <HelpCircle className="w-4 h-4 text-zinc-400 hover:text-zinc-300 cursor-pointer" />
-                                <ExternalLink className="w-4 h-4 text-zinc-400 hover:text-zinc-300 cursor-pointer" />
-                            </div>
-                        </div>
-
-
-
-                        <div className="p-4 border-b border-zinc-800">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Search"
-                                    className="w-full bg-zinc-900 border border-zinc-700 rounded-lg pl-10 pr-4 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                            </div>
-                        </div>
-
-
-                        <div className="p-4 border-b border-zinc-800">
-                            <Button variant="ghost" onClick={() => setIsModalOpen(true)}>
-                                <Plus className="w-4 h-4" />
-                                <span className="text-sm font-medium">New</span>
-                            </Button>
-                        </div>
-
-                        {
-                            collections && collections.length > 0 ? (
-                                collections.map((collection) => (
-                                    <div className='flex flex-col justify-start items-start p-3 border-b border-zinc-800 w-full' key={collection.id}>
-                                        <CollectionFolder collection={collection} />
-                                    </div>
-                                ))
-                            ) : (
-                                <EmptyCollections />
-                            )
-                        }
-                    </div>
-                );
-
-            default:
-                return <div className="p-4 text-zinc-400">Select a tab to view content</div>;
-        }
-    };
     return (
-        <div className="flex h-screen bg-zinc-900">
-            {/* Sidebar */}
-            <div className="w-12 bg-zinc-900 border-r border-zinc-800 flex flex-col items-center py-4 space-y-4">
-                {sidebarItems.map((item, index) => (
-                    <div
-                        key={index}
-                        onClick={() => setActiveTab(item.label)}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer transition-colors ${activeTab === item.label
-                                ? 'bg-blue-600 text-white'
-                                : 'text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800'
-                            }`}
-                    >
-                        <item.icon className="w-4 h-4" />
-                    </div>
-                ))}
+        <div className="flex flex-col h-full bg-[#0e1117] border-r border-[#1e2330] overflow-hidden">
+            {/* Top actions: + New and Import */}
+            <div className="flex items-center gap-2 px-3 py-2.5 border-b border-[#1e2330]">
+                <button 
+                    onClick={() => setIsModalOpen(true)}
+                    className="flex items-center gap-1 text-xs text-zinc-300 hover:text-white transition-colors font-medium"
+                >
+                    <Plus className="w-3.5 h-3.5" />
+                    New
+                </button>
+                <button 
+                    onClick={() => setIsImportModalOpen(true)}
+                    className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-300 transition-colors font-medium"
+                >
+                    <Upload className="w-3 h-3" />
+                    Import
+                </button>
             </div>
 
-            <div className="flex-1 bg-zinc-900 overflow-y-auto">{renderTabContent()}</div>
+            {/* Search */}
+            <div className="px-3 py-2 border-b border-[#1e2330]">
+                <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search..."
+                        className="w-full bg-[#161b26] border border-[#1e2330] rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-[#2a3040] transition-colors"
+                    />
+                </div>
+            </div>
 
+            {/* Collections list */}
+            <div className="flex-1 overflow-y-auto px-1 py-1">
+                {collections && collections.length > 0 ? (
+                    collections
+                        .filter(c => !searchQuery || c.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                        .map((collection) => (
+                            <CollectionFolder key={collection.id} collection={collection} />
+                        ))
+                ) : (
+                    <EmptyCollections onImport={() => setIsImportModalOpen(true)} />
+                )}
+            </div>
 
             <CreateCollection
                 workspaceId={currentWorkspace?.id}
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
             />
-
+            <ImportModal
+                workspaceId={currentWorkspace?.id}
+                isModalOpen={isImportModalOpen}
+                setIsModalOpen={setIsImportModalOpen}
+            />
         </div>
     );
 }
