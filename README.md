@@ -1,6 +1,6 @@
 # Impulse — The Agentic API Collaboration Platform
 
-![Impulse Banner](https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2670&auto=format&fit=crop)
+![Impulse Banner](/public/preview.png)
 
 Impulse is a high-performance, collaborative API development platform designed for modern teams. Built with a focus on speed, aesthetics, and agentic workflows, it provides a unified environment for REST testing, Realtime/WebSocket debugging, and team-wide documentation.
 
