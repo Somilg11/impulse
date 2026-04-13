@@ -68,50 +68,75 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
   return (
     <Tabs
       defaultValue="parameters"
-      className="bg-zinc-900 rounded-md w-full px-4 py-4"
+      className="w-full border border-[#1e2330] rounded-lg overflow-hidden bg-[#0e1117]"
     >
-      <TabsList className="bg-zinc-800 rounded-t-md">
-        <TabsTrigger value="parameters" className="flex-1">
-          Parameters
-        </TabsTrigger>
-        <TabsTrigger value="headers" className="flex-1">
-          Headers
-        </TabsTrigger>
-        <TabsTrigger value="body" className="flex-1">
-          Body
-        </TabsTrigger>
-      </TabsList>
+      {/* Underline-style tabs matching the reference */}
+      <div className="border-b border-[#1e2330] px-1">
+        <TabsList className="bg-transparent h-9 p-0 gap-0">
+          <TabsTrigger 
+              value="parameters" 
+              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
+          >
+            Params
+          </TabsTrigger>
+          <TabsTrigger 
+              value="body" 
+              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
+          >
+            Body
+          </TabsTrigger>
+          <TabsTrigger 
+              value="headers" 
+              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
+          >
+            Headers
+          </TabsTrigger>
+          <TabsTrigger 
+              value="auth" 
+              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
+          >
+            Authorization
+          </TabsTrigger>
+        </TabsList>
+      </div>
       
-      <TabsContent value="parameters" >
-        <KeyValueFormEditor
-          initialData={getParametersData()}
-          onSubmit={handleParametersChange}
-          placeholder={{
-            key: "Parameter Name",
-            value: "Parameter Value",
-            description: "URL Parameter",
-          }}
-        />
-      </TabsContent>
-      
-      <TabsContent value="headers">
-        <KeyValueFormEditor
-          initialData={getHeadersData()}
-          onSubmit={handleHeadersChange}
-          placeholder={{
-            key: "Header Name",
-            value: "Header Value",
-            description: "HTTP Header",
-          }}
-        />
-      </TabsContent>
-      
-      <TabsContent value="body">
-        <BodyEditor 
-          initialData={getBodyData()}
-          onSubmit={handleBodyChange} 
-        />
-      </TabsContent>
+      {/* Tab content */}
+      <div className="min-h-[250px] md:min-h-[350px]">
+        <TabsContent value="parameters" className="mt-0 p-3 focus-visible:outline-none">
+            <KeyValueFormEditor
+            initialData={getParametersData()}
+            onSubmit={handleParametersChange}
+            placeholder={{
+                key: "Parameter Name",
+                value: "Parameter Value",
+                description: "URL Parameter",
+            }}
+            />
+        </TabsContent>
+        
+        <TabsContent value="body" className="mt-0 focus-visible:outline-none">
+            <BodyEditor 
+            initialData={getBodyData()}
+            onSubmit={handleBodyChange} 
+            />
+        </TabsContent>
+
+        <TabsContent value="headers" className="mt-0 p-3 focus-visible:outline-none">
+            <KeyValueFormEditor
+            initialData={getHeadersData()}
+            onSubmit={handleHeadersChange}
+            placeholder={{
+                key: "Header Name",
+                value: "Header Value",
+                description: "HTTP Header",
+            }}
+            />
+        </TabsContent>
+        
+        <TabsContent value="auth" className="mt-0 p-4 focus-visible:outline-none">
+            <div className="text-xs text-zinc-500 italic">Authorization settings coming soon</div>
+        </TabsContent>
+      </div>
     </Tabs>
   );
 };

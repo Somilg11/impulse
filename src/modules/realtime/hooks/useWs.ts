@@ -118,6 +118,15 @@ export const useWsStore = create<WsStore>()(
         reconnectAttempts: 0
       })
 
+      // Protocol validation
+      if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
+        const errorMsg = 'Invalid protocol. URL must start with ws:// or wss://'
+        console.error(errorMsg)
+        set({ status: 'error', error: errorMsg })
+        options.onError?.(new Error(errorMsg))
+        return
+      }
+
       try {
         const ws = new WebSocket(url)
 
@@ -161,10 +170,11 @@ export const useWsStore = create<WsStore>()(
         }
 
         ws.onerror = (event) => {
-          console.error('WebSocket error:', event)
+          // Note: event objects for WebSocket errors are standardly empty {} in browsers for security
+          console.error('WebSocket connection error. Check if the server is running and reachable at:', url)
           set({ 
             status: 'error', 
-            error: 'Connection error occurred' 
+            error: 'Connection failed. Check console for details.' 
           })
           options.onError?.(event)
         }

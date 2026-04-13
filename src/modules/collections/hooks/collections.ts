@@ -27,7 +27,7 @@ export function useDeleteCollection(collectionId: string) {
             queryClient.invalidateQueries({ queryKey: ['collections'] });
         },
     });
-} 
+}
 
 export function useEditCollection(collectionId: string, name: string) {
     const queryClient = useQueryClient();

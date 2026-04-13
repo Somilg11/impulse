@@ -22,6 +22,7 @@ interface ModalProps {
   submitVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
   size?: string
   className?: string
+  disabled?: boolean
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -36,7 +37,8 @@ const Modal: React.FC<ModalProps> = ({
   showFooter = true,
   submitVariant = "default",
   size,
-  className = ''
+  className = '',
+  disabled = false
 }) => {
   const handleSubmit = () => {
     if (onSubmit) {
@@ -72,6 +74,7 @@ const Modal: React.FC<ModalProps> = ({
               <Button
                 className='bg-blue-400 hover:bg-blue-500 text-white'
                 onClick={handleSubmit}
+                disabled={disabled}
               >
                 {submitText}
               </Button>

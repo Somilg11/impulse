@@ -6,14 +6,14 @@ import { MEMBER_ROLE } from "@prisma/client";
 
 export const initializeWorkspace = async () => {
     const user = await currentUser();
-    if(!user){
+    if (!user) {
         return {
             success: false,
             error: "User not authenticated"
         }
     }
     try {
-        const workspace =  await db.workspace.upsert({
+        const workspace = await db.workspace.upsert({
             where: {
                 name_ownerId: {
                     ownerId: user.id,
@@ -51,7 +51,7 @@ export const initializeWorkspace = async () => {
 
 export async function getWorkspaces() {
     const user = await currentUser();
-    if(!user) throw new Error("User not authenticated");
+    if (!user) throw new Error("User not authenticated");
 
     const workspaces = await db.workspace.findMany({
         where: {
@@ -67,7 +67,7 @@ export async function getWorkspaces() {
 
 export async function createWorkspace(name: string) {
     const user = await currentUser();
-    if(!user) throw new Error("User not authenticated");
+    if (!user) throw new Error("User not authenticated");
 
     const workspace = await db.workspace.create({
         data: {

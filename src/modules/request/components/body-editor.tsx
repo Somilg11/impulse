@@ -164,9 +164,9 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
   return (
     <div className={cn("w-full", className)}>
       <Form {...form}>
-        <div className="border border-zinc-700 rounded-lg overflow-hidden bg-zinc-900">
+        <div className="border border-[#1e2330] rounded-lg overflow-hidden bg-[#0e1117]">
           {/* Header */}
-          <div className="bg-zinc-900 border-b border-zinc-900 px-4 py-3 flex items-center justify-between">
+          <div className="bg-[#0e1117] border-b border-[#1e2330] px-3 py-2.5 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <h3 className="text-sm font-medium text-zinc-200">Raw Request Body</h3>
               <div className="flex items-center gap-2 text-xs text-zinc-400">
@@ -181,16 +181,16 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="w-[180px] h-7 bg-zinc-700 border-zinc-600 text-xs">
+                          <SelectTrigger className="w-[180px] h-7 bg-[#1e2330] border-[#2a3040] text-xs">
                             <SelectValue />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-zinc-800 border-zinc-600">
+                        <SelectContent className="bg-[#161b26] border-[#1e2330]">
                           {contentTypeOptions.map((option) => (
                             <SelectItem
                               key={option.value}
                               value={option.value}
-                              className="text-xs hover:bg-zinc-700 focus:bg-zinc-700"
+                              className="text-xs hover:bg-[#1e2330] focus:bg-[#1e2330]"
                             >
                               <div className="flex items-center gap-2">
                                 <option.icon className="h-3 w-3" />
@@ -214,7 +214,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                   size="sm"
                   onClick={handleGenerateClick}
                   disabled={isPending}
-                  className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700"
+                  className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-[#1e2330]"
                   title="Generate JSON Body"
                 >
                   <Sparkles className={cn('h-3 w-3', isPending ? 'animate-spin text-zinc-400' : 'text-green-400')} />
@@ -226,7 +226,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={handleFormat}
-                  className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700"
+                  className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-[#1e2330]"
                   title="Format JSON"
                 >
                   <AlignLeft className="h-3 w-3" />
@@ -236,7 +236,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleCopy}
-                className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700"
+                className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-[#1e2330]"
                 title="Copy content"
               >
                 {copied ? <Check className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3" />}
@@ -246,7 +246,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleReset}
-                className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700"
+                className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-[#1e2330]"
                 title="Clear content"
               >
                 <RotateCcw className="h-3 w-3" />
@@ -290,7 +290,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="bg-zinc-900 border-t border-zinc-700 px-4 py-3 flex items-center justify-between">
+          <div className="bg-[#0e1117] border-t border-[#1e2330] px-3 py-2.5 flex items-center justify-between">
             <div className="text-xs text-zinc-400">
               Lines: {bodyValue?.split('\n').length || 0} | 
               Characters: {bodyValue?.length || 0}

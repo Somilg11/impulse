@@ -1,7 +1,6 @@
 import {
     EllipsisVertical,
     FilePlus,
-    Folder,
     Trash,
     Edit,
     ChevronDown,
@@ -47,14 +46,14 @@ const CollectionFolder = ({ collection }: Props) => {
     isError,
   } = useGetAllRequestFromCollection(collection.id);
 
-  const { openRequestTab } = useRequestPlaygroundStore();
+  const { openRequestTab, activeTabId } = useRequestPlaygroundStore();
 
-  const requestColorMap: Record<REST_METHOD, string> = {
-    [REST_METHOD.GET]: "text-green-500",
-    [REST_METHOD.POST]: "text-blue-500",
-    [REST_METHOD.PUT]: "text-yellow-500",
-    [REST_METHOD.DELETE]: "text-red-500",
-    [REST_METHOD.PATCH]: "text-orange-500",
+  const methodColorMap: Record<REST_METHOD, string> = {
+    [REST_METHOD.GET]: "text-green-400 bg-green-400/10",
+    [REST_METHOD.POST]: "text-amber-400 bg-amber-400/10",
+    [REST_METHOD.PUT]: "text-blue-400 bg-blue-400/10",
+    [REST_METHOD.DELETE]: "text-red-400 bg-red-400/10",
+    [REST_METHOD.PATCH]: "text-orange-400 bg-orange-400/10",
   };
 
   const hasRequests = requestData && requestData.length > 0;
@@ -66,167 +65,85 @@ const CollectionFolder = ({ collection }: Props) => {
                 onOpenChange={setIsCollapsed}
                 className="w-full"
             >
-                <div className="flex flex-col w-full">
-                    {/* Collection Header */}
-                    <div className="flex flex-row justify-between items-center p-2 flex-1 w-full hover:bg-zinc-900 rounded-md">
-                        <CollapsibleTrigger className="flex flex-row justify-start items-center space-x-2 flex-1">
-                            <div className="flex items-center space-x-1">
-                                {hasRequests ? (
-                                    isCollapsed ? (
-                                        <ChevronDown className="w-4 h-4 text-zinc-400" />
-                                    ) : (
-                                        <ChevronRight className="w-4 h-4 text-zinc-400" />
-                                    )
-                                ) : (
-                                    <div className="w-4 h-4" /> // Spacer when no requests
-                                )}
-                                <Folder className="w-5 h-5 text-zinc-400" />
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <span className="text-sm font-medium text-zinc-200 capitalize">
-                                    {collection.name}
-                                </span>
-                                {hasRequests && (
-                                    <div className="flex items-center space-x-1">
-                                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
-                                        <span className="text-xs text-zinc-400">
-                                            ({requestData.length})
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                        </CollapsibleTrigger>
-
-                        <div className="flex flex-row justify-center items-center space-x-2">
-                            <FilePlus
-                                className="w-4 h-4 text-zinc-400 hover:text-blue-400 cursor-pointer"
-                                onClick={() => setIsAddRequestOpen(true)}
-                            />
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button className="p-1 hover:bg-zinc-800 rounded">
-                                        <EllipsisVertical className="w-4 h-4 text-zinc-400 hover:text-blue-400" />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-48">
-                                    <DropdownMenuItem onClick={() => setIsAddRequestOpen(true)}>
-                                        <div className="flex flex-row justify-between items-center w-full">
-                                            <div className="font-semibold flex justify-center items-center">
-                                                <FilePlus className="text-green-400 mr-2 w-4 h-4" />
-                                                Add Request
-                                            </div>
-                                            <span className="text-xs text-zinc-400 bg-zinc-700 px-1 rounded">
-                                                ⌘R
-                                            </span>
-                                        </div>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-                                        <div className="flex flex-row justify-between items-center w-full">
-                                            <div className="font-semibold flex justify-center items-center">
-                                                <Edit className="text-blue-400 mr-2 w-4 h-4" />
-                                                Edit
-                                            </div>
-                                            <span className="text-xs text-zinc-400 bg-zinc-700 px-1 rounded">
-                                                ⌘E
-                                            </span>
-                                        </div>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setIsDeleteOpen(true)}>
-                                        <div className="flex flex-row justify-between items-center w-full">
-                                            <div className="font-semibold flex justify-center items-center">
-                                                <Trash className="text-red-400 mr-2 w-4 h-4" />
-                                                Delete
-                                            </div>
-                                            <span className="text-xs text-zinc-400 bg-zinc-700 px-1 rounded">
-                                                ⌘D
-                                            </span>
-                                        </div>
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    </div>
-
-                    {/* Collapsible Content - Requests List */}
-                    <CollapsibleContent className="w-full">
-            {isPending ? (
-              <div className="pl-8 py-2">
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-zinc-600 border-t-blue-400 rounded-full animate-spin"></div>
-                  <span className="text-xs text-zinc-500">
-                    Loading requests...
-                  </span>
-                </div>
-              </div>
-            ) : isError ? (
-              <div className="pl-8 py-2">
-                <span className="text-xs text-red-400">
-                  Failed to load requests
-                </span>
-              </div>
-            ) : hasRequests ? (
-              <div className="ml-6 border-l border-zinc-800 pl-4 space-y-1">
-                {requestData.map((request: any) => (
-                  <div
-                    key={request.id}
-                    onClick={() => openRequestTab(request)}
-                    className="flex items-center justify-between py-2 px-3 hover:bg-zinc-900/50 rounded-md cursor-pointer group transition-colors"
-                  >
-                    <div className="flex items-center space-x-3 flex-1">
-                      <div className="flex items-center space-x-2">
-                        <span
-                          className={`text-xs font-bold px-2 py-1 rounded ${
-                            requestColorMap[request.method as keyof typeof requestColorMap] ?? ''
-                          } bg-zinc-800`}
-                        >
-                          {request.method}
-                        </span>
-                        <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shadow-sm shadow-green-400/50"></div>
-                      </div>
-                      <div className="flex flex-col flex-1 min-w-0">
-                        <span className="text-sm text-zinc-200 truncate font-medium">
-                          {request.name || request.url}
-                        </span>
-                        {request.url && request.name && (
-                          <span className="text-xs text-zinc-500 truncate">
-                            {request.url}
-                          </span>
+                {/* Collection header */}
+                <div className="flex items-center group">
+                    <CollapsibleTrigger className="flex items-center gap-1.5 flex-1 px-3 py-1.5 hover:bg-[#1e2330]/50 rounded transition-colors cursor-pointer text-left">
+                        {hasRequests ? (
+                            isCollapsed ? (
+                                <ChevronDown className="w-3 h-3 text-zinc-500 shrink-0" />
+                            ) : (
+                                <ChevronRight className="w-3 h-3 text-zinc-500 shrink-0" />
+                            )
+                        ) : (
+                            <div className="w-3 h-3 shrink-0" />
                         )}
-                      </div>
-                    </div>
+                        <span className="text-xs text-zinc-300 font-medium truncate">
+                            {collection.name}
+                        </span>
+                    </CollapsibleTrigger>
 
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1 hover:bg-zinc-800 rounded">
-                            <EllipsisVertical className="w-3 h-3 text-zinc-400" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-32">
-                          <DropdownMenuItem>
-                            <Edit className="text-blue-400 mr-2 w-3 h-3" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Trash className="text-red-400 mr-2 w-3 h-3" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity pr-1">
+                        <button 
+                            onClick={() => setIsAddRequestOpen(true)}
+                            className="p-1 hover:bg-[#1e2330] rounded text-zinc-500 hover:text-zinc-300 transition-colors"
+                        >
+                            <FilePlus className="w-3 h-3" />
+                        </button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="p-1 hover:bg-[#1e2330] rounded text-zinc-500 hover:text-zinc-300 transition-colors">
+                                    <EllipsisVertical className="w-3 h-3" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="bg-[#161b26] border border-[#1e2330] text-zinc-300 rounded-lg shadow-xl w-36">
+                                <DropdownMenuItem onClick={() => setIsAddRequestOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
+                                    <FilePlus className="w-3 h-3 text-green-400" />
+                                    Add Request
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
+                                    <Edit className="w-3 h-3 text-blue-400" />
+                                    Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
+                                    <Trash className="w-3 h-3 text-red-400" />
+                                    Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="pl-8 py-2">
-                <span className="text-xs text-zinc-500 italic">
-                  No requests yet
-                </span>
-              </div>
-            )}
-          </CollapsibleContent>
                 </div>
+
+                {/* Requests list */}
+                <CollapsibleContent>
+                    {isPending ? (
+                        <div className="pl-7 py-2">
+                            <div className="w-3 h-3 border-2 border-[#1e2330] border-t-blue-400 rounded-full animate-spin" />
+                        </div>
+                    ) : isError ? (
+                        <div className="pl-7 py-1.5 text-[10px] text-red-400/60">Error</div>
+                    ) : hasRequests ? (
+                        <div className="ml-3 space-y-0.5">
+                            {requestData.map((request: any) => (
+                                <button
+                                    key={request.id}
+                                    onClick={() => openRequestTab(request)}
+                                    className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#1e2330]/50 rounded transition-colors text-left group/req"
+                                >
+                                    <span className={`text-[9px] font-bold px-1 py-0.5 rounded shrink-0 ${
+                                        methodColorMap[request.method as keyof typeof methodColorMap] ?? 'text-zinc-500 bg-zinc-500/10'
+                                    }`}>
+                                        {request.method}
+                                    </span>
+                                    <span className="text-xs text-zinc-300 truncate">
+                                        {request.name || "Untitled"}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="pl-7 py-1.5 text-[10px] text-zinc-600 italic">No requests</div>
+                    )}
+                </CollapsibleContent>
             </Collapsible>
 
             <SaveRequestToCollectionModal
@@ -235,7 +152,6 @@ const CollectionFolder = ({ collection }: Props) => {
                 collectionId={collection.id}
             />
 
-            {/* Modals */}
             <EditCollectionModal
                 isModalOpen={isEditOpen}
                 setIsModalOpen={setIsEditOpen}
@@ -248,7 +164,6 @@ const CollectionFolder = ({ collection }: Props) => {
                 setIsModalOpen={setIsDeleteOpen}
                 collectionId={collection.id}
             />
-
         </>
     )
 }

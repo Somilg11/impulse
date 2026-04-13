@@ -168,7 +168,7 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={addNewRow}
-                className="h-8 w-8 p-0 hover:bg-zinc-700"
+                className="h-8 w-8 p-0 hover:bg-[#1e2330]"
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -181,14 +181,14 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
               <div
                 key={field.id}
                 className={cn(
-                  "grid grid-cols-12 gap-3 p-3 rounded-lg border transition-all",
+                  "grid grid-cols-12 gap-2 md:gap-3 p-2 md:p-3 rounded-lg border transition-all",
                   form.watch(`items.${index}.enabled`)
-                    ? "bg-zinc-900 border-zinc-700"
-                    : "bg-zinc-800/50 border-zinc-800 opacity-60"
+                    ? "bg-[#161b26] border-[#1e2330]"
+                    : "bg-[#161b26]/50 border-[#1e2330]/50 opacity-60"
                 )}
               >
                 {/* Key Input */}
-                <div className="col-span-4">
+                <div className="col-span-5 md:col-span-4">
                   <FormField
                     control={form.control}
                     name={`items.${index}.key`}
@@ -209,7 +209,7 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
                 </div>
 
                 {/* Value Input */}
-                <div className="col-span-4">
+                <div className="col-span-5 md:col-span-4">
                   <FormField
                     control={form.control}
                     name={`items.${index}.value`}
