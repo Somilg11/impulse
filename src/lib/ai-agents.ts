@@ -1,4 +1,4 @@
-import { generateObject, generateText } from 'ai';
+import { generateObject } from 'ai';
 import { google } from '@ai-sdk/google';
 import { z } from 'zod';
 
@@ -26,7 +26,7 @@ function isQuotaLikeError(error: unknown): boolean {
 }
 
 
-const model = google('gemini-2.0-flash');
+const model = google('gemini-3.6-flash');
 
 export interface RequestSuggestionParams {
     workspaceName: string;
