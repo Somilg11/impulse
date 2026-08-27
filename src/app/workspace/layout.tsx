@@ -4,11 +4,18 @@ import Header from '@/modules/layout/components/header'
 import { initializeWorkspace } from '@/modules/workspace/actions'
 import TabbedLeftPanel from '@/modules/workspace/components/tabbed-left-panel'
 import React from 'react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: 'Workspace',
+    description: 'Build, send, and share API requests.',
+    // Authenticated surface - never index it.
+    robots: { index: false, follow: false },
+}
 
 const RootLayout = async ( { children }: { children: React.ReactNode } ) => {
     const workspace = await initializeWorkspace();
     const user = await currentUser();
-    console.log("Workspace initialized in layout:", workspace);
   return (
     <>
     {/* @ts-expect-error */}
