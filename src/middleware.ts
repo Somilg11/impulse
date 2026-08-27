@@ -1,29 +1,27 @@
 import { NextResponse } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 import type { NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
-    const response = await fetch(new URL("/api/auth/get-session", request.url), {
-        headers: {
-            cookie: request.headers.get("cookie") || "",
-        },
-    });
+/**
+ * Optimistic routing only: this checks for the presence of the session cookie
+ * instead of making an HTTP round trip to /api/auth/get-session on every
+ * navigation. Real authentication and authorization happen in the server
+ * actions and route handlers (see src/lib/authz.ts).
+ */
+export function middleware(request: NextRequest) {
+    const hasSession = Boolean(getSessionCookie(request));
 
-    let session = null;
-    if (response.ok) {
-        session = await response.json().catch(() => null);
-    }
-    
     const isAuthPage = request.nextUrl.pathname.startsWith("/sign-in");
     const isWorkspacePage = request.nextUrl.pathname.startsWith("/workspace");
 
-    if (isAuthPage && session?.user) {
+    if (isAuthPage && hasSession) {
         return NextResponse.redirect(new URL("/workspace", request.url));
     }
 
-    if (isWorkspacePage && (!session || !session.user)) {
+    if (isWorkspacePage && !hasSession) {
         return NextResponse.redirect(new URL("/", request.url));
     }
-    
+
     return NextResponse.next();
 }
 

@@ -1,20 +1,22 @@
 "use server"
 
 import db from "@/lib/db"
-import { currentUser } from "@/modules/authentication/actions"
+import { assertWorkspaceMember, requireUser } from "@/lib/authz"
 import { MEMBER_ROLE } from "@prisma/client"
 import { randomBytes } from "crypto"
 
 export const generateWorkspaceInvite = async (workspaceId: string) => {
-  const token = randomBytes(16).toString("hex")
-const user = await currentUser()
-if(!user) throw new Error("Unauthorized")
+  // Only workspace admins may hand out membership.
+  const { user } = await assertWorkspaceMember(workspaceId, MEMBER_ROLE.ADMIN)
+
+  const token = randomBytes(32).toString("hex")
+
   const invite = await db.workspaceInvite.create({
     data: {
       workspaceId,
       token,
       createdById: user.id,
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), 
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
     }
   })
 
@@ -22,8 +24,7 @@ if(!user) throw new Error("Unauthorized")
 }
 
 export const acceptWorkspaceInvite = async (token: string) => {
-  const user = await currentUser();
-  if (!user) throw new Error("Unauthorized");
+  const user = await requireUser();
 
   const invite = await db.workspaceInvite.findUnique({
     where: { token },
@@ -33,8 +34,14 @@ export const acceptWorkspaceInvite = async (token: string) => {
 
   if (!invite.expiresAt || invite.expiresAt < new Date()) throw new Error("Invite expired");
 
-  await db.workspaceMember.create({
-    data: {
+  // Re-opening an invite link must not blow up on the unique membership index,
+  // and must not demote an existing member back to VIEWER.
+  await db.workspaceMember.upsert({
+    where: {
+      userId_workspaceId: { userId: user.id, workspaceId: invite.workspaceId },
+    },
+    update: {},
+    create: {
       userId: user.id,
       workspaceId: invite.workspaceId,
       role: MEMBER_ROLE.VIEWER,
@@ -45,13 +52,18 @@ export const acceptWorkspaceInvite = async (token: string) => {
     where: { id: invite.id },
   });
 
-  
-  return { success: true };
+  return { success: true, workspaceId: invite.workspaceId };
 };
 
 export const getAllWorkspaceMembers = async (workspaceId: string) => {
+  await assertWorkspaceMember(workspaceId);
+
   return await db.workspaceMember.findMany({
     where: { workspaceId },
-    include: { user: true },
+    include: {
+      user: {
+        select: { id: true, name: true, email: true, image: true },
+      },
+    },
   });
 };
