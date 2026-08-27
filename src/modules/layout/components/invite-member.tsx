@@ -72,7 +72,7 @@ const InviteMember = () => {
             {isLoading ? (
               <p className="text-xs text-muted-foreground">Loading members...</p>
             ) : (
-              workspaceMembers?.map((member: any) => (
+              workspaceMembers?.map((member) => (
                 <Hint key={member.id} label={member.user.name || "Unknown User"}>
                   <Avatar className="border-2 border-background size-8 mt-2">
                     <AvatarImage src={member.user.image || ""} />

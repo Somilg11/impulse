@@ -8,7 +8,7 @@ import CollectionFolder from '@/modules/collections/components/collection-folder
 
 
 interface Props {
-  currentWorkspace: any;
+  currentWorkspace: { id: string; name: string } | null | undefined;
 }
 
 const TabbedSidebar = ({ currentWorkspace }: Props) => {
@@ -112,7 +112,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
 
     
       <CreateCollection
-        workspaceId={currentWorkspace?.id}
+        workspaceId={currentWorkspace?.id ?? ""}
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
       />

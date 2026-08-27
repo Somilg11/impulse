@@ -23,11 +23,11 @@ export interface JsonBodyGenerationParams {
   method?: string;
   endpoint?: string;
   context?: string;
-  existingSchema?: Record<string, any>;
+  existingSchema?: Record<string, unknown>;
 }
 
 export interface JsonBodyResponse {
-  jsonBody: Record<string, any>;
+  jsonBody: Record<string, unknown>;
   explanation: string;
   suggestions: string[];
 }

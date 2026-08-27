@@ -108,9 +108,9 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
       .map(({ key, value }) => ({ key, value }));
 
   // Simple debounce implementation
-  const debounce = (fn: (...args: any[]) => void, wait = 500) => {
+  const debounce = <TArgs extends unknown[]>(fn: (...args: TArgs) => void, wait = 500) => {
     let t: ReturnType<typeof setTimeout> | null = null;
-    return (...args: any[]) => {
+    return (...args: TArgs) => {
       if (t) clearTimeout(t);
       t = setTimeout(() => fn(...args), wait);
     };
