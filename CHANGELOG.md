@@ -47,5 +47,13 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   longer demote an existing admin.
 
 ### Removed
-- `axios` (unused), the `Test` model, `verify_prisma.js`, and a fake
-  "All tests passed" panel that reported assertions it never ran.
+- `axios` (unused), `@ai-sdk/react` (never imported), the `Test` model,
+  `verify_prisma.js`, and a fake "All tests passed" panel that reported
+  assertions it never ran.
+
+### Security
+- Dependency tree is clean: `npm audit` reports 0 vulnerabilities with and
+  without dev dependencies. Upgraded `ai` to 7 and `@ai-sdk/google` to 4 (which
+  moves `undici` off the vulnerable 5.x line) and pinned patched `dompurify` and
+  `deepmerge-ts` through `overrides`, since neither parent package ships a fixed
+  release.

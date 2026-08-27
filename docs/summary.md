@@ -324,8 +324,8 @@ Filter/Save buttons — Save became a real `Blob` download.
 ## 8. Testing and verification
 
 CI runs on every push and PR: typecheck, lint, and build, plus a job that
-applies every migration to a fresh Postgres and fails on schema drift, plus an
-advisory dependency audit.
+applies every migration to a fresh Postgres and fails on schema drift, plus a
+dependency audit that fails on any high or critical advisory.
 
 There is no *test framework* wired up yet — an honest gap. Verification for the
 security-critical work was done by exercising the running application:
@@ -364,7 +364,7 @@ were deliberately written as pure and dependency-free so that is a small job.
 
 | Concern | How it is handled |
 |---|---|
-| CI | `.github/workflows/ci.yml` — typecheck, lint, build; migrations applied to a fresh Postgres with a drift check; advisory `npm audit` |
+| CI | `.github/workflows/ci.yml` — typecheck, lint, build; migrations applied to a fresh Postgres with a drift check; blocking `npm audit` at high severity |
 | Branching | Trunk-based with `main` (deployable) and `develop` (integration); short-lived `type/issue-slug` branches; hotfixes off `main` and back-merged |
 | Commits | Conventional Commits, squash-merged so the squash title becomes the changelog entry |
 | Review | PR template with a security checklist; `CODEOWNERS` marks `authz.ts`, `ssrf.ts`, `server-fetch.ts`, `api/`, `middleware.ts`, and `prisma/` as review-required |

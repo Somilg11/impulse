@@ -89,9 +89,14 @@ jobs:
   audit:
     name: Dependency audit
     runs-on: ubuntu-latest
-    # Advisory only: transitive advisories can require a major upgrade that is
-    # not always safe to take immediately. Surfaced, never silently ignored.
-    continue-on-error: true
+    # Blocking, because the tree is currently clean at this level. Only high and
+    # critical advisories fail the build; moderate ones are reported by
+    # Dependabot without blocking unrelated work.
+    #
+    # If an upstream advisory lands with no fixed release available, prefer an
+    # `overrides` entry in package.json pinning the patched transitive version.
+    # Falling back to `continue-on-error: true` is the last resort, not the
+    # first move.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
