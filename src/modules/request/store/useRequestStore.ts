@@ -1,16 +1,29 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
-import { ResponseData } from "../components/response-viewer";
+import type { ExecResult } from "@/lib/http";
+import type { SendMode } from "../lib/send-request";
 
+/** Mirrors a Prisma `Request` row: the Json columns come back as JsonValue,
+ * not string, so they are normalized before landing in a tab. */
 interface SavedRequest {
   id: string;
   name: string;
   method: string;
   url: string;
-  body?: string;
-  headers?: string;
-  parameters?: string;
- 
+  body?: unknown;
+  headers?: unknown;
+  parameters?: unknown;
+  collectionId?: string;
+}
+
+function toEditorString(value: unknown): string | undefined {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value === "string") return value;
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return undefined;
+  }
 }
 
 export type RequestTab = {
@@ -22,39 +35,56 @@ export type RequestTab = {
   headers?: string;
   parameters?: string;
   unsavedChanges?: boolean;
-  requestId?: string; // 👈 link to DB request
+  requestId?: string; // set once the tab is backed by a DB row
   collectionId?: string;
   workspaceId?: string;
 };
 
+const DEFAULT_URL = "https://echo.hoppscotch.io";
+
 type PlaygroundState = {
   tabs: RequestTab[];
   activeTabId: string | null;
+  sendMode: SendMode;
+  responseViewerData: ExecResult | null;
+  responseByTabId: Record<string, ExecResult>;
+
   addTab: () => void;
   closeTab: (id: string) => void;
   setActiveTab: (id: string) => void;
   updateTab: (id: string, data: Partial<RequestTab>) => void;
   markUnsaved: (id: string, value: boolean) => void;
-  openRequestTab: (req: any) => void; // 👈 new
+  openRequestTab: (req: SavedRequest & { workspaceId?: string }) => void;
   updateTabFromSavedRequest: (tabId: string, savedRequest: SavedRequest) => void;
-  responseViewerData:ResponseData | null;
-  setResponseViewerData: (data:ResponseData) => void
+  setSendMode: (mode: SendMode) => void;
+  setResponseViewerData: (data: ExecResult | null, tabId?: string) => void;
+};
+
+const initialTab: RequestTab = {
+  id: nanoid(),
+  title: "Request",
+  method: "GET",
+  url: DEFAULT_URL,
+  unsavedChanges: false,
 };
 
 export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
-  responseViewerData:null,
-  setResponseViewerData: (data) => set({ responseViewerData: data }),
-  tabs: [
-    {
-      id: nanoid(),
-      title: "Request",
-      method: "GET",
-      url: "https://echo.hoppscotch.io",
-      unsavedChanges: false,
-      
-    },
-  ],
-  activeTabId: null,
+  tabs: [initialTab],
+  activeTabId: initialTab.id,
+  sendMode: "auto",
+  responseViewerData: null,
+  responseByTabId: {},
+
+  setSendMode: (mode) => set({ sendMode: mode }),
+
+  setResponseViewerData: (data, tabId) =>
+    set((state) => ({
+      responseViewerData: data,
+      responseByTabId:
+        tabId && data
+          ? { ...state.responseByTabId, [tabId]: data }
+          : state.responseByTabId,
+    })),
 
   addTab: () =>
     set((state) => {
@@ -69,9 +99,9 @@ export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
         unsavedChanges: true,
       };
       return {
-        tabs: [...state.tabs, newTab ],
+        tabs: [...state.tabs, newTab],
         activeTabId: newTab.id,
-
+        responseViewerData: null,
       };
     }),
 
@@ -79,13 +109,26 @@ export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
     set((state) => {
       const newTabs = state.tabs.filter((t) => t.id !== id);
       const newActive =
-        state.activeTabId === id && newTabs.length > 0
-          ? newTabs[0].id
+        state.activeTabId === id
+          ? newTabs[0]?.id ?? null
           : state.activeTabId;
-      return { tabs: newTabs, activeTabId: newActive };
+
+      const responseByTabId = { ...state.responseByTabId };
+      delete responseByTabId[id];
+
+      return {
+        tabs: newTabs,
+        activeTabId: newActive,
+        responseByTabId,
+        responseViewerData: newActive ? responseByTabId[newActive] ?? null : null,
+      };
     }),
 
-  setActiveTab: (id) => set({ activeTabId: id }),
+  setActiveTab: (id) =>
+    set((state) => ({
+      activeTabId: id,
+      responseViewerData: state.responseByTabId[id] ?? null,
+    })),
 
   updateTab: (id, data) =>
     set((state) => ({
@@ -103,10 +146,12 @@ export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
 
   openRequestTab: (req) =>
     set((state) => {
-      // 🔎 check if already open
       const existing = state.tabs.find((t) => t.requestId === req.id);
       if (existing) {
-        return { activeTabId: existing.id };
+        return {
+          activeTabId: existing.id,
+          responseViewerData: state.responseByTabId[existing.id] ?? null,
+        };
       }
 
       const newTab: RequestTab = {
@@ -114,9 +159,9 @@ export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
         title: req.name || "Untitled",
         method: req.method,
         url: req.url,
-        body: req.body,
-        headers: req.headers,
-        parameters: req.parameters,
+        body: toEditorString(req.body),
+        headers: toEditorString(req.headers),
+        parameters: toEditorString(req.parameters),
         requestId: req.id,
         collectionId: req.collectionId,
         workspaceId: req.workspaceId,
@@ -126,27 +171,32 @@ export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
       return {
         tabs: [...state.tabs, newTab],
         activeTabId: newTab.id,
+        responseViewerData: null,
       };
     }),
 
-    updateTabFromSavedRequest: (tabId: string, savedRequest: SavedRequest) =>
-  set((state) => ({
-    tabs: state.tabs.map((t) =>
-      t.id === tabId
-        ? {
-            ...t,
-            id: savedRequest.id, // ✅ Replace temporary id with saved one
-            title: savedRequest.name,
-            method: savedRequest.method,
-            body: savedRequest?.body,
-            headers: savedRequest?.headers,
-            parameters: savedRequest?.parameters,
-            url: savedRequest.url,
-            unsavedChanges: false,
-          }
-        : t
-    ),
-    activeTabId: savedRequest.id, // ✅ keep active in sync
-  })),
-
+  /**
+   * Links a tab to the row it was just saved as. The tab keeps its own client
+   * id: overwriting it with the database id used to leave `requestId` unset, so
+   * sending a freshly saved request failed until the page was reloaded.
+   */
+  updateTabFromSavedRequest: (tabId, savedRequest) =>
+    set((state) => ({
+      tabs: state.tabs.map((t) =>
+        t.id === tabId
+          ? {
+              ...t,
+              title: savedRequest.name,
+              method: savedRequest.method,
+              url: savedRequest.url,
+              body: toEditorString(savedRequest.body),
+              headers: toEditorString(savedRequest.headers),
+              parameters: toEditorString(savedRequest.parameters),
+              requestId: savedRequest.id,
+              collectionId: savedRequest.collectionId ?? t.collectionId,
+              unsavedChanges: false,
+            }
+          : t
+      ),
+    })),
 }));

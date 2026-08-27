@@ -3,9 +3,9 @@
 import Modal from "@/components/ui/modal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Folder, Plus, Search, X } from "lucide-react";
-import React, { useState, useEffect, act } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
-import { useAddRequestToCollection, useSaveRequest } from "@/modules/request/hooks/request";
+import { useAddRequestToCollection } from "@/modules/request/hooks/request";
 import { REST_METHOD } from "@prisma/client";
 import { useWorkspaceStore } from "@/modules/layout/store";
 import { useCollections } from "../hooks/collections";
@@ -29,36 +29,42 @@ const SaveRequestToCollectionModal = ({
     name: string;
     method: REST_METHOD;
     url: string;
+    body?: string;
+    headers?: string;
+    parameters?: string;
   };
   initialName?: string;
   collectionId?: string
 }) => {
   const [requestName, setRequestName] = useState(initialName);
-  const [selectedCollectionId, setSelectedCollectionId] = useState<string>(collectionId || "");
+  // Only the user's explicit pick is stored; the effective selection below is
+  // derived, so there is no state to keep in sync as `collections` loads.
+  const [pickedCollectionId, setPickedCollectionId] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
 
   
   const { selectedWorkspace } = useWorkspaceStore();
-  const { data: collections, isLoading, isError } = useCollections(selectedWorkspace?.id!);
-  const { mutateAsync, isPending } = useAddRequestToCollection(selectedCollectionId);
+  const { data: collections, isLoading, isError } = useCollections(selectedWorkspace?.id ?? "");
 
-
-  useEffect(() => {
+  // Reset the form each time the modal opens. Adjusting state during render
+  // against the previous value is React's documented alternative to mirroring a
+  // prop into state inside an effect.
+  const [wasModalOpen, setWasModalOpen] = useState(isModalOpen);
+  if (isModalOpen !== wasModalOpen) {
+    setWasModalOpen(isModalOpen);
     if (isModalOpen) {
       setRequestName(requestData.name || initialName);
-      setSelectedCollectionId(collectionId || "");
+      setPickedCollectionId("");
       setSearchTerm("");
     }
-  }, [isModalOpen, requestData.name, initialName]);
+  }
 
+  // Precedence: what the user picked, then a caller-pinned collection, then the
+  // first available one once the list has loaded.
+  const selectedCollectionId =
+    pickedCollectionId || collectionId || collections?.[0]?.id || "";
 
-  useEffect(() => {
-    if (!isModalOpen) return;
-    if (collectionId) return; 
-    if (!selectedCollectionId && collections && collections.length > 0) {
-      setSelectedCollectionId(collections[0].id);
-    }
-  }, [isModalOpen, collections, collectionId, selectedCollectionId]);
+  const { mutateAsync, isPending } = useAddRequestToCollection(selectedCollectionId);
 
 
   
@@ -91,10 +97,15 @@ const SaveRequestToCollectionModal = ({
     }
     
     try {
+      // Headers, params, and body must travel with the request; saving only the
+      // name/method/url silently dropped everything the user configured.
       await mutateAsync({
         url: requestData.url.trim(),
         method: requestData.method,
         name: requestName.trim(),
+        body: requestData.body,
+        headers: requestData.headers,
+        parameters: requestData.parameters,
       });
      
       toast.success(`Request saved to "${selectedCollection?.name}" collection`);
@@ -176,7 +187,7 @@ const SaveRequestToCollectionModal = ({
               filteredCollections.map((collection) => (
                 <div
                   key={collection.id}
-                  onClick={() => setSelectedCollectionId(collection.id)}
+                  onClick={() => setPickedCollectionId(collection.id)}
                   className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                     selectedCollectionId === collection.id
                       ? "bg-blue-600/20 border border-blue-500/50 shadow-lg shadow-blue-500/10"
