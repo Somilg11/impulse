@@ -1,0 +1,11 @@
+# Default owner for everything.
+*                       @Somilg11
+
+# Security-critical paths - these should never merge without a review.
+/src/lib/authz.ts       @Somilg11
+/src/lib/ssrf.ts        @Somilg11
+/src/lib/server-fetch.ts @Somilg11
+/src/app/api/           @Somilg11
+/src/middleware.ts      @Somilg11
+/prisma/                @Somilg11
+/.github/workflows/     @Somilg11

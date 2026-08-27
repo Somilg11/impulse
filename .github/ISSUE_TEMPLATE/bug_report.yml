@@ -1,0 +1,43 @@
+name: Bug report
+description: Something does not work as expected
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a workspace
+        2. ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: send-mode
+    attributes:
+      label: Execution mode
+      description: Only relevant for request-sending bugs.
+      options: ["Not applicable", "Auto", "Browser", "Proxy"]
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Server output or browser console. Redact tokens and secrets.
+      render: shell
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "macOS 15, Chrome 130, Node 22, self-hosted"
