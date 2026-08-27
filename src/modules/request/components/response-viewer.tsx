@@ -1,156 +1,169 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useMemo, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Editor from "@monaco-editor/react";
 import {
   Clock,
   HardDrive,
-  CheckCircle,
+  AlertTriangle,
   Copy,
   Download,
-  Filter,
-  MoreHorizontal,
   Code,
   FileText,
   Settings,
-  TestTube,
+  Globe,
+  Server,
 } from "lucide-react";
-
-type HeadersMap = Record<string, string>;
-
-interface RequestRun {
-  id: string;
-  requestId?: string;
-  status?: number;
-  statusText?: string | null;
-  headers?: HeadersMap | any;
-  body?: any;
-  durationMs?: number;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
-}
-
-interface Result {
-  status?: number;
-  statusText?: string;
-  duration?: number;
-  size?: number;
-}
-
-export interface ResponseData {
-  success: boolean;
-  requestRun?: RequestRun;
-  result?: Result;
-  error?: string;
-}
+import { toast } from "sonner";
+import type { ExecResult } from "@/lib/http";
 
 interface Props {
-  responseData: ResponseData;
+  responseData: ExecResult;
+}
+
+const MONACO_OPTIONS = {
+  readOnly: true,
+  minimap: { enabled: false },
+  scrollBeyondLastLine: false,
+  fontSize: 14,
+  wordWrap: "on" as const,
+  fontFamily:
+    'ui-monospace, SFMono-Regular, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+  lineNumbers: "on" as const,
+  glyphMargin: false,
+  folding: true,
+  lineDecorationsWidth: 0,
+  lineNumbersMinChars: 3,
+  renderLineHighlight: "none" as const,
+  scrollbar: {
+    vertical: "auto" as const,
+    horizontal: "auto" as const,
+    verticalScrollbarSize: 8,
+    horizontalScrollbarSize: 8,
+  },
+};
+
+function getStatusColor(status: number): string {
+  if (status >= 200 && status < 300) return "text-green-400";
+  if (status >= 300 && status < 400) return "text-yellow-400";
+  if (status >= 400 && status < 500) return "text-orange-400";
+  if (status >= 500) return "text-red-400";
+  return "text-gray-400";
+}
+
+function formatBytes(bytes: number): string {
+  if (!bytes) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+}
+
+/** Guess a sensible filename extension from the response content type. */
+function extensionFor(contentType: string): string {
+  if (contentType.includes("json")) return "json";
+  if (contentType.includes("html")) return "html";
+  if (contentType.includes("xml")) return "xml";
+  if (contentType.includes("csv")) return "csv";
+  return "txt";
 }
 
 const ResponseViewer = ({ responseData }: Props) => {
   const [activeTab, setActiveTab] = useState("json");
 
-  const getStatusColor = (status?: number): string => {
-    const s = typeof status === "number" ? status : 0;
-    if (s >= 200 && s < 300) return "text-green-400";
-    if (s >= 300 && s < 400) return "text-yellow-400";
-    if (s >= 400 && s < 500) return "text-orange-400";
-    if (s >= 500) return "text-red-400";
-    return "text-gray-400";
-  };
+  const { status, statusText, durationMs, size, headers, body, contentType, via, error } =
+    responseData;
 
-  const formatBytes = (bytes?: number): string => {
-    if (!bytes || bytes === 0) return "0 B";
-    const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
+  // The body is always raw text; pretty-print it only when it parses as JSON.
+  const { prettyBody, isJson } = useMemo(() => {
+    const raw = body ?? "";
+    if (!raw.trim()) return { prettyBody: "", isJson: false };
+    try {
+      return { prettyBody: JSON.stringify(JSON.parse(raw), null, 2), isJson: true };
+    } catch {
+      return { prettyBody: raw, isJson: false };
+    }
+  }, [body]);
 
   const copyToClipboard = (text: string) => {
     if (!navigator?.clipboard) return;
-    navigator.clipboard.writeText(text).catch(() => {
-      /* ignore */
-    });
+    navigator.clipboard
+      .writeText(text)
+      .then(() => toast.success("Copied"))
+      .catch(() => toast.error("Could not copy"));
   };
 
-  // Defensive parse: body may be already an object or invalid JSON
-  let responseBody: unknown = {};
-  let formattedJsonString = "";
-  try {
-    const rawBody = responseData?.requestRun?.body;
-    if (typeof rawBody === "string") {
-      responseBody = rawBody.length ? JSON.parse(rawBody) : rawBody;
-    } else {
-      responseBody = rawBody ?? {};
+  const downloadBody = () => {
+    if (!body) {
+      toast.error("No response body to save");
+      return;
     }
-    formattedJsonString = JSON.stringify(responseBody, null, 2);
-  } catch (e) {
-    // If parsing fails, fall back to the raw string
-    responseBody = responseData?.requestRun?.body ?? {};
-    formattedJsonString =
-      typeof responseBody === "string"
-        ? responseBody
-        : JSON.stringify(responseBody, null, 2);
-  }
+    const blob = new Blob([body], { type: contentType || "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `response.${extensionFor(contentType)}`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  };
 
-  const status: number | undefined =
-    responseData.result?.status ?? responseData.requestRun?.status;
-  const statusText: string | null | undefined =
-    responseData.result?.statusText ?? responseData.requestRun?.statusText;
-  const duration: number | undefined =
-    responseData.result?.duration ?? responseData.requestRun?.durationMs;
-  const size: number | undefined = responseData.result?.size;
-  const rawBody = responseData.requestRun?.body;
+  const headerEntries = Object.entries(headers ?? {});
 
   return (
     <div className="w-full bg-[#0e1117] text-white p-3 md:p-4">
       <div className="w-full mx-auto">
-        {/* Status Header */}
+        {/* Status header */}
         <Card className="bg-[#161b26] border-[#1e2330] mb-4">
           <CardHeader className="pb-3">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex flex-wrap items-center gap-3 md:gap-4">
                 <div className="flex items-center gap-2">
                   <span className="text-gray-400">Status:</span>
-                  <Badge
-                    className={`${getStatusColor(
-                      status
-                    )} bg-transparent border-current`}
-                  >
-                    {status ?? "—"} • {statusText ?? ""}
+                  <Badge className={`${getStatusColor(status)} bg-transparent border-current`}>
+                    {status || "—"} {statusText ? `• ${statusText}` : ""}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-gray-400" />
                   <span className="text-gray-400">Time:</span>
-                  <span className="text-blue-300">
-                    {duration ? `${duration} ms` : "—"}
-                  </span>
+                  <span className="text-blue-300">{durationMs} ms</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <HardDrive className="w-4 h-4 text-gray-400" />
                   <span className="text-gray-400">Size:</span>
                   <span className="text-green-300">{formatBytes(size)}</span>
                 </div>
+                <Badge
+                  variant="secondary"
+                  className="bg-[#1e2330] text-zinc-400 border-0 gap-1.5"
+                  title={
+                    via === "browser"
+                      ? "Sent from your browser"
+                      : "Sent from the server proxy"
+                  }
+                >
+                  {via === "browser" ? (
+                    <Globe className="w-3 h-3" />
+                  ) : (
+                    <Server className="w-3 h-3" />
+                  )}
+                  {via}
+                </Badge>
               </div>
               <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 <Button
                   size="sm"
                   variant="ghost"
                   className="text-gray-400 hover:text-white"
-                >
-                  <Filter className="w-4 h-4 mr-2" />
-                  Filter
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-gray-400 hover:text-white"
+                  onClick={downloadBody}
+                  disabled={!body}
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Save
@@ -159,25 +172,28 @@ const ResponseViewer = ({ responseData }: Props) => {
                   size="sm"
                   variant="ghost"
                   className="text-gray-400 hover:text-white"
+                  onClick={() => copyToClipboard(prettyBody)}
+                  disabled={!body}
                 >
-                  <MoreHorizontal className="w-4 h-4" />
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy
                 </Button>
               </div>
             </div>
+
+            {error && (
+              <div className="mt-3 flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/5 p-3">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+                <p className="text-xs leading-relaxed text-red-300">{error}</p>
+              </div>
+            )}
           </CardHeader>
         </Card>
 
-        {/* Response Tabs */}
+        {/* Body */}
         <Card className="bg-[#161b26] border-[#1e2330]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-gray-200">Response Body</CardTitle>
-          </CardHeader>
           <CardContent className="p-0">
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="w-full"
-            >
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <div className="px-3 md:px-4 border-b border-[#1e2330]">
                 <TabsList className="bg-transparent p-0 h-auto">
                   <TabsTrigger
@@ -185,7 +201,7 @@ const ResponseViewer = ({ responseData }: Props) => {
                     className="bg-transparent data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-gray-400 rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 py-2"
                   >
                     <Code className="w-4 h-4 mr-2" />
-                    JSON
+                    {isJson ? "JSON" : "Pretty"}
                   </TabsTrigger>
                   <TabsTrigger
                     value="raw"
@@ -200,175 +216,73 @@ const ResponseViewer = ({ responseData }: Props) => {
                   >
                     <Settings className="w-4 h-4 mr-2" />
                     Headers
-                    <Badge
-                      variant="secondary"
-                      className="ml-2 text-xs bg-zinc-700"
-                    >
-                      {
-                        Object.keys(responseData.requestRun?.headers ?? {})
-                          .length
-                      }
+                    <Badge variant="secondary" className="ml-2 text-xs bg-zinc-700">
+                      {headerEntries.length}
                     </Badge>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="test"
-                    className="bg-transparent data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-gray-400 rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 py-2"
-                  >
-                    <TestTube className="w-4 h-4 mr-2" />
-                    Test Results
                   </TabsTrigger>
                 </TabsList>
               </div>
 
               <TabsContent value="json" className="mt-0">
-                <div className="relative">
-                  <div className="absolute top-4 right-4 z-10">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-gray-400 hover:text-white bg-zinc-800/50 backdrop-blur-sm"
-                      onClick={() => copyToClipboard(formattedJsonString)}
-                    >
-                      <Copy className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="h-96">
-                    <Editor
-                      height="100%"
-                      defaultLanguage="json"
-                      value={formattedJsonString}
-                      options={{
-                        readOnly: true,
-                        minimap: { enabled: false },
-                        scrollBeyondLastLine: false,
-                        fontSize: 14,
-                        wordWrap: "on",
-                        fontFamily:
-                          'ui-monospace, SFMono-Regular, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-                        lineNumbers: "on",
-                        glyphMargin: false,
-                        folding: true,
-                        lineDecorationsWidth: 0,
-                        lineNumbersMinChars: 3,
-                        renderLineHighlight: "none",
-                        scrollbar: {
-                          vertical: "auto",
-                          horizontal: "auto",
-                          verticalScrollbarSize: 8,
-                          horizontalScrollbarSize: 8,
-                        },
-                      }}
-                      theme="vs-dark"
-                    />
-                  </div>
+                <div className="h-96">
+                  <Editor
+                    height="100%"
+                    language={isJson ? "json" : "plaintext"}
+                    value={prettyBody}
+                    options={MONACO_OPTIONS}
+                    theme="vs-dark"
+                  />
                 </div>
               </TabsContent>
 
               <TabsContent value="raw" className="mt-0">
-                <div className="relative">
-                  <div className="absolute top-4 right-4 z-10">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-gray-400 hover:text-white"
-                      onClick={() => copyToClipboard(String(rawBody ?? ""))}
-                    >
-                      <Copy className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="h-96">
-                    <Editor
-                      height="100%"
-                      defaultLanguage="text"
-                      value={String(rawBody ?? "")}
-                      options={{
-                        readOnly: true,
-                        minimap: { enabled: false },
-                        scrollBeyondLastLine: false,
-                        fontSize: 14,
-                        fontFamily:
-                          'ui-monospace, SFMono-Regular, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-                        wordWrap: "on",
-                        lineNumbers: "on",
-                        glyphMargin: false,
-                        folding: true,
-                        lineDecorationsWidth: 0,
-                        lineNumbersMinChars: 3,
-                        renderLineHighlight: "none",
-                        scrollbar: {
-                          vertical: "auto",
-                          horizontal: "auto",
-                          verticalScrollbarSize: 8,
-                          horizontalScrollbarSize: 8,
-                        },
-                      }}
-                      theme="vs-dark"
-                    />
-                  </div>
+                <div className="h-96">
+                  <Editor
+                    height="100%"
+                    language="plaintext"
+                    value={body ?? ""}
+                    options={MONACO_OPTIONS}
+                    theme="vs-dark"
+                  />
                 </div>
               </TabsContent>
 
               <TabsContent value="headers" className="mt-0">
                 <ScrollArea className="h-96">
                   <div className="p-6">
-                    <div className="space-y-3">
-                      {Object.entries(
-                        responseData.requestRun?.headers ?? {}
-                      ).map(([key, value]) => (
-                        <div
-                          key={key}
-                          className="flex items-start justify-between py-2 border-b border-zinc-800 last:border-b-0"
-                        >
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium text-blue-300 text-sm">
-                              {key}
-                            </div>
-                            <div className="text-gray-300 text-sm break-all">
-                              {String(value)}
-                            </div>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-gray-400 hover:text-white ml-2"
-                            onClick={() => copyToClipboard(`${key}: ${value}`)}
+                    {headerEntries.length === 0 ? (
+                      <p className="text-sm text-zinc-500">
+                        No headers exposed.{" "}
+                        {via === "browser" &&
+                          "Cross-origin responses only expose safelisted headers unless the API sets Access-Control-Expose-Headers. Proxy mode shows all of them."}
+                      </p>
+                    ) : (
+                      <div className="space-y-3">
+                        {headerEntries.map(([key, value]) => (
+                          <div
+                            key={key}
+                            className="flex items-start justify-between py-2 border-b border-zinc-800 last:border-b-0"
                           >
-                            <Copy className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-blue-300 text-sm">{key}</div>
+                              <div className="text-gray-300 text-sm break-all">
+                                {String(value)}
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-gray-400 hover:text-white ml-2"
+                              onClick={() => copyToClipboard(`${key}: ${value}`)}
+                            >
+                              <Copy className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </ScrollArea>
-              </TabsContent>
-
-              <TabsContent value="test" className="mt-0">
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span className="text-green-400 font-medium">
-                      All tests passed
-                    </span>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-zinc-800 rounded-lg">
-                      <span className="text-gray-300">Status code is 200</span>
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-zinc-800 rounded-lg">
-                      <span className="text-gray-300">
-                        Response time is less than 3000ms
-                      </span>
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-zinc-800 rounded-lg">
-                      <span className="text-gray-300">
-                        Content-Type is present
-                      </span>
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                    </div>
-                  </div>
-                </div>
               </TabsContent>
             </Tabs>
           </CardContent>

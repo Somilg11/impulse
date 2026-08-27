@@ -123,7 +123,7 @@ const CollectionFolder = ({ collection }: Props) => {
                         <div className="pl-7 py-1.5 text-[10px] text-red-400/60">Error</div>
                     ) : hasRequests ? (
                         <div className="ml-3 space-y-0.5">
-                            {requestData.map((request: any) => (
+                            {requestData.map((request) => (
                                 <button
                                     key={request.id}
                                     onClick={() => openRequestTab(request)}

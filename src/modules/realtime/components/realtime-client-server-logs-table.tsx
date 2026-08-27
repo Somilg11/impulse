@@ -10,6 +10,12 @@ const RealtimeClientServerLogsTable = () => {
   const tableRef = useRef<HTMLDivElement>(null)
   const rowRefs = useRef<(HTMLDivElement | null)[]>([])
 
+  const scrollToBottom = () => {
+    if (tableRef.current) {
+      tableRef.current.scrollTop = tableRef.current.scrollHeight
+    }
+  }
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (messages.length > 0 && selectedMessageIndex === -1) {
@@ -22,11 +28,6 @@ const RealtimeClientServerLogsTable = () => {
     rowRefs.current = rowRefs.current.slice(0, messages.length)
   }, [messages.length])
 
-  const scrollToBottom = () => {
-    if (tableRef.current) {
-      tableRef.current.scrollTop = tableRef.current.scrollHeight
-    }
-  }
 
   const scrollToRow = (index: number) => {
     const row = rowRefs.current[index]
@@ -90,7 +91,7 @@ const RealtimeClientServerLogsTable = () => {
     }).format(timestamp)
   }
 
-  const formatMessageData = (data: any) => {
+  const formatMessageData = (data: unknown) => {
     if (typeof data === 'string') {
       try {
         return JSON.stringify(JSON.parse(data), null, 2)

@@ -2,7 +2,12 @@ import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Send, Copy, Trash2, RefreshCw } from 'lucide-react'
 import { useWsStore } from '../hooks/useWs'
-import Editor from '@monaco-editor/react'
+import Editor, { type OnMount } from '@monaco-editor/react'
+
+// Derived from the mount signature so the editor types do not depend on
+// importing `monaco-editor` directly, which is only a transitive dependency.
+type MonacoEditor = Parameters<OnMount>[0]
+type MonacoApi = Parameters<OnMount>[1]
 import { toast } from 'sonner'
 import RealtimeClientServerLogsTable from './realtime-client-server-logs-table'
 
@@ -18,8 +23,8 @@ const RealtimeMessageEditor = () => {
   
   const [isSending, setIsSending] = useState(false)
   const [lastSent, setLastSent] = useState('')
-  const editorRef = useRef(null)
-  const monacoRef = useRef(null)
+  const editorRef = useRef<MonacoEditor | null>(null)
+  const monacoRef = useRef<MonacoApi | null>(null)
 
   useEffect(() => {
     if (!draftMessage) {
@@ -69,7 +74,7 @@ const RealtimeMessageEditor = () => {
   }, [draftMessage, send, isConnected])
 
   // Initialize Monaco Editor
-  const handleEditorDidMount = useCallback((editor: any, monaco: any) => {
+  const handleEditorDidMount = useCallback<OnMount>((editor, monaco) => {
     editorRef.current = editor
     monacoRef.current = monaco
 
@@ -104,7 +109,6 @@ const RealtimeMessageEditor = () => {
       const formatted = JSON.stringify(parsed, null, 2)
       setDraftMessage(formatted)
       if (editorRef.current) {
-        // @ts-ignore
         editorRef.current.setValue(formatted)
       }
     } catch (error) {
@@ -126,9 +130,7 @@ const RealtimeMessageEditor = () => {
     const emptyMessage = '{\n  \n}'
     setDraftMessage(emptyMessage)
     if (editorRef.current) {
-      // @ts-ignore
       editorRef.current.setValue(emptyMessage)
-      // @ts-ignore
       editorRef.current.focus()
     }
   }, [setDraftMessage])

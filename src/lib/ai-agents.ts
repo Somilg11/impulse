@@ -1,8 +1,32 @@
-import { generateObject, generateText } from 'ai';
+import { generateObject } from 'ai';
 import { google } from '@ai-sdk/google';
 import { z } from 'zod';
 
-const model = google('gemini-2.0-flash');
+/**
+ * Provider SDKs surface quota failures inconsistently - sometimes as a message
+ * containing "429", sometimes as a numeric `status`/`statusCode`. Narrow the
+ * unknown catch value once instead of casting to `any` at each call site.
+ */
+type ProviderErrorLike = {
+    message?: string;
+    status?: number;
+    statusCode?: number;
+};
+
+function isQuotaLikeError(error: unknown): boolean {
+    const e: ProviderErrorLike =
+        typeof error === "object" && error !== null ? (error as ProviderErrorLike) : {};
+
+    return Boolean(
+        e.message?.includes("429") ||
+        e.message?.includes("Quota exceeded") ||
+        e.statusCode === 429 ||
+        e.status === 429
+    );
+}
+
+
+const model = google('gemini-3.6-flash');
 
 export interface RequestSuggestionParams {
     workspaceName: string;
@@ -91,12 +115,9 @@ Consider the workspace theme and make names that would make sense to other devel
             data: result.object,
             error: null
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error generating request name suggestions:', error);
-        const isQuotaError = error.message?.includes('429') ||
-            error.message?.includes('Quota exceeded') ||
-            error.statusCode === 429 ||
-            error.status === 429;
+        const isQuotaError = isQuotaLikeError(error);
 
         return {
             success: false,
@@ -166,12 +187,9 @@ IMPORTANT: Return the jsonBody as a valid JSON string that can be parsed with JS
             },
             error: null
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error generating JSON body:', error);
-        const isQuotaError = error.message?.includes('429') ||
-            error.message?.includes('Quota exceeded') ||
-            error.statusCode === 429 ||
-            error.status === 429;
+        const isQuotaError = isQuotaLikeError(error);
 
         return {
             success: false,
@@ -188,7 +206,7 @@ export async function generateSmartJsonBody({
     endpoint,
     context,
     existingSchema
-}: JsonBodyGenerationParams & { existingSchema?: Record<string, any> }) {
+}: JsonBodyGenerationParams & { existingSchema?: Record<string, unknown> }) {
     try {
         const enhancedPrompt = `
 You are an expert API developer creating JSON request bodies.
@@ -237,12 +255,9 @@ IMPORTANT: Return the jsonBody as a valid JSON string that can be parsed with JS
             },
             error: null
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error generating smart JSON body:', error);
-        const isQuotaError = error.message?.includes('429') ||
-            error.message?.includes('Quota exceeded') ||
-            error.statusCode === 429 ||
-            error.status === 429;
+        const isQuotaError = isQuotaLikeError(error);
 
         return {
             success: false,
@@ -288,12 +303,9 @@ User Request: ${prompt}
             data: result.object,
             error: null
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error generating structured JSON body:', error);
-        const isQuotaError = error.message?.includes('429') ||
-            error.message?.includes('Quota exceeded') ||
-            error.statusCode === 429 ||
-            error.status === 429;
+        const isQuotaError = isQuotaLikeError(error);
 
         return {
             success: false,
@@ -307,7 +319,7 @@ User Request: ${prompt}
 /**
  * Utility function to validate generated JSON
  */
-export function validateGeneratedJson(jsonBody: Record<string, any>): {
+export function validateGeneratedJson(jsonBody: Record<string, unknown>): {
     isValid: boolean;
     errors: string[];
     suggestions: string[];

@@ -25,9 +25,12 @@ const AddNameModal = ({
   const [suggestions, setSuggestions] = useState<Array<{name: string; reasoning: string}>>([]);
 
  
-  useEffect(() => {
+  // Reset the field when the modal switches to a different tab.
+  const [lastTabId, setLastTabId] = useState(tabId);
+  if (tabId !== lastTabId) {
+    setLastTabId(tabId);
     if (tab) setName(tab.title);
-  }, [tabId]);
+  }
 
   const handleSubmit = async () => {
     if (!name.trim()) return;

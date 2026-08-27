@@ -13,11 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Test {
-  id   String @id @default(cuid())
-  name String
-}
-
 model User {
   id            String    @id
   name          String
@@ -50,11 +45,17 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([token])
+  @@index([userId])
   @@map("session")
 }
 
 model Account {
-  id                    String    @id
+  id String @id
+
+  // Better Auth 1.7 scopes account identity by the OIDC issuer (e.g.
+  // "https://accounts.google.com") rather than by providerId alone, so the same
+  // account id from two different issuers cannot collide.
+  issuer                String
   accountId             String
   providerId            String
   userId                String
@@ -69,6 +70,8 @@ model Account {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
+  @@unique([issuer, accountId])
+  @@index([userId])
   @@map("account")
 }
 
@@ -80,6 +83,7 @@ model Verification {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now()) @updatedAt
 
+  @@index([identifier])
   @@map("verification")
 }
 
@@ -107,14 +111,14 @@ enum MEMBER_ROLE {
 }
 
 model WorkspaceInvite {
-  id String @id @default(cuid())
+  id          String    @id @default(cuid())
   workspaceId String
-  token String @unique
-  expiresAt DateTime?
+  token       String    @unique
+  expiresAt   DateTime?
   createdById String
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdBy User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -140,12 +144,12 @@ model Collection {
   name String
 
   workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId],references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   requests Request[]
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@unique([name, workspaceId])
 }
@@ -159,33 +163,33 @@ enum REST_METHOD {
 }
 
 model Request {
-  id     String      @id @default(cuid())
-  name   String
-  method REST_METHOD @default(GET)
-  url    String
+  id         String      @id @default(cuid())
+  name       String
+  method     REST_METHOD @default(GET)
+  url        String
   parameters Json?
-  headers Json?
+  headers    Json?
 
-  body Json?
+  body     Json?
   response Json?
 
   collectionId String
-  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  runs RequestRun[]
+  collection   Collection   @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  runs         RequestRun[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
 
 model RequestRun {
-  id   String @id @default(cuid())
+  id        String  @id @default(cuid())
   requestId String
   request   Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
-  status Int
+  status     Int
   statusText String?
-  headers Json?
-  body Json?
+  headers    Json?
+  body       Json?
   durationMs Int
 
   createdAt DateTime @default(now())

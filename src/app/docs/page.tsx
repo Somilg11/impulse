@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Documentation",
+  description:
+    "Guides for using Impulse: building requests, execution modes, collections, workspaces, and importing from Postman.",
+  alternates: { canonical: "/docs" },
+};
+
 import React from "react";
 import { Terminal, Zap, Layers, ScrollText, Cpu, Share2, ArrowRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
@@ -97,7 +106,7 @@ export default function DocsPage() {
           <div className="bg-white/5 border border-white/10 rounded-2xl p-8 mb-8 text-center">
             <ScrollText className="h-12 w-12 text-zinc-700 mx-auto mb-4" />
             <h4 className="text-white font-bold mb-2">Hierarchical Organization</h4>
-            <p className="text-sm text-zinc-500">Nest folders within folders to mirror your API's versioning or resource structure.</p>
+            <p className="text-sm text-zinc-500">Nest folders within folders to mirror your API&apos;s versioning or resource structure.</p>
           </div>
         </>
       )
@@ -140,7 +149,7 @@ export default function DocsPage() {
                 <h4 className="text-lg font-bold text-white tracking-tight">Cortex AI Engine</h4>
              </div>
              <p className="text-zinc-400 text-sm leading-relaxed mb-6">
-               Impulse isn't just a client; it's an intelligent assistant. Our Cortex engine analyzes your patterns and offers real-time suggestions to optimize your API usage.
+               Impulse isn&apos;t just a client; it&apos;s an intelligent assistant. Our Cortex engine analyzes your patterns and offers real-time suggestions to optimize your API usage.
              </p>
              <button className="text-xs font-bold text-white bg-white/5 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 transition-colors">
                Explore Cortex features
@@ -157,7 +166,7 @@ export default function DocsPage() {
         <>
           <p className="text-zinc-400 leading-relaxed mb-6">
             Built for modern teams. Share your workspaces with a single link, manage roles (Viewer, Editor, Admin), 
-            and see your team's changes in real-time.
+            and see your team&apos;s changes in real-time.
           </p>
           <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-white/5 border border-white/10 border-dashed mb-8">
              <div className="flex items-center gap-3">
@@ -203,7 +212,7 @@ export default function DocsPage() {
       <section className="bg-white/5 border border-white/10 rounded-2xl p-10 text-center">
         <h3 className="text-xl font-bold text-white mb-4">Still have questions?</h3>
         <p className="text-zinc-400 mb-8 max-w-md mx-auto leading-relaxed">
-          If you didn't find what you were looking for, please open an issue on our <Link href="https://github.com/Somilg11/impulse" className="text-blue-400 hover:underline">GitHub</Link> or join our developer forum.
+          If you didn&apos;t find what you were looking for, please open an issue on our <Link href="https://github.com/Somilg11/impulse" className="text-blue-400 hover:underline">GitHub</Link> or join our developer forum.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
            <Link href="https://github.com/Somilg11" target="_blank">

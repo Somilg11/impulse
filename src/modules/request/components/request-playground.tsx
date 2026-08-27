@@ -17,7 +17,7 @@ export default function PlaygroundPage() {
 
   const activeTab = tabs.find((t) => t.id === activeTabId);
 
-  const {mutateAsync, isPending} = useSaveRequest(activeTab?.requestId!);
+  const { mutateAsync } = useSaveRequest(activeTab?.requestId ?? "");
   const [showSaveModal, setShowSaveModal] = useState(false);
 
 
@@ -33,7 +33,10 @@ export default function PlaygroundPage() {
     return {
       name: activeTab.title || "Untitled Request",
       method: (activeTab.method as REST_METHOD) || REST_METHOD.GET,
-      url: activeTab.url || "https://echo.hoppscotch.io"
+      url: activeTab.url || "https://echo.hoppscotch.io",
+      body: activeTab.body,
+      headers: activeTab.headers,
+      parameters: activeTab.parameters,
     };
   };
 
@@ -48,7 +51,9 @@ export default function PlaygroundPage() {
       return;
     }
 
-    if (activeTab.collectionId) {
+    // Only an already-saved request can be updated in place; anything else
+    // needs a collection picked first.
+    if (activeTab.requestId) {
   
       try {
         await mutateAsync({

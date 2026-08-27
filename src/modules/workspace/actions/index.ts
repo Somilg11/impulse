@@ -1,6 +1,7 @@
 "use server";
 
 import db from "@/lib/db";
+import { assertWorkspaceMember } from "@/lib/authz";
 import { currentUser } from "@/modules/authentication/actions";
 import { MEMBER_ROLE } from "@prisma/client";
 
@@ -86,6 +87,8 @@ export async function createWorkspace(name: string) {
 }
 
 export const getWorkspaceById = async (id: string) => {
+    await assertWorkspaceMember(id);
+
     const workspace = await db.workspace.findUnique({
         where: { id },
         include: {

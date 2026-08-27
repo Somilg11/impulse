@@ -16,7 +16,7 @@ import { useState } from "react";
 
 const Page = () => {
   const { selectedWorkspace } = useWorkspaceStore();
-  const { data: currentWorkspace, isPending } = useGetWorkspace( selectedWorkspace?.id!);
+  const { data: currentWorkspace, isPending } = useGetWorkspace(selectedWorkspace?.id ?? "");
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   if (isPending) {

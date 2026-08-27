@@ -1,249 +1,144 @@
 "use server";
 
 import db from "@/lib/db";
-import { REST_METHOD } from "@prisma/client";
+import { MEMBER_ROLE, REST_METHOD } from "@prisma/client";
 
-import axios, { AxiosRequestConfig } from "axios";
+import {
+  assertCollectionAccess,
+  assertRequestAccess,
+} from "@/lib/authz";
+import { buildExecRequest, type ExecResult } from "@/lib/http";
+import { executeOnServer } from "@/lib/server-fetch";
 
 export type Request = {
-    name: string;
-    method: REST_METHOD;
-    url: string;
-    body?: string;
-    headers?: string;
-    parameters?: string;
+  name: string;
+  method: REST_METHOD;
+  url: string;
+  body?: string;
+  headers?: string;
+  parameters?: string;
 };
 
-export const addRequestToCollection = async (collectionId: string, value: Request) => {
-    const request = await db.request.create({
-        data: {
-            collectionId,
-            name: value.name,
-            method: value.method,
-            url: value.url,
-            body: value.body,
-            headers: value.headers,
-            parameters: value.parameters,
-        }
-    });
+export type RunResponse = {
+  success: boolean;
+  result: ExecResult;
+  runId?: string;
+};
 
-    return request;
-}
+export const addRequestToCollection = async (
+  collectionId: string,
+  value: Request
+) => {
+  await assertCollectionAccess(collectionId, MEMBER_ROLE.EDITOR);
+
+  return await db.request.create({
+    data: {
+      collectionId,
+      name: value.name,
+      method: value.method,
+      url: value.url,
+      body: value.body,
+      headers: value.headers,
+      parameters: value.parameters,
+    },
+  });
+};
 
 export const saveRequest = async (id: string, value: Request) => {
+  await assertRequestAccess(id, MEMBER_ROLE.EDITOR);
 
-    console.log(value, id);
-    const request = await db.request.update({
-        where: {
-            id: id
-        },
-        data: {
-            name: value.name,
-            method: value.method,
-            url: value.url,
-            body: value.body,
-            headers: value.headers,
-            parameters: value.parameters,
-        },
-    });
-
-    return request;
-}
+  return await db.request.update({
+    where: { id },
+    data: {
+      name: value.name,
+      method: value.method,
+      url: value.url,
+      body: value.body,
+      headers: value.headers,
+      parameters: value.parameters,
+    },
+  });
+};
 
 export const getAllRequestFromCollection = async (collectionId: string) => {
-    const requests = await db.request.findMany({
-        where: {
-            collectionId,
-        },
+  await assertCollectionAccess(collectionId);
+
+  return await db.request.findMany({
+    where: { collectionId },
+    orderBy: { createdAt: "asc" },
+  });
+};
+
+export const deleteRequest = async (id: string) => {
+  await assertRequestAccess(id, MEMBER_ROLE.EDITOR);
+  await db.request.delete({ where: { id } });
+};
+
+/**
+ * Persist an execution result against a saved request. Used by browser mode,
+ * where the request is sent from the user's machine and only the outcome is
+ * recorded here.
+ */
+export const recordRun = async (
+  requestId: string,
+  result: ExecResult
+): Promise<{ runId: string }> => {
+  await assertRequestAccess(requestId);
+
+  const run = await db.requestRun.create({
+    data: {
+      requestId,
+      status: result.status ?? 0,
+      statusText: result.statusText || (result.error ? "Error" : null),
+      headers: result.headers ?? {},
+      body: result.body ?? "",
+      durationMs: Math.round(result.durationMs ?? 0),
+    },
+    select: { id: true },
+  });
+
+  if (!result.error && result.status > 0) {
+    await db.request.update({
+      where: { id: requestId },
+      data: { response: result.body ?? "" },
     });
-    return requests;
-}
+  }
 
-export async function sendRequest(req: {
-    method: string;
-    url: string;
-    headers?: Record<string, string>;
-    params?: Record<string, string>;
-    body?: any;
-}) {
-    const config: AxiosRequestConfig = {
-        method: req.method,
-        url: req.url,
-        headers: req.headers,
-        params: req.params,
-        data: req.body,
-        validateStatus: () => true, // ✅ capture errors too
-    };
+  return { runId: run.id };
+};
 
-    const start = performance.now();
-    try {
-        const res = await axios(config);
-        const end = performance.now();
+/**
+ * Execute a saved request from the server (proxy mode) and record the run.
+ * The URL is validated by the SSRF guard inside `executeOnServer`.
+ */
+export const run = async (requestId: string): Promise<RunResponse> => {
+  await assertRequestAccess(requestId);
 
-        const duration = end - start;
-        const size =
-            res.headers["content-length"] ||
-            new TextEncoder().encode(JSON.stringify(res.data)).length;
+  const request = await db.request.findUnique({ where: { id: requestId } });
+  if (!request) throw new Error("Request not found");
 
-        console.log(res.data);
+  const result = await executeOnServer(
+    buildExecRequest({
+      method: request.method,
+      url: request.url,
+      headers: request.headers,
+      parameters: request.parameters,
+      body: request.body,
+    })
+  );
 
-        return {
-            status: res.status,
-            statusText: res.statusText,
-            headers: Object.fromEntries(Object.entries(res.headers)),
-            data: res.data,
-            duration: Math.round(duration),
-            size,
-        };
-    } catch (error: any) {
-        const end = performance.now();
-        return {
-            error: error.message,
-            duration: Math.round(end - start),
-        };
-    }
-}
+  const { runId } = await recordRun(requestId, result);
 
-export async function run(requestId: string) {
-    try {
-        const request = await db.request.findUnique({
-            where: { id: requestId }
-        });
+  return { success: !result.error, result, runId };
+};
 
-        if (!request) {
-            throw new Error(`Request with id ${requestId} not found`);
-        }
+/** Recent runs for a saved request, newest first. */
+export const getRequestRuns = async (requestId: string, take = 20) => {
+  await assertRequestAccess(requestId);
 
-
-        const requestConfig = {
-            method: request.method,
-            url: request.url,
-            headers: request.headers as Record<string, string> || undefined,
-            params: request.parameters as Record<string, any> || undefined,
-            body: request.body || undefined
-        };
-
-        const result = await sendRequest(requestConfig);
-
-
-        const requestRun = await db.requestRun.create({
-            data: {
-                requestId: request.id,
-                status: result.status || 0,
-                statusText: result.statusText || (result.error ? 'Error' : null),
-                headers: result.headers || "",
-                body: result.data ? (typeof result.data === 'string' ? result.data : JSON.stringify(result.data)) : undefined,
-                durationMs: result.duration || 0
-            }
-        });
-
-
-        if (result.data && !result.error) {
-            await db.request.update({
-                where: { id: request.id },
-                data: {
-                    response: result.data,
-                    updatedAt: new Date()
-                }
-            });
-        }
-
-        return {
-            success: true,
-            requestRun,
-            result
-        };
-
-    } catch (error: any) {
-        try {
-            const failedRun = await db.requestRun.create({
-                data: {
-                    requestId,
-                    status: 0,
-                    statusText: 'Failed',
-                    headers: "",
-                    body: error.message,
-                    durationMs: 0
-                }
-            });
-
-            return {
-                success: false,
-                error: error.message,
-                requestRun: failedRun
-            };
-        } catch (dbError) {
-            return {
-                success: false,
-                error: `Request failed: ${error.message}. DB save failed: ${(dbError as Error).message}`
-            };
-        }
-    }
-}
-
-export async function runDirect(requestData: {
-    id: string;
-    method: string;
-    url: string;
-    headers?: Record<string, string>;
-    parameters?: Record<string, any>;
-    body?: any;
-}) {
-    try {
-        const requestConfig = {
-            method: requestData.method,
-            url: requestData.url,
-            headers: requestData.headers,
-            params: requestData.parameters,
-            body: requestData.body
-        };
-
-        const result = await sendRequest(requestConfig);
-
-        const requestRun = await db.requestRun.create({
-            data: {
-                requestId: requestData.id,
-                status: result.status || 0,
-                statusText: result.statusText || (result.error ? 'Error' : null),
-                headers: result.headers || "",
-                body: result.data ? (typeof result.data === 'string' ? result.data : JSON.stringify(result.data)) : undefined,
-                durationMs: result.duration || 0
-            }
-        });
-
-        // Update request with latest response if successful
-        if (result.data && !result.error) {
-            await db.request.update({
-                where: { id: requestData.id },
-                data: {
-                    response: result.data,
-                    updatedAt: new Date()
-                }
-            });
-        }
-
-        return {
-            success: true,
-            requestRun,
-            result
-        };
-
-    } catch (error: any) {
-        const failedRun = await db.requestRun.create({
-            data: {
-                requestId: requestData.id,
-                status: 0,
-                statusText: 'Failed',
-                headers: "",
-                body: error.message,
-                durationMs: 0
-            }
-        });
-
-        return {
-            success: false,
-            error: error.message,
-            requestRun: failedRun
-        };
-    }
-}
+  return await db.requestRun.findMany({
+    where: { requestId },
+    orderBy: { createdAt: "desc" },
+    take,
+  });
+};

@@ -18,10 +18,14 @@ const RealtimeConnectionBar = () => {
   
   const [url, setUrl] = useState(connectedUrl || '')
 
-  // keep local input in sync with connectedUrl
-  useEffect(() => {
+  // Keep the input in sync with the store's connected URL. React's documented
+  // way to adjust state when a prop changes is to compare against the previous
+  // value during render, not to mirror it in an effect.
+  const [lastConnectedUrl, setLastConnectedUrl] = useState(connectedUrl)
+  if (connectedUrl !== lastConnectedUrl) {
+    setLastConnectedUrl(connectedUrl)
     setUrl(connectedUrl || '')
-  }, [connectedUrl])
+  }
 
   const onConnect = useCallback(() => {
     if (!url.trim()) {

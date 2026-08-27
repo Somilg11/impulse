@@ -169,7 +169,7 @@ export default function LandingPage() {
                                 </div>
                                 <div className="leading-relaxed">
                                     <span className="text-zinc-300">{'{'}</span><br/>
-                                    &nbsp;&nbsp;<span className="text-blue-300">"refresh_token"</span><span className="text-zinc-300">: </span><span className="text-yellow-300">"eyJhbGciOiJIUzI1NiIsInR5cCI6Ik..."</span><br/>
+                                    &nbsp;&nbsp;<span className="text-blue-300">&quot;refresh_token&quot;</span><span className="text-zinc-300">: </span><span className="text-yellow-300">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...&quot;</span><br/>
                                     <span className="text-zinc-300">{'}'}</span>
                                 </div>
                             </div>

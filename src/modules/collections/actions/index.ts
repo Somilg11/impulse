@@ -1,63 +1,128 @@
 "use server";
 
 import db from "@/lib/db";
+import { assertCollectionAccess, assertWorkspaceMember } from "@/lib/authz";
+import { MEMBER_ROLE, REST_METHOD } from "@prisma/client";
 
 export const createCollection = async (workspaceId: string, name: string) => {
-    const collection = await db.collection.create({
+    await assertWorkspaceMember(workspaceId, MEMBER_ROLE.EDITOR);
+
+    return await db.collection.create({
         data: {
             name,
-            workspace: {
-                connect: {
-                    id: workspaceId,
-                },
-            },
+            workspace: { connect: { id: workspaceId } },
         },
     });
-
-    return collection;
 };
 
 export const getCollections = async (workspaceId: string) => {
-    const collections = await db.collection.findMany({
-        where: {
-            workspaceId,
-        },
-    });
+    await assertWorkspaceMember(workspaceId);
 
-    return collections;
+    return await db.collection.findMany({
+        where: { workspaceId },
+        orderBy: { createdAt: "asc" },
+    });
 };
 
-
 export const deleteCollection = async (collectionId: string) => {
-    await db.collection.delete({
-        where: {
-            id: collectionId,
-        },
-    });
+    await assertCollectionAccess(collectionId, MEMBER_ROLE.EDITOR);
+    await db.collection.delete({ where: { id: collectionId } });
 };
 
 export const editCollection = async (collectionId: string, name: string) => {
-    await db.collection.update({
-        where: {
-            id: collectionId,
-        },
-        data: {
-            name,
-        },
-    });
+    await assertCollectionAccess(collectionId, MEMBER_ROLE.EDITOR);
+    await db.collection.update({ where: { id: collectionId }, data: { name } });
 };
 
-export const importCollections = async (workspaceId: string, data: any) => {
-    try {
-        // Detect format
-        const collections = data.collections || (data.info && data.item ? [data] : []);
+const SUPPORTED_METHODS = new Set<string>(Object.values(REST_METHOD));
 
-        if (collections.length === 0) {
+/** Postman stores headers as [{key, value, disabled}]; the editor uses the same
+ * shape, so imports keep that shape rather than converting to an object map. */
+type ImportedKeyValue = { key: string; value: string; enabled: boolean };
+
+/** Loose shapes for imported JSON, which is untrusted and only partly known. */
+type RawObject = Record<string, unknown>;
+
+type RawRequest = {
+    method?: string;
+    url?: unknown;
+    header?: unknown;
+    body?: { raw?: string } | null;
+};
+
+type RawItem = {
+    name?: string;
+    request?: RawRequest;
+    item?: unknown;
+    url?: unknown;
+    method?: string;
+    headers?: unknown;
+    parameters?: unknown;
+    body?: string | null;
+};
+
+type RawCollection = {
+    name?: string;
+    info?: { name?: string };
+    item?: unknown;
+    requests?: unknown;
+};
+
+function normalizeKeyValues(input: unknown): ImportedKeyValue[] {
+    if (Array.isArray(input)) {
+        return (input as unknown[])
+            .filter((entry): entry is RawObject => typeof entry === "object" && entry !== null)
+            .map((entry) => ({
+                key: String(entry.key ?? ""),
+                value: String(entry.value ?? ""),
+                enabled: entry.disabled === true ? false : entry.enabled !== false,
+            }))
+            .filter((entry) => entry.key.trim().length > 0);
+    }
+
+    if (input && typeof input === "object") {
+        return Object.entries(input as Record<string, unknown>).map(([key, value]) => ({
+            key,
+            value: value === null || value === undefined ? "" : String(value),
+            enabled: true,
+        }));
+    }
+
+    return [];
+}
+
+function extractUrl(url: unknown): string {
+    if (typeof url === "string") return url;
+    if (url && typeof url === "object") {
+        const raw = (url as { raw?: unknown }).raw;
+        if (typeof raw === "string") return raw;
+    }
+    return "";
+}
+
+/** Postman v2.1 puts query params on url.query; the editor keeps them separate. */
+function extractQuery(url: unknown): ImportedKeyValue[] {
+    if (url && typeof url === "object") {
+        const query = (url as { query?: unknown }).query;
+        if (Array.isArray(query)) return normalizeKeyValues(query);
+    }
+    return [];
+}
+
+export const importCollections = async (workspaceId: string, data: unknown) => {
+    try {
+        await assertWorkspaceMember(workspaceId, MEMBER_ROLE.EDITOR);
+
+        const payload = (data ?? {}) as RawCollection & { collections?: unknown };
+        const collections: unknown =
+            payload.collections ?? (payload.info && payload.item ? [payload] : []);
+
+        if (!Array.isArray(collections) || collections.length === 0) {
             throw new Error("No collections found in the provided data.");
         }
 
-        for (const colData of collections) {
-            // Create collection
+        for (const raw of collections) {
+            const colData = raw as RawCollection;
             const collection = await db.collection.create({
                 data: {
                     name: colData.name || colData.info?.name || "Imported Collection",
@@ -65,8 +130,7 @@ export const importCollections = async (workspaceId: string, data: any) => {
                 },
             });
 
-            // Parse items (Postman uses .item, Impulse might use .requests)
-            const items = colData.item || colData.requests || [];
+            const items = colData.item ?? colData.requests ?? [];
             await processItems(collection.id, items);
         }
 
@@ -77,46 +141,53 @@ export const importCollections = async (workspaceId: string, data: any) => {
     }
 };
 
-// Helper to recursively process items (Postman items can be folders or requests)
-async function processItems(collectionId: string, items: any[]) {
-    for (const item of items) {
-        if (item.request) {
-            // It's a request
+/**
+ * Postman items are either requests or folders. The schema has no nested folder
+ * model, so folders are flattened into the parent collection and their name is
+ * prefixed onto each request so the grouping is not lost entirely.
+ */
+async function processItems(collectionId: string, items: unknown, prefix = "") {
+    if (!Array.isArray(items)) return;
+
+    for (const raw of items) {
+        const item = raw as RawItem;
+        if (item?.request) {
             const req = item.request;
-            const method = (req.method || 'GET').toUpperCase();
-            
-            // Map Postman headers to JSON string
-            const headers = Array.isArray(req.header) 
-                ? JSON.stringify(req.header.reduce((acc: any, h: any) => ({ ...acc, [h.key]: h.value }), {}))
-                : typeof req.header === 'object' ? JSON.stringify(req.header) : "{}";
+            const rawMethod = String(req.method ?? "GET").toUpperCase();
+            const method = SUPPORTED_METHODS.has(rawMethod)
+                ? (rawMethod as REST_METHOD)
+                : REST_METHOD.GET;
 
             await db.request.create({
                 data: {
                     collectionId,
-                    name: item.name || "Untitled Request",
-                    method: method as any,
-                    url: typeof req.url === 'string' ? req.url : (req.url?.raw || ""),
-                    headers: headers,
-                    body: req.body?.raw || null,
-                    parameters: "{}", // Default
-                }
+                    name: prefix + (item.name || "Untitled Request"),
+                    method,
+                    url: extractUrl(req.url),
+                    headers: JSON.stringify(normalizeKeyValues(req.header)),
+                    parameters: JSON.stringify(extractQuery(req.url)),
+                    body: req.body?.raw ?? undefined,
+                },
             });
-        } else if (item.item && Array.isArray(item.item)) {
-            // It's a folder in Postman, for now we flatten or just process its contents into the same collection
-            // since Impulse currently doesn't have a nested folder model in DB (only Collections -> Requests)
-            await processItems(collectionId, item.item);
-        } else if (item.url && item.method) {
-            // Simple Impulse format
+        } else if (Array.isArray(item?.item)) {
+            const folderName = item.name ? `${prefix}${item.name} / ` : prefix;
+            await processItems(collectionId, item.item, folderName);
+        } else if (item?.url && item?.method) {
+            const rawMethod = String(item.method).toUpperCase();
+            const method = SUPPORTED_METHODS.has(rawMethod)
+                ? (rawMethod as REST_METHOD)
+                : REST_METHOD.GET;
+
             await db.request.create({
                 data: {
                     collectionId,
-                    name: item.name || "Untitled Request",
-                    method: item.method as any,
-                    url: item.url,
-                    headers: typeof item.headers === 'string' ? item.headers : JSON.stringify(item.headers || {}),
-                    body: item.body || null,
-                    parameters: typeof item.parameters === 'string' ? item.parameters : JSON.stringify(item.parameters || {}),
-                }
+                    name: prefix + (item.name || "Untitled Request"),
+                    method,
+                    url: extractUrl(item.url),
+                    headers: JSON.stringify(normalizeKeyValues(item.headers)),
+                    parameters: JSON.stringify(normalizeKeyValues(item.parameters)),
+                    body: item.body ?? undefined,
+                },
             });
         }
     }
