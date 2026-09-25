@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -28,6 +27,7 @@ import { useGenerateJsonBody } from '@/modules/ai/hooks/ai-suggestion'
 
 import { useWorkspaceStore } from '@/modules/layout/store'
 import { useRequestPlaygroundStore } from '../store/useRequestStore'
+import MonacoEditor from '@/components/monaco-editor'
 import {
   BODY_TYPES,
   isFieldBody,
@@ -38,10 +38,7 @@ import {
 import KeyValueFormEditor from './key-value-form'
 
 
-const MonacoEditor = dynamic(
-  () => import('@monaco-editor/react'),
-  { ssr: false }
-)
+
 
 const bodyEditorSchema = z.object({
   contentType: z.enum(['application/json', 'text/plain']),

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import Editor from "@monaco-editor/react";
+import Editor from "@/components/monaco-editor";
 import {
   Clock,
   HardDrive,

@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Generated Prisma client, if the output is ever moved into the repo.
     "src/generated/**",
+    // Static assets, including the ~28MB of minified Monaco copied in by
+    // scripts/copy-monaco.mjs. Linting it exhausts V8's heap and crashes ESLint.
+    "public/**",
   ]),
 
   {

@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Send, Copy, Trash2, RefreshCw } from 'lucide-react'
 import { useWsStore } from '../hooks/useWs'
-import Editor, { type OnMount } from '@monaco-editor/react'
+import Editor, { type OnMount } from '@/components/monaco-editor'
 
 // Derived from the mount signature so the editor types do not depend on
 // importing `monaco-editor` directly, which is only a transitive dependency.
