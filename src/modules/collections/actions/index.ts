@@ -3,6 +3,12 @@
 import db from "@/lib/db";
 import { assertCollectionAccess, assertWorkspaceMember } from "@/lib/authz";
 import { MEMBER_ROLE, REST_METHOD } from "@prisma/client";
+import {
+    exportFilename,
+    serializeCollection,
+    type ExportFormat,
+    type ExportableCollection,
+} from "@/lib/postman";
 
 export const createCollection = async (workspaceId: string, name: string) => {
     await assertWorkspaceMember(workspaceId, MEMBER_ROLE.EDITOR);
@@ -192,3 +198,80 @@ async function processItems(collectionId: string, items: unknown, prefix = "") {
         }
     }
 }
+
+
+/**
+ * Serialize a collection and everything under it for download.
+ *
+ * The tree is read iteratively rather than with a fixed `include` depth, so a
+ * folder hierarchy of any depth exports completely.
+ */
+export const exportCollection = async (
+    collectionId: string,
+    format: ExportFormat = "postman"
+): Promise<{ filename: string; content: string }> => {
+    await assertCollectionAccess(collectionId);
+
+    const root = await db.collection.findUnique({
+        where: { id: collectionId },
+        select: { id: true, name: true, workspaceId: true },
+    });
+    if (!root) throw new Error("Collection not found");
+
+    // One query per level, rather than one per node.
+    const build = async (
+        id: string,
+        name: string
+    ): Promise<ExportableCollection> => {
+        const [requests, children] = await Promise.all([
+            db.request.findMany({
+                where: { collectionId: id },
+                orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+                select: {
+                    name: true,
+                    method: true,
+                    url: true,
+                    headers: true,
+                    parameters: true,
+                    body: true,
+                    bodyType: true,
+                    auth: true,
+                },
+            }),
+            db.collection.findMany({
+                where: { parentId: id },
+                orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+                select: { id: true, name: true },
+            }),
+        ]);
+
+        return {
+            name,
+            requests,
+            children: await Promise.all(children.map((c) => build(c.id, c.name))),
+        };
+    };
+
+    const tree = await build(root.id, root.name);
+
+    return {
+        filename: exportFilename(root.name, format),
+        content: serializeCollection(tree, format),
+    };
+};
+
+/** Export every root collection in a workspace as one document per collection. */
+export const exportWorkspace = async (
+    workspaceId: string,
+    format: ExportFormat = "postman"
+): Promise<{ filename: string; content: string }[]> => {
+    await assertWorkspaceMember(workspaceId);
+
+    const roots = await db.collection.findMany({
+        where: { workspaceId, parentId: null },
+        select: { id: true },
+        orderBy: { createdAt: "asc" },
+    });
+
+    return await Promise.all(roots.map((c) => exportCollection(c.id, format)));
+};

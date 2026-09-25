@@ -5,6 +5,7 @@ import {
     Edit,
     ChevronDown,
     ChevronRight,
+    Download,
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -19,6 +20,7 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import EditCollectionModal from "./edit-collection";
+import { useExportCollection } from "../hooks/collections";
 import DeleteCollectionModal from "./delete-collection";
 import SaveRequestToCollectionModal from "./add-request-modal";
 import { useGetAllRequestFromCollection } from "@/modules/request/hooks/request";
@@ -47,6 +49,7 @@ const CollectionFolder = ({ collection }: Props) => {
   } = useGetAllRequestFromCollection(collection.id);
 
   const { openRequestTab, activeTabId } = useRequestPlaygroundStore();
+    const exportCollection = useExportCollection(collection.id, collection.name);
 
   const methodColorMap: Record<REST_METHOD, string> = {
     [REST_METHOD.GET]: "text-green-400 bg-green-400/10",
@@ -103,6 +106,20 @@ const CollectionFolder = ({ collection }: Props) => {
                                 <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
                                     <Edit className="w-3 h-3 text-blue-400" />
                                     Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => exportCollection("postman")}
+                                    className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2"
+                                >
+                                    <Download className="w-3 h-3" />
+                                    Export (Postman)
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => exportCollection("impulse")}
+                                    className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2"
+                                >
+                                    <Download className="w-3 h-3" />
+                                    Export (Impulse)
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
                                     <Trash className="w-3 h-3 text-red-400" />
