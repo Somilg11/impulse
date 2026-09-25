@@ -3,6 +3,20 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  /* Motion.
+   *
+   * One curve for things entering and settling, one for things moving under a
+   * finger. Neither overshoots - iOS animation decelerates into place rather
+   * than bouncing, and the absence of a bounce is what reads as considered. */
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-slow: 320ms;
+}
+
 /* ---------------------------------------------------------------------------
  * Application chrome
  *
@@ -66,8 +80,14 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* San Francisco first, so on macOS and iOS the interface is set in the same
+   * face as the operating system - the single largest contributor to an app
+   * reading as native rather than as a web page. Geist is the fallback
+   * everywhere else, and was chosen originally because it is SF-adjacent. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    var(--font-geist-sans), "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo,
+    var(--font-geist-mono), "Liberation Mono", monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -200,10 +220,69 @@
 }
 
 @layer base {
+  /* Match the rendering macOS applies to native controls. Without this, text at
+   * these sizes looks noticeably heavier in a browser than in a native window. */
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Figures in dense readouts - status codes, timings, sizes - must not reflow
+   * as their values change. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Overlay scrollbars, the way macOS draws them: no track, translucent thumb. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.26);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  /* Controls compress very slightly under a press, as they do on iOS. It should
+   * be barely perceptible - it reads as responsiveness, not as an animation. */
+  .press {
+    transition: transform var(--duration-fast) var(--ease-ios);
+  }
+
+  .press:active {
+    transform: scale(0.97);
+  }
+}
+
+@layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    letter-spacing: -0.006em; /* SF is set marginally tight in system UI */
   }
 }

@@ -41,7 +41,7 @@ const RunHistory = ({ requestId, onSelect }: Props) => {
   if (!requestId) {
     return (
       <div className="p-6 text-center">
-        <p className="text-xs text-zinc-500">
+        <p className="text-[12px] text-zinc-500">
           Save this request to a collection to start recording history.
         </p>
       </div>
@@ -49,13 +49,13 @@ const RunHistory = ({ requestId, onSelect }: Props) => {
   }
 
   if (isLoading) {
-    return <div className="p-6 text-center text-xs text-zinc-500">Loading history…</div>;
+    return <div className="p-6 text-center text-[12px] text-zinc-500">Loading history…</div>;
   }
 
   if (!runs?.length) {
     return (
       <div className="p-6 text-center">
-        <p className="text-xs text-zinc-500">No runs recorded yet.</p>
+        <p className="text-[12px] text-zinc-500">No runs recorded yet.</p>
       </div>
     );
   }
@@ -73,9 +73,9 @@ const RunHistory = ({ requestId, onSelect }: Props) => {
             <button
               key={run.id}
               onClick={() => onSelect?.(run as HistoryRun)}
-              className="w-full text-left px-4 py-3 hover:bg-line/40 transition-colors flex items-center gap-3"
+              className="w-full text-left px-4 py-3 hover:bg-line/40 transition-colors duration-[--duration-fast] ease-[--ease-ios] flex items-center gap-3"
             >
-              <span className={`text-sm font-bold w-10 shrink-0 ${statusText(run.status)}`}>
+              <span className={`text-[13px] font-bold w-10 shrink-0 ${statusText(run.status)}`}>
                 {run.status || "—"}
               </span>
 

@@ -118,7 +118,7 @@ const RealtimeClientServerLogsTable = () => {
           <div className="p-1.5 bg-zinc-800 rounded-md">
             <Clock size={16} className="text-zinc-400" />
           </div>
-          <h3 className="text-sm font-bold text-zinc-100 tracking-tight">Message Logs</h3>
+          <h3 className="text-[13px] font-bold text-zinc-100 tracking-tight">Message Logs</h3>
           <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest ml-1 bg-canvas px-2 py-0.5 rounded-full border border-line">
             {messages.length}
           </span>
@@ -171,7 +171,7 @@ const RealtimeClientServerLogsTable = () => {
             <div className="p-4 rounded-full bg-surface-hover border border-line">
               <ArrowDownLeft size={24} className="opacity-20" />
             </div>
-            <p className="text-xs font-medium tracking-tight">Listening for messages...</p>
+            <p className="text-[12px] font-medium tracking-tight">Listening for messages...</p>
           </div>
         ) : (
           <div className="p-3 space-y-2">

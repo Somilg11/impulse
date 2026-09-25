@@ -135,17 +135,17 @@ const SaveRequestToCollectionModal = ({
       <div className="space-y-4">
        
         <div>
-          <label className="block text-sm font-medium mb-2 text-zinc-200">Request name</label>
+          <label className="block text-[13px] font-medium mb-2 text-zinc-200">Request name</label>
           <div className="relative">
             <input
-              className="w-full rounded-lg border border-line bg-surface-raised p-3 pr-20 text-[13px] text-zinc-100 placeholder-zinc-600 outline-none transition-colors focus:border-line-strong"
+              className="w-full rounded-lg border border-line bg-surface-raised p-3 pr-20 text-[13px] text-zinc-100 placeholder-zinc-600 outline-none transition-colors duration-[--duration-fast] ease-[--ease-ios] focus:border-line-strong"
               placeholder="Enter request name..."
               value={requestName}
               onChange={(e) => setRequestName(e.target.value)}
               autoFocus
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <span className={`text-xs font-bold px-2 py-1 rounded ${requestColorMap[requestData.method]} bg-zinc-700`}>
+              <span className={`text-[12px] font-bold px-2 py-1 rounded ${requestColorMap[requestData.method]} bg-zinc-700`}>
                 {requestData.method}
               </span>
             </div>
@@ -153,10 +153,10 @@ const SaveRequestToCollectionModal = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-zinc-200">Select location</label>
+          <label className="block text-[13px] font-medium mb-2 text-zinc-200">Select location</label>
           
    
-          <div className="flex items-center space-x-2 text-sm text-zinc-400 mb-3">
+          <div className="flex items-center space-x-2 text-[13px] text-zinc-400 mb-3">
             <span>{selectedWorkspace?.name || "workspace"}</span>
             <span>›</span>
             <span>Collections</span>
@@ -168,7 +168,7 @@ const SaveRequestToCollectionModal = ({
             <input
               type="text"
               placeholder="Search"
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-10 pr-4 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg pl-10 pr-4 py-2 text-[13px] text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -179,14 +179,14 @@ const SaveRequestToCollectionModal = ({
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="w-5 h-5 border-2 border-zinc-600 border-t-brand rounded-full animate-spin"></div>
-                <span className="ml-2 text-sm text-zinc-400">Loading collections...</span>
+                <span className="ml-2 text-[13px] text-zinc-400">Loading collections...</span>
               </div>
             ) : isError ? (
-              <div className="text-center py-4 text-red-400 text-sm">
+              <div className="text-center py-4 text-red-400 text-[13px]">
                 Failed to load collections
               </div>
             ) : filteredCollections.length === 0 ? (
-              <div className="text-center py-4 text-zinc-500 text-sm">
+              <div className="text-center py-4 text-zinc-500 text-[13px]">
                 {searchTerm ? "No collections found" : "No collections available"}
               </div>
             ) : (
@@ -208,7 +208,7 @@ const SaveRequestToCollectionModal = ({
                     ) : (
                       <Folder className="w-4 h-4 text-zinc-400" />
                     )}
-                    <span className={`text-sm font-medium ${
+                    <span className={`text-[13px] font-medium ${
                       selectedCollectionId === collection.id ? "text-brand" : "text-zinc-200"
                     }`}>
                       {collection.name}
@@ -229,7 +229,7 @@ const SaveRequestToCollectionModal = ({
         {/* Selected Collection Preview */}
         {selectedCollection && (
           <div className="p-3 bg-zinc-800/50 rounded-lg border border-zinc-700">
-            <div className="flex items-center space-x-2 text-sm">
+            <div className="flex items-center space-x-2 text-[13px]">
               <span className="text-zinc-400">Saving to:</span>
               <Folder className="w-4 h-4 text-brand" />
               <span className="text-brand font-medium">{selectedCollection.name}</span>
@@ -239,7 +239,7 @@ const SaveRequestToCollectionModal = ({
 
         {/* URL Preview (Optional) */}
         <div className="p-2 bg-zinc-900 rounded border border-zinc-700">
-          <div className="flex items-center space-x-2 text-xs">
+          <div className="flex items-center space-x-2 text-[12px]">
             <span className="text-zinc-500">URL:</span>
             <span className="text-zinc-300 truncate">{requestData.url}</span>
           </div>

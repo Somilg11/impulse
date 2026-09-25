@@ -72,7 +72,7 @@ const CodeDialog = ({ tab, isOpen, onClose }: Props) => {
       <DialogContent className="bg-canvas border-line text-zinc-200 max-w-3xl">
         <DialogHeader>
           <DialogTitle className="text-white">Code</DialogTitle>
-          <DialogDescription className="text-zinc-500 text-xs">
+          <DialogDescription className="text-zinc-500 text-[12px]">
             {activeEnvironmentName
               ? `Variables resolved from "${activeEnvironmentName}".`
               : "No environment selected, so any {{variables}} are left unresolved."}
@@ -84,7 +84,7 @@ const CodeDialog = ({ tab, isOpen, onClose }: Props) => {
             <button
               key={option.value}
               onClick={() => setTarget(option.value)}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors border ${
+              className={`px-2.5 py-1 rounded-md text-[12px] font-medium transition-colors duration-[--duration-fast] ease-[--ease-ios] border ${
                 target === option.value
                   ? "bg-line text-white border-brand/40"
                   : "bg-transparent text-zinc-500 border-line hover:text-zinc-300"
@@ -106,7 +106,7 @@ const CodeDialog = ({ tab, isOpen, onClose }: Props) => {
             size="sm"
             variant="ghost"
             onClick={handleCopy}
-            className="absolute right-2 top-2 z-10 h-7 px-2 text-xs text-zinc-400 hover:text-white bg-surface-raised/80 backdrop-blur-sm"
+            className="absolute right-2 top-2 z-10 h-7 px-2 text-[12px] text-zinc-400 hover:text-white bg-surface-raised/80 backdrop-blur-sm"
           >
             {copied ? (
               <Check className="h-3.5 w-3.5 text-green-400" />

@@ -26,7 +26,7 @@ interface Props {
 }
 
 const fieldClass =
-  "bg-canvas border-line h-9 text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:border-brand/50";
+  "bg-canvas border-line h-9 text-[13px] text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:border-brand/50";
 
 const labelClass =
   "text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5 block";
@@ -54,7 +54,7 @@ const AuthEditor = ({ value, onChange }: Props) => {
   return (
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <label className="text-xs text-zinc-400 shrink-0 w-24">Auth Type</label>
+        <label className="text-[12px] text-zinc-400 shrink-0 w-24">Auth Type</label>
         <Select
           value={auth.type}
           onValueChange={(next) => update(blankFor(next as AuthType))}
@@ -67,7 +67,7 @@ const AuthEditor = ({ value, onChange }: Props) => {
               <SelectItem
                 key={option.value}
                 value={option.value}
-                className="text-sm hover:bg-line"
+                className="text-[13px] hover:bg-line"
               >
                 {option.label}
               </SelectItem>
@@ -77,7 +77,7 @@ const AuthEditor = ({ value, onChange }: Props) => {
       </div>
 
       {auth.type === "none" && (
-        <p className="text-xs text-zinc-600 italic">
+        <p className="text-[12px] text-zinc-600 italic">
           This request will be sent without an Authorization header.
         </p>
       )}
@@ -187,10 +187,10 @@ const AuthEditor = ({ value, onChange }: Props) => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-line bg-surface-raised text-zinc-300">
-                <SelectItem value="header" className="text-sm hover:bg-line">
+                <SelectItem value="header" className="text-[13px] hover:bg-line">
                   Header
                 </SelectItem>
-                <SelectItem value="query" className="text-sm hover:bg-line">
+                <SelectItem value="query" className="text-[13px] hover:bg-line">
                   Query parameter
                 </SelectItem>
               </SelectContent>

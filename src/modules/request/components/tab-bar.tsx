@@ -24,7 +24,7 @@ export default function TabBar() {
             key={tab.id}
             onDoubleClick={() => onDoubleClick(tab.id)}
             onClick={() => setActiveTab(tab.id)}
-            className={`group relative h-full shrink-0 cursor-pointer border-r border-line px-3 flex items-center gap-2 transition-colors ${activeTabId === tab.id
+            className={`group relative h-full shrink-0 cursor-pointer border-r border-line px-3 flex items-center gap-2 transition-colors duration-[--duration-fast] ease-[--ease-ios] ${activeTabId === tab.id
                 ? "bg-surface text-white"
                 : "text-zinc-500 hover:bg-surface/60 hover:text-zinc-300"
               }`}
@@ -37,7 +37,7 @@ export default function TabBar() {
               {tab.method}
             </span>
 
-            <p className="max-w-[100px] sm:max-w-[140px] truncate text-xs">
+            <p className="max-w-[100px] sm:max-w-[140px] truncate text-[12px]">
               {tab.title}
             </p>
 
@@ -56,7 +56,7 @@ export default function TabBar() {
         ))}
         <button
           onClick={addTab}
-          className="h-full px-3 flex items-center justify-center text-zinc-500 hover:text-zinc-300 hover:bg-surface-raised/50 transition-all text-sm"
+          className="h-full px-3 flex items-center justify-center text-zinc-500 hover:text-zinc-300 hover:bg-surface-raised/50 transition-all text-[13px]"
         >
           +
         </button>

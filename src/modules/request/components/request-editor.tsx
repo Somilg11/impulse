@@ -44,8 +44,8 @@ const AwaitingResponse = () => (
       <Send className="h-4 w-4 text-zinc-600" strokeWidth={1.75} />
     </div>
     <div>
-      <p className="text-sm text-zinc-400">No response yet</p>
-      <p className="mt-1 text-xs text-zinc-600">
+      <p className="text-[13px] text-zinc-400">No response yet</p>
+      <p className="mt-1 text-[12px] text-zinc-600">
         Press{" "}
         <kbd className="rounded border border-line bg-surface-raised px-1.5 py-0.5 font-mono text-[10px] text-zinc-400">
           Enter

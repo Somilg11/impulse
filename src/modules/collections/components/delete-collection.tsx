@@ -36,7 +36,7 @@ const DeleteCollectionModal = ({
       submitText={isPending ? "Deleting..." : "Delete"}
       submitVariant="destructive"
     >
-      <p className="text-sm text-zinc-500">
+      <p className="text-[13px] text-zinc-500">
         Once deleted, all requests and data in this collection will be permanently removed.
       </p>
     </Modal>

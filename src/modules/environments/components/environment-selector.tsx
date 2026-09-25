@@ -38,7 +38,7 @@ const EnvironmentSelector = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
-            className="flex items-center gap-2 h-8 px-2.5 rounded-lg border border-line bg-surface-raised text-xs text-zinc-300 hover:bg-line transition-colors max-w-[190px]"
+            className="flex items-center gap-2 h-8 px-2.5 rounded-lg border border-line bg-surface-raised text-[12px] text-zinc-300 hover:bg-line transition-colors duration-[--duration-fast] ease-[--ease-ios] max-w-[190px]"
             title="Active environment"
           >
             <Layers className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
@@ -58,7 +58,7 @@ const EnvironmentSelector = () => {
 
           <DropdownMenuItem
             onClick={() => setActiveEnvironment(workspaceId, null)}
-            className="text-xs focus:bg-line cursor-pointer"
+            className="text-[12px] focus:bg-line cursor-pointer"
           >
             <span className="flex-1">No environment</span>
             {!activeId && <Check className="h-3.5 w-3.5 text-brand" />}
@@ -70,7 +70,7 @@ const EnvironmentSelector = () => {
             <DropdownMenuItem
               key={environment.id}
               onClick={() => setActiveEnvironment(workspaceId, environment.id)}
-              className="text-xs focus:bg-line cursor-pointer"
+              className="text-[12px] focus:bg-line cursor-pointer"
             >
               <span className="flex-1 truncate">{environment.name}</span>
               {activeId === environment.id && (
@@ -83,7 +83,7 @@ const EnvironmentSelector = () => {
 
           <DropdownMenuItem
             onClick={() => setManagerOpen(true)}
-            className="text-xs focus:bg-line cursor-pointer"
+            className="text-[12px] focus:bg-line cursor-pointer"
           >
             {environments?.length ? (
               <>

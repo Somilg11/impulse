@@ -100,8 +100,8 @@ const AddNameModal = ({
                 className="flex flex-row justify-between items-center p-2 border rounded bg-zinc-900 hover:bg-zinc-800 cursor-pointer"
                 onClick={() => setName(suggestion.name)}
               >
-                <span className="text-sm text-white">{suggestion.name}</span>
-                <span className="text-xs text-gray-400">{suggestion.reasoning}</span>
+                <span className="text-[13px] text-white">{suggestion.name}</span>
+                <span className="text-[12px] text-gray-400">{suggestion.reasoning}</span>
               </div>
             ))}
           </div>

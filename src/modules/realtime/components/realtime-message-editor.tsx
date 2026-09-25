@@ -145,7 +145,7 @@ const RealtimeMessageEditor = () => {
           <div className="p-1.5 bg-brand/10 rounded-md">
             <Send size={16} className="text-brand" />
           </div>
-          <h3 className="text-sm font-bold text-zinc-100 tracking-tight">Message Editor</h3>
+          <h3 className="text-[13px] font-bold text-zinc-100 tracking-tight">Message Editor</h3>
         </div>
         <div className="flex items-center gap-2">
           <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${
@@ -193,7 +193,7 @@ const RealtimeMessageEditor = () => {
             }}
             loading={
               <div className="w-full h-40 bg-canvas flex items-center justify-center">
-                <div className="text-zinc-600 text-xs animate-pulse">Initializing Editor...</div>
+                <div className="text-zinc-600 text-[12px] animate-pulse">Initializing Editor...</div>
               </div>
             }
           />

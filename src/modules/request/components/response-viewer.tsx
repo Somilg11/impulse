@@ -130,11 +130,11 @@ const ResponseViewer = ({
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
                 <div className="flex items-baseline gap-2">
                   <span
-                    className={`font-mono text-lg font-bold leading-none ${statusColorClass(status)}`}
+                    className={`font-mono text-[17px] font-bold leading-none ${statusColorClass(status)}`}
                   >
                     {status || "—"}
                   </span>
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-[12px] text-zinc-500">
                     {statusText || statusLabel(status)}
                   </span>
                 </div>
@@ -143,14 +143,14 @@ const ResponseViewer = ({
 
                 <div className="flex items-center gap-1.5" title="Elapsed time">
                   <Clock className="h-3.5 w-3.5 text-zinc-600" />
-                  <span className="font-mono text-xs text-zinc-300">
+                  <span className="font-mono text-[12px] text-zinc-300">
                     {formatDuration(durationMs)}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-1.5" title="Response size">
                   <HardDrive className="h-3.5 w-3.5 text-zinc-600" />
-                  <span className="font-mono text-xs text-zinc-300">
+                  <span className="font-mono text-[12px] text-zinc-300">
                     {formatBytes(size)}
                   </span>
                 </div>
@@ -168,7 +168,7 @@ const ResponseViewer = ({
                   ) : (
                     <Server className="h-3.5 w-3.5 text-zinc-600" />
                   )}
-                  <span className="text-xs capitalize text-zinc-500">{via}</span>
+                  <span className="text-[12px] capitalize text-zinc-500">{via}</span>
                 </div>
               </div>
               <div className="flex items-center gap-1 sm:gap-2 shrink-0">
@@ -198,7 +198,7 @@ const ResponseViewer = ({
         {error && (
           <div className="flex items-start gap-2 border-b border-status-server-error/20 bg-status-server-error/5 px-3 py-2.5">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-status-server-error" />
-            <p className="text-xs leading-relaxed text-red-300">{error}</p>
+            <p className="text-[12px] leading-relaxed text-red-300">{error}</p>
           </div>
         )}
 
@@ -208,42 +208,38 @@ const ResponseViewer = ({
           onValueChange={setActiveTab}
           className="flex min-h-0 w-full flex-1 flex-col"
         >
-              <div className="shrink-0 border-b border-line bg-surface px-2">
-                <TabsList className="bg-transparent p-0 h-auto">
+              <div className="shrink-0 border-b border-line bg-surface px-2.5 py-2">
+                <TabsList>
                   <TabsTrigger
                     value="json"
-                    className="rounded-none border-b-2 border-transparent bg-transparent px-3.5 py-2 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
                   >
                     <Code className="w-4 h-4 mr-2" />
                     {isJson ? "JSON" : "Pretty"}
                   </TabsTrigger>
                   <TabsTrigger
                     value="raw"
-                    className="rounded-none border-b-2 border-transparent bg-transparent px-3.5 py-2 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
                   >
                     <FileText className="w-4 h-4 mr-2" />
                     Raw
                   </TabsTrigger>
                   <TabsTrigger
                     value="headers"
-                    className="rounded-none border-b-2 border-transparent bg-transparent px-3.5 py-2 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
                   >
                     <Settings className="w-4 h-4 mr-2" />
                     Headers
-                    <Badge variant="secondary" className="ml-2 text-xs bg-zinc-700">
+                    <Badge variant="secondary" className="ml-2 text-[12px] bg-zinc-700">
                       {headerEntries.length}
                     </Badge>
                   </TabsTrigger>
                   {testResults.length > 0 && (
                     <TabsTrigger
                       value="tests"
-                      className="rounded-none border-b-2 border-transparent bg-transparent px-3.5 py-2 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
                     >
                       <TestTube className="w-4 h-4 mr-2" />
                       Tests
                       <Badge
                         variant="secondary"
-                        className={`ml-2 text-xs border-0 ${
+                        className={`ml-2 text-[12px] border-0 ${
                           testSummary.failed
                             ? "bg-red-500/15 text-red-400"
                             : "bg-green-500/15 text-green-400"
@@ -255,7 +251,6 @@ const ResponseViewer = ({
                   )}
                   <TabsTrigger
                     value="history"
-                    className="rounded-none border-b-2 border-transparent bg-transparent px-3.5 py-2 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
                   >
                     <History className="w-4 h-4 mr-2" />
                     History
@@ -305,12 +300,12 @@ const ResponseViewer = ({
                           <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
                         )}
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm text-zinc-200">{result.label}</p>
-                          <p className="mt-0.5 text-xs text-zinc-500 break-all">
+                          <p className="text-[13px] text-zinc-200">{result.label}</p>
+                          <p className="mt-0.5 text-[12px] text-zinc-500 break-all">
                             actual: <span className="font-mono">{result.actual}</span>
                           </p>
                           {result.error && (
-                            <p className="mt-0.5 text-xs text-amber-400/90">{result.error}</p>
+                            <p className="mt-0.5 text-[12px] text-amber-400/90">{result.error}</p>
                           )}
                         </div>
                       </div>
@@ -327,7 +322,7 @@ const ResponseViewer = ({
                 <ScrollArea className="h-full">
                   <div className="p-6">
                     {headerEntries.length === 0 ? (
-                      <p className="text-sm text-zinc-500">
+                      <p className="text-[13px] text-zinc-500">
                         No headers exposed.{" "}
                         {via === "browser" &&
                           "Cross-origin responses only expose safelisted headers unless the API sets Access-Control-Expose-Headers. Proxy mode shows all of them."}
@@ -340,8 +335,8 @@ const ResponseViewer = ({
                             className="flex items-start justify-between py-2 border-b border-zinc-800 last:border-b-0"
                           >
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium text-brand text-sm">{key}</div>
-                              <div className="text-gray-300 text-sm break-all">
+                              <div className="font-medium text-brand text-[13px]">{key}</div>
+                              <div className="text-gray-300 text-[13px] break-all">
                                 {String(value)}
                               </div>
                             </div>

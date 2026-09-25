@@ -68,14 +68,14 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
             <div className="flex items-center gap-2 px-3 py-2.5 border-b border-line">
                 <button 
                     onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-1 text-xs text-zinc-300 hover:text-white transition-colors font-medium"
+                    className="flex items-center gap-1 text-[12px] text-zinc-300 hover:text-white transition-colors duration-[--duration-fast] ease-[--ease-ios] font-medium"
                 >
                     <Plus className="w-3.5 h-3.5" />
                     New
                 </button>
                 <button 
                     onClick={() => setIsImportModalOpen(true)}
-                    className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-300 transition-colors font-medium"
+                    className="flex items-center gap-1 text-[12px] text-zinc-400 hover:text-zinc-300 transition-colors duration-[--duration-fast] ease-[--ease-ios] font-medium"
                 >
                     <Upload className="w-3 h-3" />
                     Import
@@ -91,7 +91,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search collections"
-                        className="h-7 w-full rounded-lg border border-line bg-surface-raised pl-8 pr-3 text-[12.5px] text-zinc-200 placeholder-zinc-600 outline-none transition-colors focus:border-line-strong"
+                        className="h-7 w-full rounded-lg border border-line bg-surface-raised pl-8 pr-3 text-[12.5px] text-zinc-200 placeholder-zinc-600 outline-none transition-colors duration-[--duration-fast] ease-[--ease-ios] focus:border-line-strong"
                     />
                 </div>
             </div>
@@ -101,7 +101,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
                 {all.length === 0 ? (
                     <EmptyCollections onImport={() => setIsImportModalOpen(true)} onCreate={() => setIsModalOpen(true)} />
                 ) : visible.length === 0 ? (
-                    <p className="px-3 py-6 text-center text-xs text-zinc-600">
+                    <p className="px-3 py-6 text-center text-[12px] text-zinc-600">
                         Nothing matches &ldquo;{searchQuery.trim()}&rdquo;.
                     </p>
                 ) : (

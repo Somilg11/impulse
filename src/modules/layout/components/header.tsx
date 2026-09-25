@@ -42,7 +42,7 @@ const Header = ({ user }: Props) => {
 
             {/* Mobile hamburger */}
             <button
-                className="md:hidden p-1.5 text-zinc-400 hover:text-white transition-colors"
+                className="md:hidden p-1.5 text-zinc-400 hover:text-white transition-colors duration-[--duration-fast] ease-[--ease-ios]"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
                 {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}

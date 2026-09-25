@@ -28,14 +28,14 @@ const EmptyCollections = ({ onImport, onCreate }: EmptyCollectionsProps) => {
         {onCreate && (
           <button
             onClick={onCreate}
-            className="h-8 w-full rounded-lg bg-brand text-[12.5px] font-medium text-white transition-colors hover:bg-brand-hover"
+            className="h-8 w-full rounded-lg bg-brand text-[12.5px] font-medium text-white transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:bg-brand-hover"
           >
             New collection
           </button>
         )}
         <button
           onClick={onImport}
-          className="flex h-8 w-full items-center justify-center gap-1.5 rounded-lg border border-line bg-surface-raised text-[12.5px] font-medium text-zinc-300 transition-colors hover:bg-surface-hover"
+          className="flex h-8 w-full items-center justify-center gap-1.5 rounded-lg border border-line bg-surface-raised text-[12.5px] font-medium text-zinc-300 transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:bg-surface-hover"
         >
           <Upload className="h-3.5 w-3.5" />
           Import

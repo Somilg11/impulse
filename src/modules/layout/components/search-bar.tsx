@@ -29,7 +29,7 @@ const SearchBar = () => {
             >
                 <span className="inline-flex flex-1 items-center">
                     <Search size={14} className="mr-2 text-zinc-500" />
-                    <span className="text-xs text-left pr-2">Search documentation...</span>
+                    <span className="text-[12px] text-left pr-2">Search documentation...</span>
                 </span>
                 <span className="flex space-x-1 items-center">
                     <kbd className="px-1.5 py-0.5 text-[10px] bg-white/10 text-zinc-500 border border-white/5 rounded">⌘</kbd>
@@ -45,23 +45,23 @@ const SearchBar = () => {
                         className="bg-transparent border-none text-zinc-200 placeholder:text-zinc-500 h-12"
                     />
                     <CommandList className="bg-transparent max-h-[300px] overflow-y-auto">
-                        <CommandEmpty className="text-zinc-500 py-6 text-center text-sm">No results found.</CommandEmpty>
+                        <CommandEmpty className="text-zinc-500 py-6 text-center text-[13px]">No results found.</CommandEmpty>
                         <CommandGroup heading="Suggestions" className="px-2 pb-2">
-                            <CommandItem onSelect={() => setOpen(false)} className="text-zinc-300 hover:bg-white/5 rounded-lg flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors">
-                                <span className="p-1 bg-brand/10 rounded text-brand text-xs font-bold uppercase tracking-wider">REST</span>
-                                <span className="text-sm">Pre-request Script</span>
+                            <CommandItem onSelect={() => setOpen(false)} className="text-zinc-300 hover:bg-white/5 rounded-lg flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors duration-[--duration-fast] ease-[--ease-ios]">
+                                <span className="p-1 bg-brand/10 rounded text-brand text-[12px] font-bold uppercase tracking-wider">REST</span>
+                                <span className="text-[13px]">Pre-request Script</span>
                             </CommandItem>
-                            <CommandItem onSelect={() => setOpen(false)} className="text-zinc-300 hover:bg-white/5 rounded-lg flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors">
-                                <span className="p-1 bg-green-500/10 rounded text-green-400 text-xs font-bold uppercase tracking-wider">TEST</span>
-                                <span className="text-sm">Tests</span>
+                            <CommandItem onSelect={() => setOpen(false)} className="text-zinc-300 hover:bg-white/5 rounded-lg flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors duration-[--duration-fast] ease-[--ease-ios]">
+                                <span className="p-1 bg-green-500/10 rounded text-green-400 text-[12px] font-bold uppercase tracking-wider">TEST</span>
+                                <span className="text-[13px]">Tests</span>
                             </CommandItem>
-                            <CommandItem onSelect={() => setOpen(false)} className="text-zinc-300 hover:bg-white/5 rounded-lg flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors">
-                                <span className="p-1 bg-purple-500/10 rounded text-purple-400 text-xs font-bold uppercase tracking-wider">ENV</span>
-                                <span className="text-sm">Variables</span>
+                            <CommandItem onSelect={() => setOpen(false)} className="text-zinc-300 hover:bg-white/5 rounded-lg flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors duration-[--duration-fast] ease-[--ease-ios]">
+                                <span className="p-1 bg-purple-500/10 rounded text-purple-400 text-[12px] font-bold uppercase tracking-wider">ENV</span>
+                                <span className="text-[13px]">Variables</span>
                             </CommandItem>
-                            <CommandItem onSelect={() => setOpen(false)} className="text-zinc-300 hover:bg-white/5 rounded-lg flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors">
-                                <span className="p-1 bg-yellow-500/10 rounded text-yellow-400 text-xs font-bold uppercase tracking-wider">DOCS</span>
-                                <span className="text-sm">Documentation</span>
+                            <CommandItem onSelect={() => setOpen(false)} className="text-zinc-300 hover:bg-white/5 rounded-lg flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors duration-[--duration-fast] ease-[--ease-ios]">
+                                <span className="p-1 bg-yellow-500/10 rounded text-yellow-400 text-[12px] font-bold uppercase tracking-wider">DOCS</span>
+                                <span className="text-[13px]">Documentation</span>
                             </CommandItem>
                         </CommandGroup>
                     </CommandList>

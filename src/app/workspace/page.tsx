@@ -33,7 +33,7 @@ const Page = () => {
       <div className="md:hidden flex items-center border-b border-line bg-canvas px-3 h-9 shrink-0">
         <button
           onClick={() => setShowMobileSidebar(!showMobileSidebar)}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-all ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[12px] font-medium transition-all ${
             showMobileSidebar
               ? "bg-line text-brand"
               : "text-zinc-400 hover:text-zinc-300"

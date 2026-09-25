@@ -70,7 +70,7 @@ const InviteMember = () => {
           {/* Members Avatars */}
           <div className="flex -space-x-2 overflow-hidden mb-3">
             {isLoading ? (
-              <p className="text-xs text-muted-foreground">Loading members...</p>
+              <p className="text-[12px] text-muted-foreground">Loading members...</p>
             ) : (
               workspaceMembers?.map((member) => (
                 <Hint key={member.id} label={member.user.name || "Unknown User"}>

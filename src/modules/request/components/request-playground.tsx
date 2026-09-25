@@ -111,7 +111,7 @@ export default function PlaygroundPage() {
 
         <button
           onClick={addTab}
-          className="h-9 rounded-lg bg-brand px-4 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover"
+          className="h-9 rounded-lg bg-brand px-4 text-[13px] font-medium text-white transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:bg-brand-hover"
         >
           New request
         </button>

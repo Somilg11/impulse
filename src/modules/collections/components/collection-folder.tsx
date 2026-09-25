@@ -78,7 +78,7 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                 {/* Collection header */}
                 <div className="flex items-center group">
                     <CollapsibleTrigger
-                        className="flex flex-1 cursor-pointer items-center gap-1.5 rounded-md px-2 py-[5px] text-left transition-colors hover:bg-surface-hover"
+                        className="flex flex-1 cursor-pointer items-center gap-1.5 rounded-md px-2 py-[5px] text-left transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:bg-surface-hover"
                         style={{ paddingLeft: `${12 + depth * 12}px` }}
                     >
                         {hasRequests ? (
@@ -90,7 +90,7 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                         ) : (
                             <div className="w-3 h-3 shrink-0" />
                         )}
-                        <span className="text-xs text-zinc-300 font-medium truncate">
+                        <span className="text-[12px] text-zinc-300 font-medium truncate">
                             {collection.name}
                         </span>
                         {/* Count conveys size without expanding; folders are counted
@@ -105,48 +105,48 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                     <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity pr-1">
                         <button 
                             onClick={() => setIsAddRequestOpen(true)}
-                            className="p-1 hover:bg-line rounded text-zinc-500 hover:text-zinc-300 transition-colors"
+                            className="p-1 hover:bg-line rounded text-zinc-500 hover:text-zinc-300 transition-colors duration-[--duration-fast] ease-[--ease-ios]"
                         >
                             <FilePlus className="w-3 h-3" />
                         </button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className="p-1 hover:bg-line rounded text-zinc-500 hover:text-zinc-300 transition-colors">
+                                <button className="p-1 hover:bg-line rounded text-zinc-500 hover:text-zinc-300 transition-colors duration-[--duration-fast] ease-[--ease-ios]">
                                     <EllipsisVertical className="w-3 h-3" />
                                 </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="bg-surface-raised border border-line text-zinc-300 rounded-lg shadow-xl w-36">
-                                <DropdownMenuItem onClick={() => setIsAddRequestOpen(true)} className="text-xs hover:bg-line cursor-pointer gap-2">
+                                <DropdownMenuItem onClick={() => setIsAddRequestOpen(true)} className="text-[12px] hover:bg-line cursor-pointer gap-2">
                                     <FilePlus className="w-3 h-3 text-green-400" />
                                     Add Request
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsRunnerOpen(true)} className="text-xs hover:bg-line cursor-pointer gap-2">
+                                <DropdownMenuItem onClick={() => setIsRunnerOpen(true)} className="text-[12px] hover:bg-line cursor-pointer gap-2">
                                     <Play className="w-3 h-3" />
                                     Run collection
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsAddFolderOpen(true)} className="text-xs hover:bg-line cursor-pointer gap-2">
+                                <DropdownMenuItem onClick={() => setIsAddFolderOpen(true)} className="text-[12px] hover:bg-line cursor-pointer gap-2">
                                     <FolderPlus className="w-3 h-3" />
                                     New Folder
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="text-xs hover:bg-line cursor-pointer gap-2">
+                                <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="text-[12px] hover:bg-line cursor-pointer gap-2">
                                     <Edit className="w-3 h-3 text-brand" />
                                     Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => exportCollection("postman")}
-                                    className="text-xs hover:bg-line cursor-pointer gap-2"
+                                    className="text-[12px] hover:bg-line cursor-pointer gap-2"
                                 >
                                     <Download className="w-3 h-3" />
                                     Export (Postman)
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => exportCollection("impulse")}
-                                    className="text-xs hover:bg-line cursor-pointer gap-2"
+                                    className="text-[12px] hover:bg-line cursor-pointer gap-2"
                                 >
                                     <Download className="w-3 h-3" />
                                     Export (Impulse)
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-xs hover:bg-line cursor-pointer gap-2">
+                                <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-[12px] hover:bg-line cursor-pointer gap-2">
                                     <Trash className="w-3 h-3 text-red-400" />
                                     Delete
                                 </DropdownMenuItem>
@@ -179,14 +179,14 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                                 <button
                                     key={request.id}
                                     onClick={() => openRequestTab(request)}
-                                    className="group/req flex w-full items-center gap-2 rounded-md px-2 py-[5px] text-left transition-colors hover:bg-surface-hover"
+                                    className="group/req flex w-full items-center gap-2 rounded-md px-2 py-[5px] text-left transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:bg-surface-hover"
                                 >
                                     <span className={`text-[9px] font-bold px-1 py-0.5 rounded shrink-0 ${
                                         methodBadge(request.method)
                                     }`}>
                                         {request.method}
                                     </span>
-                                    <span className="text-xs text-zinc-300 truncate">
+                                    <span className="text-[12px] text-zinc-300 truncate">
                                         {request.name || "Untitled"}
                                     </span>
                                 </button>

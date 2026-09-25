@@ -147,7 +147,7 @@ const CollectionRunner = ({ collectionId, collectionName, isOpen, onClose }: Pro
       <DialogContent className="bg-canvas border-line text-zinc-200 max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-white">Run &ldquo;{collectionName}&rdquo;</DialogTitle>
-          <DialogDescription className="text-zinc-500 text-xs">
+          <DialogDescription className="text-zinc-500 text-[12px]">
             Requests run one after another, in collection order.{" "}
             {activeEnvironmentName
               ? `Using the "${activeEnvironmentName}" environment.`
@@ -160,7 +160,7 @@ const CollectionRunner = ({ collectionId, collectionName, isOpen, onClose }: Pro
             size="sm"
             onClick={run}
             disabled={running}
-            className="h-8 bg-brand hover:bg-brand-hover text-xs"
+            className="h-8 bg-brand hover:bg-brand-hover text-[12px]"
           >
             {running ? (
               <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
@@ -177,14 +177,14 @@ const CollectionRunner = ({ collectionId, collectionName, isOpen, onClose }: Pro
               onClick={() => {
                 cancelRef.current = true;
               }}
-              className="h-8 text-xs text-zinc-400 hover:text-zinc-200"
+              className="h-8 text-[12px] text-zinc-400 hover:text-zinc-200"
             >
               <Square className="h-3 w-3 mr-1.5" /> Stop
             </Button>
           )}
 
           {completed.length > 0 && (
-            <div className="ml-auto flex items-center gap-2 text-xs">
+            <div className="ml-auto flex items-center gap-2 text-[12px]">
               <Badge
                 variant="secondary"
                 className={`border-0 ${
@@ -214,7 +214,7 @@ const CollectionRunner = ({ collectionId, collectionName, isOpen, onClose }: Pro
         <ScrollArea className="h-[340px] border border-line rounded-lg">
           {rows.length === 0 ? (
             <div className="h-[330px] flex items-center justify-center">
-              <p className="text-xs text-zinc-600">
+              <p className="text-[12px] text-zinc-600">
                 Press Run to execute every request in this collection.
               </p>
             </div>
@@ -244,7 +244,7 @@ const CollectionRunner = ({ collectionId, collectionName, isOpen, onClose }: Pro
                       {row.method}
                     </span>
 
-                    <span className="flex-1 min-w-0 truncate text-xs text-zinc-300">
+                    <span className="flex-1 min-w-0 truncate text-[12px] text-zinc-300">
                       {row.label}
                     </span>
 

@@ -82,12 +82,12 @@ const ImportModal = ({
                     onClick={() => fileInputRef.current?.click()}
                     className="border-2 border-dashed border-line rounded-xl p-8 flex flex-col items-center justify-center gap-3 hover:bg-surface-raised cursor-pointer transition-all group"
                 >
-                    <div className="p-3 bg-brand/10 rounded-full group-hover:bg-brand/20 transition-colors">
+                    <div className="p-3 bg-brand/10 rounded-full group-hover:bg-brand/20 transition-colors duration-[--duration-fast] ease-[--ease-ios]">
                         <Upload className="w-6 h-6 text-brand" />
                     </div>
                     <div className="text-center">
-                        <p className="text-sm font-medium text-zinc-200">Click to upload or drag and drop</p>
-                        <p className="text-xs text-zinc-500 mt-1">JSON files (Postman or Impulse export)</p>
+                        <p className="text-[13px] font-medium text-zinc-200">Click to upload or drag and drop</p>
+                        <p className="text-[12px] text-zinc-500 mt-1">JSON files (Postman or Impulse export)</p>
                     </div>
                     <input 
                         type="file" 
@@ -110,7 +110,7 @@ const ImportModal = ({
                         value={jsonContent}
                         onChange={(e) => setJsonContent(e.target.value)}
                         placeholder='{ "collections": [...] }'
-                        className="h-40 w-full resize-none rounded-lg border border-line bg-canvas p-3 font-mono text-[12px] text-zinc-300 placeholder-zinc-700 outline-none transition-colors focus:border-line-strong"
+                        className="h-40 w-full resize-none rounded-lg border border-line bg-canvas p-3 font-mono text-[12px] text-zinc-300 placeholder-zinc-700 outline-none transition-colors duration-[--duration-fast] ease-[--ease-ios] focus:border-line-strong"
                     />
                     <div className="absolute top-2 right-2 p-1.5 bg-surface-raised border border-line rounded text-zinc-500">
                         <FileJson className="w-3.5 h-3.5" />

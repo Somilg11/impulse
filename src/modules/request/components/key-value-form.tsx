@@ -159,7 +159,7 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
         <div className="space-y-4">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-zinc-400">
+            <h3 className="text-[13px] font-medium text-zinc-400">
               Query Parameters
             </h3>
             <div className="flex items-center gap-2">
@@ -198,11 +198,11 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
                           <Input
                             {...field}
                             placeholder={placeholder.key}
-                            className="bg-transparent border-0 focus:ring-0 focus:border-0 text-sm placeholder:text-zinc-500"
+                            className="bg-transparent border-0 focus:ring-0 focus:border-0 text-[13px] placeholder:text-zinc-500"
                             disabled={!form.watch(`items.${index}.enabled`)}
                           />
                         </FormControl>
-                        <FormMessage className="text-xs" />
+                        <FormMessage className="text-[12px]" />
                       </FormItem>
                     )}
                   />
@@ -219,11 +219,11 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
                           <Input
                             {...field}
                             placeholder={placeholder.value}
-                            className="bg-transparent border-0 focus:ring-0 focus:border-0 text-sm placeholder:text-zinc-500"
+                            className="bg-transparent border-0 focus:ring-0 focus:border-0 text-[13px] placeholder:text-zinc-500"
                             disabled={!form.watch(`items.${index}.enabled`)}
                           />
                         </FormControl>
-                        <FormMessage className="text-xs" />
+                        <FormMessage className="text-[12px]" />
                       </FormItem>
                     )}
                   />
@@ -243,7 +243,7 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
                               size="sm"
                               onClick={() => toggleEnabled(index)}
                               className={cn(
-                                "h-5 w-5 p-0 rounded-sm border-2 transition-colors",
+                                "h-5 w-5 p-0 rounded-sm border-2 transition-colors duration-[--duration-fast] ease-[--ease-ios]",
                                 checkboxField.value
                                   ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
                                   : "border-red-500 text-red-500 hover:border-red-400"
@@ -270,7 +270,7 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
                     onClick={() => removeRow(index)}
                     disabled={fields.length <= 1}
                     className={cn(
-                      "h-5 w-5 p-0 transition-colors",
+                      "h-5 w-5 p-0 transition-colors duration-[--duration-fast] ease-[--ease-ios]",
                       fields.length <= 1
                         ? "text-zinc-600 cursor-not-allowed"
                         : "text-red-400 hover:text-red-300 hover:bg-red-900/20"
@@ -285,7 +285,7 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
 
           {/* Autosave enabled — changes are saved automatically */}
           <div className="flex justify-end pt-4">
-            <span className="text-xs text-zinc-500">
+            <span className="text-[12px] text-zinc-500">
               Changes saved automatically
             </span>
           </div>

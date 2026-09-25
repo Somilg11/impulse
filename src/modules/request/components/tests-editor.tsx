@@ -28,7 +28,7 @@ interface Props {
 }
 
 const control =
-  "h-8 text-xs bg-canvas border-line text-zinc-200 focus-visible:ring-0 focus:ring-0";
+  "h-8 text-[12px] bg-canvas border-line text-zinc-200 focus-visible:ring-0 focus:ring-0";
 
 let counter = 0;
 const nextId = () => `a${Date.now().toString(36)}${counter++}`;
@@ -57,7 +57,7 @@ const TestsEditor = ({ value, onChange }: Props) => {
     <div className="space-y-3">
       {assertions.length === 0 && (
         <div className="py-8 text-center">
-          <p className="text-xs text-zinc-500 mb-1">No assertions yet.</p>
+          <p className="text-[12px] text-zinc-500 mb-1">No assertions yet.</p>
           <p className="text-[11px] text-zinc-600">
             Add one to check the response every time this request runs.
           </p>
@@ -74,7 +74,7 @@ const TestsEditor = ({ value, onChange }: Props) => {
               type="checkbox"
               checked={assertion.enabled !== false}
               onChange={(e) => update(assertion.id, { enabled: e.target.checked })}
-              className="accent-[var(--color-brand)] shrink-0"
+              className="h-[14px] w-[14px] shrink-0 cursor-pointer accent-[var(--color-brand)]"
               title="Enabled"
             />
 
@@ -92,7 +92,7 @@ const TestsEditor = ({ value, onChange }: Props) => {
               </SelectTrigger>
               <SelectContent className="rounded-xl border-line bg-surface-raised text-zinc-300">
                 {SOURCES.map((option) => (
-                  <SelectItem key={option.value} value={option.value} className="text-xs">
+                  <SelectItem key={option.value} value={option.value} className="text-[12px]">
                     {option.label}
                   </SelectItem>
                 ))}
@@ -121,7 +121,7 @@ const TestsEditor = ({ value, onChange }: Props) => {
               </SelectTrigger>
               <SelectContent className="rounded-xl border-line bg-surface-raised text-zinc-300">
                 {COMPARATORS.map((option) => (
-                  <SelectItem key={option.value} value={option.value} className="text-xs">
+                  <SelectItem key={option.value} value={option.value} className="text-[12px]">
                     {option.label}
                   </SelectItem>
                 ))}
@@ -154,7 +154,7 @@ const TestsEditor = ({ value, onChange }: Props) => {
           size="sm"
           variant="ghost"
           onClick={add}
-          className="h-7 text-xs text-zinc-400 hover:text-zinc-200"
+          className="h-7 text-[12px] text-zinc-400 hover:text-zinc-200"
         >
           <Plus className="h-3.5 w-3.5 mr-1" /> Add assertion
         </Button>
