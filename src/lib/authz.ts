@@ -81,6 +81,22 @@ export async function assertCollectionAccess(
   return { ...ctx, collectionId: collection.id };
 }
 
+export async function assertEnvironmentAccess(
+  environmentId: string,
+  min: MEMBER_ROLE = MEMBER_ROLE.VIEWER
+) {
+  if (!environmentId) throw new AuthzError("Environment not found");
+
+  const environment = await db.environment.findUnique({
+    where: { id: environmentId },
+    select: { id: true, workspaceId: true },
+  });
+  if (!environment) throw new AuthzError("Environment not found");
+
+  const ctx = await assertWorkspaceMember(environment.workspaceId, min);
+  return { ...ctx, environmentId: environment.id };
+}
+
 export async function assertRequestAccess(
   requestId: string,
   min: MEMBER_ROLE = MEMBER_ROLE.VIEWER

@@ -1,7 +1,7 @@
 "use server";
 
 import db from "@/lib/db";
-import { MEMBER_ROLE, REST_METHOD } from "@prisma/client";
+import { BODY_TYPE, MEMBER_ROLE, REST_METHOD } from "@prisma/client";
 
 import {
   assertCollectionAccess,
@@ -17,6 +17,11 @@ export type Request = {
   body?: string;
   headers?: string;
   parameters?: string;
+  bodyType?: BODY_TYPE;
+  /** Serialized AuthConfig - see src/lib/auth-schemes.ts */
+  auth?: string;
+  /** Serialized Assertion[] - see src/lib/assertions.ts */
+  tests?: string;
 };
 
 export type RunResponse = {
@@ -40,6 +45,9 @@ export const addRequestToCollection = async (
       body: value.body,
       headers: value.headers,
       parameters: value.parameters,
+      bodyType: value.bodyType ?? BODY_TYPE.JSON,
+      auth: value.auth,
+      tests: value.tests,
     },
   });
 };
@@ -56,6 +64,9 @@ export const saveRequest = async (id: string, value: Request) => {
       body: value.body,
       headers: value.headers,
       parameters: value.parameters,
+      ...(value.bodyType ? { bodyType: value.bodyType } : {}),
+      ...(value.auth !== undefined ? { auth: value.auth } : {}),
+      ...(value.tests !== undefined ? { tests: value.tests } : {}),
     },
   });
 };
@@ -81,7 +92,8 @@ export const deleteRequest = async (id: string) => {
  */
 export const recordRun = async (
   requestId: string,
-  result: ExecResult
+  result: ExecResult,
+  testResults?: unknown
 ): Promise<{ runId: string }> => {
   await assertRequestAccess(requestId);
 
@@ -93,6 +105,9 @@ export const recordRun = async (
       headers: result.headers ?? {},
       body: result.body ?? "",
       durationMs: Math.round(result.durationMs ?? 0),
+      size: result.size ?? 0,
+      via: result.via,
+      ...(testResults !== undefined ? { testResults: testResults as object } : {}),
     },
     select: { id: true },
   });
@@ -141,4 +156,69 @@ export const getRequestRuns = async (requestId: string, take = 20) => {
     orderBy: { createdAt: "desc" },
     take,
   });
+};
+
+/**
+ * Every request in a collection and its subfolders, in run order.
+ *
+ * Used by the collection runner. Requests carry their auth, body type, and
+ * assertions so the runner composes them exactly as a manual send would.
+ */
+export const getRunnableRequests = async (collectionId: string) => {
+  await assertCollectionAccess(collectionId);
+
+  const collect = async (
+    id: string,
+    prefix: string
+  ): Promise<
+    {
+      id: string;
+      label: string;
+      name: string;
+      method: string;
+      url: string;
+      headers: unknown;
+      parameters: unknown;
+      body: unknown;
+      bodyType: string;
+      auth: unknown;
+      tests: unknown;
+    }[]
+  > => {
+    const [requests, folders] = await Promise.all([
+      db.request.findMany({
+        where: { collectionId: id },
+        orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+      }),
+      db.collection.findMany({
+        where: { parentId: id },
+        orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+        select: { id: true, name: true },
+      }),
+    ]);
+
+    const own = requests.map((request) => ({
+      id: request.id,
+      label: prefix ? `${prefix} / ${request.name}` : request.name,
+      name: request.name,
+      method: request.method as string,
+      url: request.url,
+      headers: request.headers,
+      parameters: request.parameters,
+      body: request.body,
+      bodyType: request.bodyType as string,
+      auth: request.auth,
+      tests: request.tests,
+    }));
+
+    const nested = await Promise.all(
+      folders.map((folder) =>
+        collect(folder.id, prefix ? `${prefix} / ${folder.name}` : folder.name)
+      )
+    );
+
+    return [...own, ...nested.flat()];
+  };
+
+  return await collect(collectionId, "");
 };

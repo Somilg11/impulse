@@ -5,6 +5,9 @@ import {
     Edit,
     ChevronDown,
     ChevronRight,
+    Download,
+    FolderPlus,
+    Play,
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -19,25 +22,39 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import EditCollectionModal from "./edit-collection";
+import { useExportCollection } from "../hooks/collections";
+import CreateCollection from "./create-collection";
+import CollectionRunner from "@/modules/request/components/collection-runner";
 import DeleteCollectionModal from "./delete-collection";
 import SaveRequestToCollectionModal from "./add-request-modal";
 import { useGetAllRequestFromCollection } from "@/modules/request/hooks/request";
 import { REST_METHOD } from "@prisma/client";
 import { useRequestPlaygroundStore } from "@/modules/request/store/useRequestStore";
 
-interface Props {
-    collection: {
-        id: string;
-        name: string;
-        updatedAt: Date;
-        workspaceId: string;
-    }
+interface CollectionNode {
+    id: string;
+    name: string;
+    updatedAt: Date;
+    workspaceId: string;
+    parentId?: string | null;
 }
 
-const CollectionFolder = ({ collection }: Props) => {
+interface Props {
+    collection: CollectionNode;
+    /** Sibling folders nested under this one. */
+    children?: CollectionNode[];
+    /** Look up a node's own children, so the tree can recurse. */
+    childrenOf?: (parentId: string) => CollectionNode[];
+    depth?: number;
+}
+
+const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
+    const childFolders = childrenOf?.(collection.id) ?? [];
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isAddRequestOpen, setIsAddRequestOpen] = useState(false);
+    const [isAddFolderOpen, setIsAddFolderOpen] = useState(false);
+    const [isRunnerOpen, setIsRunnerOpen] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const {
@@ -47,6 +64,7 @@ const CollectionFolder = ({ collection }: Props) => {
   } = useGetAllRequestFromCollection(collection.id);
 
   const { openRequestTab, activeTabId } = useRequestPlaygroundStore();
+    const exportCollection = useExportCollection(collection.id, collection.name);
 
   const methodColorMap: Record<REST_METHOD, string> = {
     [REST_METHOD.GET]: "text-green-400 bg-green-400/10",
@@ -67,7 +85,10 @@ const CollectionFolder = ({ collection }: Props) => {
             >
                 {/* Collection header */}
                 <div className="flex items-center group">
-                    <CollapsibleTrigger className="flex items-center gap-1.5 flex-1 px-3 py-1.5 hover:bg-[#1e2330]/50 rounded transition-colors cursor-pointer text-left">
+                    <CollapsibleTrigger
+                        className="flex items-center gap-1.5 flex-1 px-3 py-1.5 hover:bg-[#1e2330]/50 rounded transition-colors cursor-pointer text-left"
+                        style={{ paddingLeft: `${12 + depth * 12}px` }}
+                    >
                         {hasRequests ? (
                             isCollapsed ? (
                                 <ChevronDown className="w-3 h-3 text-zinc-500 shrink-0" />
@@ -100,9 +121,31 @@ const CollectionFolder = ({ collection }: Props) => {
                                     <FilePlus className="w-3 h-3 text-green-400" />
                                     Add Request
                                 </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setIsRunnerOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
+                                    <Play className="w-3 h-3" />
+                                    Run collection
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setIsAddFolderOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
+                                    <FolderPlus className="w-3 h-3" />
+                                    New Folder
+                                </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
                                     <Edit className="w-3 h-3 text-blue-400" />
                                     Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => exportCollection("postman")}
+                                    className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2"
+                                >
+                                    <Download className="w-3 h-3" />
+                                    Export (Postman)
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => exportCollection("impulse")}
+                                    className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2"
+                                >
+                                    <Download className="w-3 h-3" />
+                                    Export (Impulse)
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
                                     <Trash className="w-3 h-3 text-red-400" />
@@ -115,6 +158,16 @@ const CollectionFolder = ({ collection }: Props) => {
 
                 {/* Requests list */}
                 <CollapsibleContent>
+                    {/* Child folders first, so requests read as leaves of this level */}
+                    {childFolders.map((child) => (
+                        <CollectionFolder
+                            key={child.id}
+                            collection={child}
+                            childrenOf={childrenOf}
+                            depth={depth + 1}
+                        />
+                    ))}
+
                     {isPending ? (
                         <div className="pl-7 py-2">
                             <div className="w-3 h-3 border-2 border-[#1e2330] border-t-blue-400 rounded-full animate-spin" />
@@ -150,6 +203,21 @@ const CollectionFolder = ({ collection }: Props) => {
                 isModalOpen={isAddRequestOpen}
                 setIsModalOpen={setIsAddRequestOpen}
                 collectionId={collection.id}
+            />
+
+            <CollectionRunner
+                collectionId={collection.id}
+                collectionName={collection.name}
+                isOpen={isRunnerOpen}
+                onClose={() => setIsRunnerOpen(false)}
+            />
+
+            <CreateCollection
+                workspaceId={collection.workspaceId}
+                parentId={collection.id}
+                parentName={collection.name}
+                isModalOpen={isAddFolderOpen}
+                setIsModalOpen={setIsAddFolderOpen}
             />
 
             <EditCollectionModal

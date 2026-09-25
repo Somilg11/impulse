@@ -2,12 +2,13 @@
 
 import {
   applyParams,
-  buildExecRequest,
   byteLength,
   headersToObject,
   type ExecRequest,
   type ExecResult,
 } from "@/lib/http";
+import { composeRequest, type RequestDraft } from "@/lib/request-pipeline";
+import type { VariableMap } from "@/lib/variables";
 
 /**
  * Request execution modes.
@@ -24,12 +25,12 @@ export type SendMode = "auto" | "browser" | "proxy";
 
 export const BROWSER_TIMEOUT_MS = 30_000;
 
-export type SendInput = {
-  method: string;
-  url: string;
-  headers?: unknown;
-  parameters?: unknown;
-  body?: unknown;
+export type SendInput = RequestDraft;
+
+export type SendOutcome = {
+  result: ExecResult;
+  /** Variables referenced by the request but missing from the environment. */
+  missingVariables: string[];
 };
 
 function failure(
@@ -149,30 +150,44 @@ export async function executeViaProxy(request: ExecRequest): Promise<ExecResult>
 }
 
 /**
- * Send a request using the selected mode. Works for unsaved tabs: nothing here
- * needs a database id.
+ * Send a request using the selected mode.
+ *
+ * Composition (variables, auth, body encoding) happens here so browser and proxy
+ * sends are byte-identical, and so unsaved tabs work - nothing in this path
+ * needs a database row.
  */
 export async function sendRequest(
   input: SendInput,
+  variables: VariableMap = {},
   mode: SendMode = "auto"
-): Promise<ExecResult> {
-  const request = buildExecRequest(input);
+): Promise<SendOutcome> {
+  const { request, missingVariables } = composeRequest(input, variables);
 
-  if (!request.url) return failure("browser", "URL is required", 0);
+  if (!request.url) {
+    return {
+      result: failure("browser", "URL is required", 0),
+      missingVariables,
+    };
+  }
 
   try {
     // Reject obviously malformed URLs before spending a round trip.
     new URL(request.url);
   } catch {
-    return failure(
-      "browser",
-      "Invalid URL. Include the scheme, e.g. https://api.example.com",
-      0
-    );
+    const hint = missingVariables.length
+      ? `Unresolved variable${missingVariables.length > 1 ? "s" : ""}: ${missingVariables
+          .map((v) => `{{${v}}}`)
+          .join(", ")}`
+      : "Invalid URL. Include the scheme, e.g. https://api.example.com";
+    return { result: failure("browser", hint, 0), missingVariables };
   }
 
-  if (mode === "proxy") return await executeViaProxy(request);
-  if (mode === "browser") return await executeInBrowser(request);
+  if (mode === "proxy") {
+    return { result: await executeViaProxy(request), missingVariables };
+  }
+  if (mode === "browser") {
+    return { result: await executeInBrowser(request), missingVariables };
+  }
 
   const browserResult = await executeInBrowser(request);
 
@@ -181,7 +196,7 @@ export async function sendRequest(
   const shouldFallBack =
     Boolean(browserResult.error) && browserResult.status === 0;
 
-  if (!shouldFallBack) return browserResult;
+  if (!shouldFallBack) return { result: browserResult, missingVariables };
 
   const proxyResult = await executeViaProxy(request);
 
@@ -189,10 +204,13 @@ export async function sendRequest(
   // more actionable one (CORS vs. "private address blocked").
   if (proxyResult.error) {
     return {
-      ...proxyResult,
-      error: `${proxyResult.error} (browser: ${browserResult.error})`,
+      result: {
+        ...proxyResult,
+        error: `${proxyResult.error} (browser: ${browserResult.error})`,
+      },
+      missingVariables,
     };
   }
 
-  return proxyResult;
+  return { result: proxyResult, missingVariables };
 }

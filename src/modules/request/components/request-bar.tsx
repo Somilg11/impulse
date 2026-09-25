@@ -12,7 +12,11 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Loader } from 'lucide-react'
+import { Code2, Loader } from 'lucide-react'
+import { useState } from 'react'
+import { looksLikeCurl, parseCurl } from '@/lib/curl'
+import CodeDialog from './code-dialog'
+import { Hint } from '@/components/ui/hint'
 import { useSendRequest } from '../hooks/request'
 import { toast } from 'sonner'
 import { METHODS } from '@/lib/http'
@@ -42,10 +46,43 @@ const RequestBar = ({ tab, updateTab }: Props) => {
   const setSendMode = useRequestPlaygroundStore((s) => s.setSendMode);
 
   const { mutateAsync, isPending } = useSendRequest();
+  const [codeOpen, setCodeOpen] = useState(false);
+
+  /**
+   * Pasting a curl command fills the whole request instead of dumping the
+   * command into the URL field. Browser devtools and API docs both hand you
+   * curl, so this is the fastest path in.
+   */
+  const onUrlPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    const text = event.clipboardData.getData('text');
+    if (!looksLikeCurl(text)) return;
+
+    const parsed = parseCurl(text);
+    if (!parsed) return;
+
+    event.preventDefault();
+    updateTab(tab.id, {
+      method: parsed.method,
+      url: parsed.url,
+      headers: JSON.stringify(parsed.headers),
+      parameters: JSON.stringify(parsed.parameters),
+      body: parsed.body ?? '',
+      bodyType: parsed.bodyType,
+      ...(parsed.auth ? { auth: JSON.stringify(parsed.auth) } : {}),
+    });
+    toast.success('Imported from cURL');
+  };
 
   const onSendRequest = async () => {
     try {
-      const { result } = await mutateAsync(tab);
+      const { result, missingVariables } = await mutateAsync(tab);
+
+      if (missingVariables.length) {
+        toast.warning(
+          `Unresolved: ${missingVariables.map((v) => `{{${v}}}`).join(", ")}`,
+          { description: "Select an environment that defines them." }
+        );
+      }
 
       if (result.error) {
         toast.error(result.error);
@@ -88,13 +125,26 @@ const RequestBar = ({ tab, updateTab }: Props) => {
         {/* URL input */}
         <Input
           value={tab.url || ''}
+          onPaste={onUrlPaste}
           onChange={(e) => updateTab(tab.id, { url: e.target.value })}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && tab.url && !isPending) onSendRequest();
           }}
-          placeholder="https://api.example.com/users"
+          placeholder="https://api.example.com/users — or paste a cURL command"
           className="flex-1 min-w-0 bg-transparent border-0 rounded-none h-10 px-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:ring-offset-0"
         />
+
+        {/* Code snippet */}
+        <Hint label="View as code" side="bottom">
+          <button
+            type="button"
+            onClick={() => setCodeOpen(true)}
+            disabled={!tab.url}
+            className="h-10 px-3 border-l border-[#1e2330] text-zinc-500 hover:text-zinc-200 disabled:opacity-40 transition-colors shrink-0"
+          >
+            <Code2 className="w-4 h-4" />
+          </button>
+        </Hint>
 
         {/* Send button */}
         <Button
@@ -126,6 +176,8 @@ const RequestBar = ({ tab, updateTab }: Props) => {
           {SEND_MODES.find((m) => m.value === sendMode)?.hint}
         </span>
       </div>
+
+      <CodeDialog tab={tab} isOpen={codeOpen} onClose={() => setCodeOpen(false)} />
     </div>
   )
 }

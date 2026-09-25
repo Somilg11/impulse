@@ -9,6 +9,7 @@ import InviteMember from "./invite-member";
 import { useState } from "react";
 
 import SearchBar from "./search-bar";
+import EnvironmentSelector from "@/modules/environments/components/environment-selector";
 
 interface Props {
     user: UserProps;
@@ -34,6 +35,7 @@ const Header = ({ user }: Props) => {
 
             {/* Right: actions */}
             <div className="hidden md:flex items-center gap-3">
+                <EnvironmentSelector />
                 <SearchBar />
                 <div className="h-4 w-px bg-[#1e2330]" />
                 <InviteMember />

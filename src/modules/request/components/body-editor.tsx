@@ -28,6 +28,14 @@ import { useGenerateJsonBody } from '@/modules/ai/hooks/ai-suggestion'
 
 import { useWorkspaceStore } from '@/modules/layout/store'
 import { useRequestPlaygroundStore } from '../store/useRequestStore'
+import {
+  BODY_TYPES,
+  isFieldBody,
+  monacoLanguageFor,
+  parseBodyFields,
+  type BodyType,
+} from '@/lib/body-types'
+import KeyValueFormEditor from './key-value-form'
 
 
 const MonacoEditor = dynamic(
@@ -47,12 +55,17 @@ interface BodyEditorProps {
     contentType?: 'application/json' | 'text/plain'
     body?: string
   }
+  /** Drives the editor language, the Content-Type, and the editor shape. */
+  bodyType?: BodyType
+  onBodyTypeChange?: (next: BodyType) => void
   onSubmit: (data: BodyEditorFormData) => void
   className?: string
 }
 
 const BodyEditor: React.FC<BodyEditorProps> = ({
   initialData = { contentType: 'application/json', body: '' },
+  bodyType = 'JSON',
+  onBodyTypeChange,
   onSubmit,
   className
 }) => {
@@ -73,7 +86,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
     },
   })
 
-  const contentType = form.watch('contentType')
+  const bodyValueWatch = form.watch('body')
   const bodyValue = form.watch('body')
 
   // Handle editor value changes
@@ -131,7 +144,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
 
 
   const handleFormat = () => {
-    if (contentType === 'application/json' && bodyValue) {
+    if (bodyType === 'JSON' && bodyValue) {
       try {
         const formatted = JSON.stringify(JSON.parse(bodyValue), null, 2)
         form.setValue('body', formatted)
@@ -146,21 +159,6 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
     form.setValue('body', '')
   }
 
-  const contentTypeOptions = [
-    {
-      value: 'application/json',
-      label: 'application/json',
-      icon: Code,
-      description: 'JSON data format'
-    },
-    {
-      value: 'text/plain',
-      label: 'text/plain',
-      icon: FileText,
-      description: 'Plain text format'
-    }
-  ]
-
   return (
     <div className={cn("w-full", className)}>
       <Form {...form}>
@@ -170,43 +168,33 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
             <div className="flex items-center gap-4">
               <h3 className="text-sm font-medium text-zinc-200">Raw Request Body</h3>
               <div className="flex items-center gap-2 text-xs text-zinc-400">
-                <span>Content Type</span>
-                <FormField
-                  control={form.control}
-                  name="contentType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
+                <span>Type</span>
+                <Select
+                  value={bodyType}
+                  onValueChange={(next) => onBodyTypeChange?.(next as BodyType)}
+                >
+                  <SelectTrigger className="w-[180px] h-7 bg-[#1e2330] border-[#2a3040] text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#161b26] border-[#1e2330]">
+                    {BODY_TYPES.map((option) => (
+                      <SelectItem
+                        key={option.value}
+                        value={option.value}
+                        className="text-xs hover:bg-[#1e2330] focus:bg-[#1e2330]"
                       >
-                        <FormControl>
-                          <SelectTrigger className="w-[180px] h-7 bg-[#1e2330] border-[#2a3040] text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-[#161b26] border-[#1e2330]">
-                          {contentTypeOptions.map((option) => (
-                            <SelectItem
-                              key={option.value}
-                              value={option.value}
-                              className="text-xs hover:bg-[#1e2330] focus:bg-[#1e2330]"
-                            >
-                              <div className="flex items-center gap-2">
-                                <option.icon className="h-3 w-3" />
-                                <span>{option.label}</span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
+                        <div className="flex flex-col items-start">
+                          <span>{option.label}</span>
+                          <span className="text-[10px] text-zinc-500">{option.hint}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              {contentType === 'application/json' && (
+              {bodyType === 'JSON' && (
                 
                 <Button
                   type="button"
@@ -254,7 +242,41 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
             </div>
           </div>
 
-          {/* Editor */}
+          {/* Editor - shape depends on the body type */}
+          {bodyType === 'NONE' ? (
+            <div className="h-40 flex items-center justify-center">
+              <p className="text-xs text-zinc-600 italic">
+                This request will be sent without a body.
+              </p>
+            </div>
+          ) : isFieldBody(bodyType) ? (
+            <div className="p-3">
+              <KeyValueFormEditor
+                initialData={
+                  parseBodyFields(form.getValues('body')).length
+                    ? parseBodyFields(form.getValues('body'))
+                    : [{ key: '', value: '', enabled: true }]
+                }
+                onSubmit={(fields) => {
+                  const serialized = JSON.stringify(
+                    fields.filter((f) => f.key.trim() || f.value.trim())
+                  )
+                  form.setValue('body', serialized)
+                  onSubmit({ contentType: 'text/plain', body: serialized })
+                }}
+                placeholder={{
+                  key: 'Field Name',
+                  value: 'Field Value',
+                  description: bodyType === 'FORM_DATA' ? 'Form field' : 'Encoded field',
+                }}
+              />
+              <p className="text-[11px] text-zinc-600 mt-3">
+                {bodyType === 'FORM_DATA'
+                  ? 'Sent as multipart/form-data. Text fields only - file uploads are not supported yet.'
+                  : 'Sent as application/x-www-form-urlencoded.'}
+              </p>
+            </div>
+          ) : (
           <div className="relative h-80">
             <FormField
               control={form.control}
@@ -265,7 +287,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                     <MonacoEditor
                       height="320px"
                       value={field.value}
-                      language={contentType === 'application/json' ? 'json' : 'plaintext'}
+                      language={monacoLanguageFor(bodyType)}
                       theme="vs-dark"
                       options={{
                         automaticLayout: true,
@@ -288,6 +310,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
               )}
             />
           </div>
+          )}
 
           {/* Footer */}
           <div className="bg-[#0e1117] border-t border-[#1e2330] px-3 py-2.5 flex items-center justify-between">
