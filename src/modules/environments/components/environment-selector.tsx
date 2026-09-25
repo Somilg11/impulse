@@ -15,6 +15,7 @@ import { useWorkspaceStore } from "@/modules/layout/store";
 import { useEnvironments } from "../hooks/environments";
 import { useEnvironmentStore } from "../store";
 import EnvironmentManager from "./environment-manager";
+import { useUiStore } from "@/modules/layout/store/ui";
 
 /**
  * Picks which environment supplies `{{variables}}` for outgoing requests.
@@ -26,7 +27,9 @@ const EnvironmentSelector = () => {
   const activeByWorkspace = useEnvironmentStore((s) => s.activeByWorkspace);
   const setActiveEnvironment = useEnvironmentStore((s) => s.setActiveEnvironment);
 
-  const [managerOpen, setManagerOpen] = useState(false);
+  // Shared, so the command palette can open the same dialog.
+  const managerOpen = useUiStore((s) => s.environmentsOpen);
+  const setManagerOpen = useUiStore((s) => s.setEnvironmentsOpen);
 
   const activeId = workspaceId ? activeByWorkspace[workspaceId] ?? null : null;
   const active = environments?.find((e) => e.id === activeId) ?? null;

@@ -23,7 +23,7 @@ const EditCollectionModal = ({
     if (!name.trim()) return;
     try {
       await mutateAsync();
-      toast.success("Collection updated successfully");
+      toast.success("Collection renamed");
       setIsModalOpen(false);
     } catch (err) {
       toast.error("Failed to update collection");

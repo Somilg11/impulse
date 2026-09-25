@@ -357,6 +357,30 @@ are sent" touches one directory instead of five.
 
 ---
 
+## 8a. How it is verified
+
+169 unit tests cover the logic that decides what goes on the wire: key/value
+normalization, variable substitution, auth schemes, body encoding, the
+composition pipeline, assertions, cURL parsing, code generation, collection
+export, and the SSRF address guard. Those modules were written free of React,
+Prisma, and network access specifically so they could be tested directly - no
+mocking, no test database, and the suite runs in about half a second.
+
+The suite was mutation-checked rather than assumed correct. Three deliberate
+regressions were introduced and each was caught: letting an auth scheme
+overwrite a hand-set `Authorization` header, removing the link-local range from
+the SSRF blocklist, and blanking unresolved variables instead of leaving them
+literal.
+
+Security behaviour was additionally verified against the running application -
+seeding two users, signing real session cookies, and calling server actions over
+HTTP as the owner, as a non-member, and anonymously.
+
+The honest gap is end-to-end coverage. UI paths are verified by hand, and
+several bugs reached the browser before being caught by eye.
+
+---
+
 ## 9. Interview summary
 
 Two minutes, spoken:
@@ -497,16 +521,19 @@ and makes history paginable and prunable without touching the definition.
 ### On process
 
 **What would you build next, and why?**
-Collection export. Import already exists, so the asymmetry is the tell — the
-product takes data in and won't give it back. Portability is cheap to build and
-disproportionately affects whether a team trusts adopting it.
+The desktop build. Browser mode reaches localhost but is blocked by CORS;
+proxy mode ignores CORS but cannot reach localhost. A desktop app collapses
+that trade-off entirely — one execution path with neither limitation. It is
+the last structural compromise in the product rather than a missing feature.
 
 **What's the weakest part of this codebase?**
-No automated test suite. CI enforces typecheck, lint, build, and migration
-integrity, but correctness verification is still manual against a running
-instance. The pure logic — the normaliser, the request builder, the address
-matcher, the import parser — was written dependency-free specifically so tests
-are a small job. Until they exist, every refactor is a manual re-verify.
+End-to-end coverage. 169 unit tests cover the request pipeline and the
+security guard, and CI gates typecheck, lint, build, and migration integrity
+— but UI paths are still verified by hand. That gap is not theoretical: a
+submenu rendered clipped because it was never portalled out of a scrolling
+parent, and a `${name}` in a toast silently resolved to the DOM's
+`window.name` global, so it typechecked and rendered empty. Both were caught
+by looking at screenshots, not by any automated check.
 
 **Why did you skip the Prisma 7 and TypeScript 7 upgrades?**
 They're major versions needing real migration work, and nothing depended on

@@ -90,7 +90,6 @@ export default function PlaygroundPage() {
       e.preventDefault();
       e.stopPropagation();
       addTab();
-      toast.success("New request created");
     },
     {
       preventDefault: true,

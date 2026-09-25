@@ -3,6 +3,7 @@ import { useWsStore } from '../hooks/useWs'
 import { ChevronUp, ChevronDown, Trash2, Copy, Clock, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { copyToClipboard } from '@/lib/clipboard'
 
 const RealtimeClientServerLogsTable = () => {
   const { messages, clearMessages } = useWsStore()
@@ -72,14 +73,6 @@ const RealtimeClientServerLogsTable = () => {
 
   const handleRowClick = (index: number) => {
     setSelectedMessageIndex(selectedMessageIndex === index ? -1 : index)
-  }
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      console.log('Copied to clipboard')
-    }).catch(err => {
-      console.error('Failed to copy: ', err)
-    })
   }
 
   const formatTimestamp = (timestamp: Date) => {
@@ -219,8 +212,8 @@ const RealtimeClientServerLogsTable = () => {
                       size="sm"
                       onClick={(e) => {
                         e.stopPropagation()
-                        copyToClipboard(message.raw || formatMessageData(message.data))
-                        toast.success('Message copied')
+                        copyToClipboard(message.raw || formatMessageData(message.data), 'Frame copied')
+                        toast.success('Frame copied')
                       }}
                       className="h-6 w-6 p-0 text-zinc-500 hover:text-zinc-200"
                       title="Copy message"

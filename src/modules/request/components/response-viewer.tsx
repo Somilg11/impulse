@@ -32,6 +32,7 @@ import {
   statusText as statusColorClass,
 } from "@/lib/http-display";
 import RunHistory, { type HistoryRun } from "./run-history";
+import { copyToClipboard } from "@/lib/clipboard";
 
 interface Props {
   responseData: ExecResult;
@@ -94,14 +95,6 @@ const ResponseViewer = ({
       return { prettyBody: raw, isJson: false };
     }
   }, [body]);
-
-  const copyToClipboard = (text: string) => {
-    if (!navigator?.clipboard) return;
-    navigator.clipboard
-      .writeText(text)
-      .then(() => toast.success("Copied"))
-      .catch(() => toast.error("Could not copy"));
-  };
 
   const downloadBody = () => {
     if (!body) {
@@ -186,7 +179,7 @@ const ResponseViewer = ({
                   size="sm"
                   variant="ghost"
                   className="text-gray-400 hover:text-white"
-                  onClick={() => copyToClipboard(prettyBody)}
+                  onClick={() => copyToClipboard(prettyBody, "Response body copied")}
                   disabled={!body}
                 >
                   <Copy className="w-4 h-4 mr-2" />
@@ -344,7 +337,7 @@ const ResponseViewer = ({
                               size="sm"
                               variant="ghost"
                               className="text-gray-400 hover:text-white ml-2"
-                              onClick={() => copyToClipboard(`${key}: ${value}`)}
+                              onClick={() => copyToClipboard(`${key}: ${value}`, "Header copied")}
                             >
                               <Copy className="w-3 h-3" />
                             </Button>

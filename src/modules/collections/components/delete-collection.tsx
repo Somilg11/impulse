@@ -8,20 +8,24 @@ const DeleteCollectionModal = ({
   isModalOpen,
   setIsModalOpen,
   collectionId,
+  collectionName,
 }: {
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
   collectionId: string;
+  collectionName?: string;
 }) => {
   const { mutateAsync, isPending } = useDeleteCollection(collectionId);
 
   const handleDelete = async () => {
     try {
       await mutateAsync();
-      toast.success("Collection deleted successfully");
+      toast.success(`Deleted "${collectionName ?? "collection"}"`);
       setIsModalOpen(false);
     } catch (err) {
-      toast.error("Failed to delete collection");
+      toast.error(
+          err instanceof Error ? err.message : "Could not delete the collection"
+        );
       console.error("Failed to delete collection:", err);
     }
   };

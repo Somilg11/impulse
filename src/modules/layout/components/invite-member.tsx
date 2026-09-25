@@ -16,6 +16,7 @@ import { Hint } from "@/components/ui/hint";
 import { toast } from "sonner";
 import { useWorkspaceStore } from "../store";
 import { useGenerateWorkspaceInvite, useGetWorkspaceMemebers } from "@/modules/invites/hooks/invites";
+import { copyToClipboard } from "@/lib/clipboard";
 
 const InviteMember = () => {
   const [inviteLink, setInviteLink] = useState("")
@@ -39,16 +40,17 @@ const InviteMember = () => {
     try {
       const response = await mutateAsync();
       setInviteLink(response);
-      toast.success("Invite link generated!");
+      toast.success("Invite link ready", {
+        description: "Valid for 7 days, single use.",
+      });
     } catch (error) {
       toast.error("Failed to generate invite link");
     }
   };
 
-  const copyToClipboard = async () => {
+  const handleCopyLink = async () => {
     if (inviteLink) {
-      await navigator.clipboard.writeText(inviteLink);
-      toast.success("Invite link copied to clipboard");
+      await copyToClipboard(inviteLink, "Invite link copied");
     }
   };
 
@@ -104,7 +106,7 @@ const InviteMember = () => {
             <Button
               variant="outline"
               size="icon"
-              onClick={copyToClipboard}
+              onClick={handleCopyLink}
               disabled={!inviteLink}
             >
               <Copy className="h-4 w-4" />

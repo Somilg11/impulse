@@ -17,6 +17,7 @@ import { CODE_TARGETS, generateCode, type CodeTarget } from "@/lib/codegen";
 import { composeRequest } from "@/lib/request-pipeline";
 import { useActiveVariables } from "@/modules/environments/hooks/use-active-variables";
 import type { RequestTab } from "../store/useRequestStore";
+import { copyToClipboard } from "@/lib/clipboard";
 
 interface Props {
   tab: RequestTab;
@@ -57,14 +58,11 @@ const CodeDialog = ({ tab, isOpen, onClose }: Props) => {
   }, [tab, target, variables]);
 
   const handleCopy = () => {
-    navigator.clipboard
-      .writeText(snippet)
-      .then(() => {
-        setCopied(true);
-        toast.success("Snippet copied");
-        setTimeout(() => setCopied(false), 1500);
-      })
-      .catch(() => toast.error("Could not copy"));
+    copyToClipboard(snippet, "Snippet copied").then((ok) => {
+      if (!ok) return;
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
   };
 
   return (

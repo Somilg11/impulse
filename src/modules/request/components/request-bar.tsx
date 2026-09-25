@@ -80,7 +80,6 @@ const RequestBar = ({ tab, updateTab }: Props) => {
       if (result.error) {
         toast.error(result.error);
       } else if (result.ok) {
-        toast.success(`${result.status} in ${result.durationMs} ms`);
       } else {
         toast.warning(`${result.status} ${result.statusText}`);
       }

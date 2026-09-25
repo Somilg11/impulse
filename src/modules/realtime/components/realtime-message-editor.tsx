@@ -9,6 +9,7 @@ import Editor, { type OnMount } from '@/components/monaco-editor'
 type MonacoEditor = Parameters<OnMount>[0]
 type MonacoApi = Parameters<OnMount>[1]
 import { toast } from 'sonner'
+import { copyToClipboard } from '@/lib/clipboard'
 import RealtimeClientServerLogsTable from './realtime-client-server-logs-table'
 
 const RealtimeMessageEditor = () => {
@@ -61,7 +62,6 @@ const RealtimeMessageEditor = () => {
       const success = send(messageToSend)
       if (success) {
         setLastSent(draftMessage)
-        toast.success('Message sent successfully')
       } else {
         toast.error('Failed to send message')
       }
@@ -112,18 +112,14 @@ const RealtimeMessageEditor = () => {
         editorRef.current.setValue(formatted)
       }
     } catch (error) {
-      alert('Invalid JSON format')
+      toast.error('Invalid JSON', {
+        description: 'The message could not be parsed, so it was left unchanged.',
+      })
     }
   }, [draftMessage, setDraftMessage])
 
   const handleCopyMessage = useCallback(() => {
-    navigator.clipboard.writeText(draftMessage)
-      .then(() => {
-        console.log('Message copied to clipboard')
-      })
-      .catch(err => {
-        console.error('Failed to copy message:', err)
-      })
+    copyToClipboard(draftMessage, 'Message copied')
   }, [draftMessage])
 
   const handleClearMessage = useCallback(() => {

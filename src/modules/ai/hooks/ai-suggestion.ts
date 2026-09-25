@@ -12,7 +12,6 @@ export function useSuggestRequestName() {
         updatedAt: Date.now(),
       });
 
-      toast.success(`Generated ${data.suggestions.length} name suggestions`);
     },
   });
 }
@@ -23,7 +22,6 @@ export function useGenerateJsonBody(){
         mutationFn: (params: JsonBodyGenerationParams) => generateJsonBody(params),
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ["json-body"] });
-            toast.success("JSON body generated successfully");
         },
         onError: (error) => {
             toast.error("Failed to generate JSON body");

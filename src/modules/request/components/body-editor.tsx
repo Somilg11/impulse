@@ -38,6 +38,7 @@ import {
   type BodyType,
 } from '@/lib/body-types'
 import KeyValueFormEditor from './key-value-form'
+import { copyToClipboard } from '@/lib/clipboard'
 
 
 
@@ -97,7 +98,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
   const handleCopy = async () => {
     if (bodyValue) {
       try {
-        await navigator.clipboard.writeText(bodyValue)
+        await copyToClipboard(bodyValue, "Body copied")
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
       } catch (err) {

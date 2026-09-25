@@ -6,8 +6,11 @@ import { toast } from "sonner";
 import {
   addRequestToCollection,
   deleteRequest,
+  duplicateRequest,
+  renameRequest,
   getAllRequestFromCollection,
   getRequestRuns,
+  getWorkspaceRequests,
   recordRun,
   Request,
   saveRequest,
@@ -164,5 +167,45 @@ export function useDeleteRequest(collectionId: string) {
 
       queryClient.invalidateQueries({ queryKey: ["requests", collectionId] });
     },
+  });
+}
+
+/** Renames a request, keeping any open tab's title in step. */
+export function useRenameRequest(collectionId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: { id: string; name: string }) =>
+      renameRequest(input.id, input.name),
+    onSuccess: (data) => {
+      const { tabs, updateTab, markUnsaved } = useRequestPlaygroundStore.getState();
+      const open = tabs.find((t) => t.requestId === data.id);
+      if (open) {
+        updateTab(open.id, { title: data.name });
+        // updateTab flags the tab dirty, but a rename is already persisted.
+        markUnsaved(open.id, false);
+      }
+      queryClient.invalidateQueries({ queryKey: ["requests", collectionId] });
+    },
+  });
+}
+
+export function useDuplicateRequest(collectionId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => duplicateRequest(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["requests", collectionId] });
+    },
+  });
+}
+
+/** Every request in the workspace, for cross-collection search. */
+export function useWorkspaceRequests(workspaceId?: string) {
+  return useQuery({
+    queryKey: ["workspace-requests", workspaceId],
+    queryFn: async () => getWorkspaceRequests(workspaceId!),
+    enabled: Boolean(workspaceId),
   });
 }

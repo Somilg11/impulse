@@ -6,6 +6,7 @@ import { BODY_TYPE, MEMBER_ROLE, REST_METHOD } from "@prisma/client";
 import {
   assertCollectionAccess,
   assertRequestAccess,
+  assertWorkspaceMember,
 } from "@/lib/authz";
 import { buildExecRequest, type ExecResult } from "@/lib/http";
 import { executeOnServer } from "@/lib/server-fetch";
@@ -221,4 +222,106 @@ export const getRunnableRequests = async (collectionId: string) => {
   };
 
   return await collect(collectionId, "");
+};
+
+/** Renames a request without touching the rest of it. */
+export const renameRequest = async (id: string, name: string) => {
+  await assertRequestAccess(id, MEMBER_ROLE.EDITOR);
+
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error("A name is required");
+
+  return await db.request.update({
+    where: { id },
+    data: { name: trimmed },
+    select: { id: true, name: true },
+  });
+};
+
+/**
+ * Copies a request into the same collection.
+ *
+ * Everything that defines the request travels with it - headers, params, body
+ * and its type, auth, and assertions - because a duplicate that silently drops
+ * the auth scheme is worse than no duplicate at all.
+ */
+export const duplicateRequest = async (id: string) => {
+  const { collectionId } = await assertRequestAccess(id, MEMBER_ROLE.EDITOR);
+
+  const source = await db.request.findUnique({ where: { id } });
+  if (!source) throw new Error("Request not found");
+
+  return await db.request.create({
+    data: {
+      collectionId,
+      name: `${source.name} copy`,
+      method: source.method,
+      url: source.url,
+      headers: source.headers ?? undefined,
+      parameters: source.parameters ?? undefined,
+      body: source.body ?? undefined,
+      bodyType: source.bodyType,
+      auth: source.auth ?? undefined,
+      tests: source.tests ?? undefined,
+      position: source.position + 1,
+    },
+  });
+};
+
+/**
+ * Every request in a workspace, with the collection path that locates it.
+ *
+ * Backs the command palette, which needs to search across collections rather
+ * than within one - the per-collection query would mean one round trip per
+ * folder just to populate a search box.
+ */
+export const getWorkspaceRequests = async (workspaceId: string) => {
+  await assertWorkspaceMember(workspaceId);
+
+  const [collections, requests] = await Promise.all([
+    db.collection.findMany({
+      where: { workspaceId },
+      select: { id: true, name: true, parentId: true },
+    }),
+    db.request.findMany({
+      where: { collection: { workspaceId } },
+      orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+      select: {
+        id: true,
+        name: true,
+        method: true,
+        url: true,
+        headers: true,
+        parameters: true,
+        body: true,
+        bodyType: true,
+        auth: true,
+        tests: true,
+        collectionId: true,
+      },
+    }),
+  ]);
+
+  const byId = new Map(collections.map((c) => [c.id, c]));
+
+  // Build "Payments / Refunds" style paths, guarding against a cycle so a
+  // malformed tree cannot hang the request.
+  const pathOf = (collectionId: string): string => {
+    const parts: string[] = [];
+    const seen = new Set<string>();
+    let cursor: string | null = collectionId;
+    while (cursor && !seen.has(cursor)) {
+      seen.add(cursor);
+      const node = byId.get(cursor);
+      if (!node) break;
+      parts.unshift(node.name);
+      cursor = node.parentId;
+    }
+    return parts.join(" / ");
+  };
+
+  return requests.map((request) => ({
+    ...request,
+    collectionPath: pathOf(request.collectionId),
+  }));
 };

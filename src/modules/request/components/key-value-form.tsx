@@ -175,8 +175,17 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
             </div>
           </div>
 
-          {/* Form Fields */}
-          <div className="space-y-2">
+          {/* Form Fields - one framed table, so rows read as a list rather than
+              floating text on the page background. */}
+          <div className="overflow-hidden rounded-[10px] border border-line bg-surface-raised">
+            <div className="grid grid-cols-12 items-center gap-2 border-b border-line bg-white/[0.02] px-1 py-1.5">
+              <span className="col-span-5 px-1.5 text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-600 md:col-span-4">
+                Key
+              </span>
+              <span className="col-span-5 px-1.5 text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-600 md:col-span-4">
+                Value
+              </span>
+            </div>
             {fields.map((field, index) => (
               <div
                 key={field.id}

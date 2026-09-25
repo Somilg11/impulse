@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react'
 import { useCollections, useExportWorkspace } from '../hooks/collections'
+import { useUiStore } from '@/modules/layout/store/ui'
 import { MEMBER_ROLE } from '@prisma/client';
 import { Download, Loader, Plus, Search, Upload } from 'lucide-react';
 import {
@@ -40,8 +41,13 @@ interface Props {
 }
 
 const TabbedSidebar = ({ currentWorkspace }: Props) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    // These two dialogs are also reachable from the command palette, so their
+    // open state is shared rather than local.
+    const isModalOpen = useUiStore((s) => s.createCollectionOpen);
+    const setIsModalOpen = useUiStore((s) => s.setCreateCollectionOpen);
+    const isImportModalOpen = useUiStore((s) => s.importOpen);
+    const setIsImportModalOpen = useUiStore((s) => s.setImportOpen);
+
     const [searchQuery, setSearchQuery] = useState('');
 
     const { data: collections, isLoading, isError } = useCollections(currentWorkspace?.id);

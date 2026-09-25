@@ -9,6 +9,9 @@ import {
     FolderPlus,
     FolderInput,
     Play,
+    Pencil,
+    CopyPlus,
+    Link2,
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -32,10 +35,16 @@ import CreateCollection from "./create-collection";
 import CollectionRunner from "@/modules/request/components/collection-runner";
 import DeleteCollectionModal from "./delete-collection";
 import SaveRequestToCollectionModal from "./add-request-modal";
-import { useDeleteRequest, useGetAllRequestFromCollection } from "@/modules/request/hooks/request";
+import {
+    useDeleteRequest,
+    useDuplicateRequest,
+    useGetAllRequestFromCollection,
+    useRenameRequest,
+} from "@/modules/request/hooks/request";
 import { toast } from "sonner";
 import { methodBadge } from "@/lib/http-display";
 import { useRequestPlaygroundStore } from "@/modules/request/store/useRequestStore";
+import { copyToClipboard } from "@/lib/clipboard";
 
 interface CollectionNode {
     id: string;
@@ -77,6 +86,24 @@ const CollectionFolder = ({
   const { openRequestTab, activeTabId } = useRequestPlaygroundStore();
     const exportCollection = useExportCollection(collection.id, collection.name);
     const deleteRequest = useDeleteRequest(collection.id);
+    const duplicateRequest = useDuplicateRequest(collection.id);
+    const renameRequest = useRenameRequest(collection.id);
+
+    // Renaming happens in place in the tree, the way a file manager does it -
+    // a modal for one text field is more ceremony than the action deserves.
+    const [renamingId, setRenamingId] = useState<string | null>(null);
+    const [draftName, setDraftName] = useState("");
+
+    const commitRename = async (id: string) => {
+        const name = draftName.trim();
+        setRenamingId(null);
+        if (!name) return;
+        try {
+            await renameRequest.mutateAsync({ id, name });
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Could not rename");
+        }
+    };
     const moveCollection = useMoveCollection(collection.workspaceId);
 
     // A folder cannot move into itself or anything beneath it - the server
@@ -282,20 +309,91 @@ const CollectionFolder = ({
                                     }`}>
                                         {request.method}
                                     </span>
-                                    <span className="flex-1 truncate text-[12px] text-zinc-300">
-                                        {request.name || "Untitled"}
-                                    </span>
+                                    {renamingId === request.id ? (
+                                        <input
+                                            autoFocus
+                                            value={draftName}
+                                            onClick={(e) => e.stopPropagation()}
+                                            onChange={(e) => setDraftName(e.target.value)}
+                                            onBlur={() => commitRename(request.id)}
+                                            onKeyDown={(e) => {
+                                                e.stopPropagation();
+                                                if (e.key === "Enter") commitRename(request.id);
+                                                if (e.key === "Escape") setRenamingId(null);
+                                            }}
+                                            className="min-w-0 flex-1 rounded border border-brand/60 bg-canvas px-1 py-px text-[12px] text-zinc-100 outline-none"
+                                        />
+                                    ) : (
+                                        <span className="flex-1 truncate text-[12px] text-zinc-300">
+                                            {request.name || "Untitled"}
+                                        </span>
+                                    )}
                                     {/* Revealed on hover so the tree stays quiet, but
                                         always focusable for keyboard users. */}
-                                    <button
-                                        type="button"
-                                        aria-label={`Delete ${request.name || "request"}`}
-                                        onClick={(e) => onDeleteRequest(e, request.id, request.name)}
-                                        disabled={deleteRequest.isPending}
-                                        className="shrink-0 rounded p-0.5 text-zinc-600 opacity-0 transition-[opacity,color] duration-[--duration-fast] hover:text-status-server-error focus-visible:opacity-100 group-hover/req:opacity-100 disabled:opacity-40"
-                                    >
-                                        <Trash className="h-3 w-3" />
-                                    </button>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button
+                                                type="button"
+                                                aria-label={`Actions for ${request.name || "request"}`}
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="shrink-0 rounded p-0.5 text-zinc-600 opacity-0 transition-[opacity,color] duration-[--duration-fast] hover:text-zinc-200 focus-visible:opacity-100 group-hover/req:opacity-100 data-[state=open]:opacity-100 data-[state=open]:text-zinc-200"
+                                            >
+                                                <EllipsisVertical className="h-3.5 w-3.5" />
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            align="start"
+                                            className="w-48"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <DropdownMenuItem
+                                                className="gap-2"
+                                                onClick={() => {
+                                                    setDraftName(request.name || "");
+                                                    setRenamingId(request.id);
+                                                }}
+                                            >
+                                                <Pencil className="h-3.5 w-3.5" />
+                                                Rename
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                className="gap-2"
+                                                onClick={async () => {
+                                                    try {
+                                                        await duplicateRequest.mutateAsync(request.id);
+                                                        toast.success("Request duplicated");
+                                                    } catch (error) {
+                                                        toast.error(
+                                                            error instanceof Error
+                                                                ? error.message
+                                                                : "Could not duplicate"
+                                                        );
+                                                    }
+                                                }}
+                                            >
+                                                <CopyPlus className="h-3.5 w-3.5" />
+                                                Duplicate
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                className="gap-2"
+                                                onClick={() =>
+                                                    copyToClipboard(request.url || "", "Request URL copied")
+                                                }
+                                            >
+                                                <Link2 className="h-3.5 w-3.5" />
+                                                Copy URL
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                variant="destructive"
+                                                className="gap-2"
+                                                onClick={(e) => onDeleteRequest(e, request.id, request.name)}
+                                            >
+                                                <Trash className="h-3.5 w-3.5" />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                             ))}
                         </div>
@@ -334,6 +432,7 @@ const CollectionFolder = ({
             />
 
             <DeleteCollectionModal
+                collectionName={collection.name}
                 isModalOpen={isDeleteOpen}
                 setIsModalOpen={setIsDeleteOpen}
                 collectionId={collection.id}

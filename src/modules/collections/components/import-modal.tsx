@@ -31,7 +31,6 @@ const ImportModal = ({
         reader.onload = (event) => {
             const content = event.target?.result as string;
             setJsonContent(content);
-            toast.success("File loaded successfully");
         };
         reader.onerror = () => {
             toast.error("Failed to read file");
@@ -51,7 +50,9 @@ const ImportModal = ({
             const result = await importCollections(workspaceId, parsedData);
 
             if (result.success) {
-                toast.success("Collections imported successfully");
+                toast.success("Collections imported", {
+                    description: "Folders and requests are in the sidebar.",
+                });
                 setJsonContent("");
                 queryClient.invalidateQueries({ queryKey: ["collections", workspaceId] });
                 setIsModalOpen(false);
@@ -121,7 +122,7 @@ const ImportModal = ({
                 <div className="flex items-start gap-3 p-3 bg-brand/5 border border-brand/10 rounded-lg">
                     <AlertCircle className="w-4 h-4 text-brand shrink-0 mt-0.5" />
                     <p className="text-[11px] leading-relaxed text-zinc-400">
-                        Requests are imported with their methods, URLs, query parameters, headers, and bodies. Postman folders are flattened into one collection, with the folder name kept as a prefix on each request.
+                        Requests are imported with their methods, URLs, query parameters, headers, and bodies. Postman folders are recreated as real nested folders, so the collection keeps the structure it had in Postman.
                     </p>
                 </div>
             </div>
