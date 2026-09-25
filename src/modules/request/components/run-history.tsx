@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import type { AssertionResult } from "@/lib/assertions";
 import { useRequestRuns } from "../hooks/request";
+import { formatBytes, statusText } from "@/lib/http-display";
 
 interface Props {
   requestId?: string;
@@ -26,22 +27,6 @@ export type HistoryRun = {
   testResults: unknown;
   createdAt: Date | string;
 };
-
-function statusColor(status: number): string {
-  if (status >= 200 && status < 300) return "text-green-400";
-  if (status >= 300 && status < 400) return "text-yellow-400";
-  if (status >= 400 && status < 500) return "text-orange-400";
-  if (status >= 500) return "text-red-400";
-  return "text-zinc-500";
-}
-
-function formatBytes(bytes?: number | null): string {
-  if (!bytes) return "—";
-  const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
-}
 
 /**
  * Past runs of a saved request.
@@ -90,7 +75,7 @@ const RunHistory = ({ requestId, onSelect }: Props) => {
               onClick={() => onSelect?.(run as HistoryRun)}
               className="w-full text-left px-4 py-3 hover:bg-line/40 transition-colors flex items-center gap-3"
             >
-              <span className={`text-sm font-bold w-10 shrink-0 ${statusColor(run.status)}`}>
+              <span className={`text-sm font-bold w-10 shrink-0 ${statusText(run.status)}`}>
                 {run.status || "—"}
               </span>
 

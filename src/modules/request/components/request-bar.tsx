@@ -20,20 +20,13 @@ import { Hint } from '@/components/ui/hint'
 import { useSendRequest } from '../hooks/request'
 import { toast } from 'sonner'
 import { METHODS } from '@/lib/http'
+import { methodText } from '@/lib/http-display'
 import type { SendMode } from '../lib/send-request'
 
 interface Props {
     tab: RequestTab,
     updateTab: (id: string, data: Partial<RequestTab>) => void;
 }
-
-const methodColorMap: Record<string, string> = {
-  GET: "text-green-400",
-  POST: "text-amber-400",
-  PUT: "text-blue-400",
-  PATCH: "text-purple-400",
-  DELETE: "text-red-400",
-};
 
 const SEND_MODES: { value: SendMode; label: string; hint: string }[] = [
   { value: "auto", label: "Auto", hint: "Browser first, proxy if CORS blocks it" },
@@ -104,7 +97,7 @@ const RequestBar = ({ tab, updateTab }: Props) => {
           value={tab.method}
           onValueChange={(value) => updateTab(tab.id, { method: value })}
         >
-          <SelectTrigger className={`w-auto min-w-[80px] sm:min-w-[90px] bg-transparent border-0 border-r border-line rounded-none h-10 px-3 font-bold text-sm tracking-wide shrink-0 focus:ring-0 ${methodColorMap[tab.method] || "text-zinc-400"}`}>
+          <SelectTrigger className={`w-auto min-w-[80px] sm:min-w-[90px] bg-transparent border-0 border-r border-line rounded-none h-10 px-3 font-bold text-sm tracking-wide shrink-0 focus:ring-0 ${methodText(tab.method)}`}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-surface-raised border border-line text-zinc-300 rounded-lg shadow-xl">
@@ -113,7 +106,7 @@ const RequestBar = ({ tab, updateTab }: Props) => {
                 <SelectItem
                   key={method}
                   value={method}
-                  className={`${methodColorMap[method]} font-bold hover:bg-line`}
+                  className={`${methodText(method)} font-bold hover:bg-line`}
                 >
                   {method}
                 </SelectItem>

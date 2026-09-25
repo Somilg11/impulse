@@ -26,6 +26,12 @@ import {
 import { toast } from "sonner";
 import type { ExecResult } from "@/lib/http";
 import { summarize, type AssertionResult } from "@/lib/assertions";
+import {
+  formatBytes,
+  formatDuration,
+  statusLabel,
+  statusText as statusColorClass,
+} from "@/lib/http-display";
 import RunHistory, { type HistoryRun } from "./run-history";
 
 interface Props {
@@ -57,22 +63,6 @@ const MONACO_OPTIONS = {
     horizontalScrollbarSize: 8,
   },
 };
-
-function getStatusColor(status: number): string {
-  if (status >= 200 && status < 300) return "text-green-400";
-  if (status >= 300 && status < 400) return "text-yellow-400";
-  if (status >= 400 && status < 500) return "text-orange-400";
-  if (status >= 500) return "text-red-400";
-  return "text-gray-400";
-}
-
-function formatBytes(bytes: number): string {
-  if (!bytes) return "0 B";
-  const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-}
 
 /** Guess a sensible filename extension from the response content type. */
 function extensionFor(contentType: string): string {
@@ -133,45 +123,54 @@ const ResponseViewer = ({
   const headerEntries = Object.entries(headers ?? {});
 
   return (
-    <div className="w-full bg-canvas text-white p-3 md:p-4">
+    <div className="w-full bg-canvas text-white">
       <div className="w-full mx-auto">
-        {/* Status header */}
-        <Card className="bg-surface-raised border-line mb-4">
-          <CardHeader className="pb-3">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-3 md:gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400">Status:</span>
-                  <Badge className={`${getStatusColor(status)} bg-transparent border-current`}>
-                    {status || "—"} {statusText ? `• ${statusText}` : ""}
-                  </Badge>
+        {/* Status bar - the summary a developer reads first, so it leads with the
+            status code at display size rather than as one label among many. */}
+        <div className="flex flex-col gap-2 border-b border-line bg-surface px-3 py-2 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className={`font-mono text-lg font-bold leading-none ${statusColorClass(status)}`}
+                  >
+                    {status || "—"}
+                  </span>
+                  <span className="text-xs text-zinc-500">
+                    {statusText || statusLabel(status)}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-400">Time:</span>
-                  <span className="text-blue-300">{durationMs} ms</span>
+
+                <span className="h-4 w-px bg-line" aria-hidden />
+
+                <div className="flex items-center gap-1.5" title="Elapsed time">
+                  <Clock className="h-3.5 w-3.5 text-zinc-600" />
+                  <span className="font-mono text-xs text-zinc-300">
+                    {formatDuration(durationMs)}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <HardDrive className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-400">Size:</span>
-                  <span className="text-green-300">{formatBytes(size)}</span>
+
+                <div className="flex items-center gap-1.5" title="Response size">
+                  <HardDrive className="h-3.5 w-3.5 text-zinc-600" />
+                  <span className="font-mono text-xs text-zinc-300">
+                    {formatBytes(size)}
+                  </span>
                 </div>
-                <Badge
-                  variant="secondary"
-                  className="bg-line text-zinc-400 border-0 gap-1.5"
+
+                <div
+                  className="flex items-center gap-1.5"
                   title={
                     via === "browser"
-                      ? "Sent from your browser"
-                      : "Sent from the server proxy"
+                      ? "Sent from your browser - can reach localhost"
+                      : "Sent through the server proxy - ignores CORS"
                   }
                 >
                   {via === "browser" ? (
-                    <Globe className="w-3 h-3" />
+                    <Globe className="h-3.5 w-3.5 text-zinc-600" />
                   ) : (
-                    <Server className="w-3 h-3" />
+                    <Server className="h-3.5 w-3.5 text-zinc-600" />
                   )}
-                  {via}
-                </Badge>
+                  <span className="text-xs capitalize text-zinc-500">{via}</span>
+                </div>
               </div>
               <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 <Button
@@ -195,16 +194,14 @@ const ResponseViewer = ({
                   Copy
                 </Button>
               </div>
-            </div>
+        </div>
 
-            {error && (
-              <div className="mt-3 flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/5 p-3">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
-                <p className="text-xs leading-relaxed text-red-300">{error}</p>
-              </div>
-            )}
-          </CardHeader>
-        </Card>
+        {error && (
+          <div className="flex items-start gap-2 border-b border-status-server-error/20 bg-status-server-error/5 px-3 py-2.5">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-status-server-error" />
+            <p className="text-xs leading-relaxed text-red-300">{error}</p>
+          </div>
+        )}
 
         {/* Body */}
         <Card className="bg-surface-raised border-line">

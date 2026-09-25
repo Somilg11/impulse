@@ -3,19 +3,13 @@ import { X } from "lucide-react";
 import { useState } from "react";
 import { useRequestPlaygroundStore } from "../store/useRequestStore";
 import AddNameModal from "./add-name-modal";
+import { methodBadge } from "@/lib/http-display";
 
 export default function TabBar() {
   const { tabs, activeTabId, setActiveTab, addTab, closeTab } =
     useRequestPlaygroundStore();
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
-
-  const methodColorMap: Record<string, string> = {
-    GET: "text-green-400 bg-green-400/10",
-    POST: "text-amber-400 bg-amber-400/10",
-    PUT: "text-blue-400 bg-blue-400/10",
-    DELETE: "text-red-400 bg-red-400/10",
-  };
 
   const onDoubleClick = (tabId: string) => {
     setSelectedTabId(tabId);
@@ -39,7 +33,7 @@ export default function TabBar() {
               <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-blue-500" />
             )}
             
-            <span className={`text-[9px] font-bold px-1 py-0.5 rounded ${methodColorMap[tab.method] || "text-zinc-500 bg-zinc-500/10"}`}>
+            <span className={`text-[9px] font-bold px-1 py-0.5 rounded ${methodBadge(tab.method)}`}>
               {tab.method}
             </span>
 

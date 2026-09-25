@@ -28,7 +28,7 @@ import CollectionRunner from "@/modules/request/components/collection-runner";
 import DeleteCollectionModal from "./delete-collection";
 import SaveRequestToCollectionModal from "./add-request-modal";
 import { useGetAllRequestFromCollection } from "@/modules/request/hooks/request";
-import { REST_METHOD } from "@prisma/client";
+import { methodBadge } from "@/lib/http-display";
 import { useRequestPlaygroundStore } from "@/modules/request/store/useRequestStore";
 
 interface CollectionNode {
@@ -66,15 +66,7 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
   const { openRequestTab, activeTabId } = useRequestPlaygroundStore();
     const exportCollection = useExportCollection(collection.id, collection.name);
 
-  const methodColorMap: Record<REST_METHOD, string> = {
-    [REST_METHOD.GET]: "text-green-400 bg-green-400/10",
-    [REST_METHOD.POST]: "text-amber-400 bg-amber-400/10",
-    [REST_METHOD.PUT]: "text-blue-400 bg-blue-400/10",
-    [REST_METHOD.DELETE]: "text-red-400 bg-red-400/10",
-    [REST_METHOD.PATCH]: "text-orange-400 bg-orange-400/10",
-  };
-
-  const hasRequests = requestData && requestData.length > 0;
+    const hasRequests = requestData && requestData.length > 0;
 
     return (
         <>
@@ -183,7 +175,7 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                                     className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-line/50 rounded transition-colors text-left group/req"
                                 >
                                     <span className={`text-[9px] font-bold px-1 py-0.5 rounded shrink-0 ${
-                                        methodColorMap[request.method as keyof typeof methodColorMap] ?? 'text-zinc-500 bg-zinc-500/10'
+                                        methodBadge(request.method)
                                     }`}>
                                         {request.method}
                                     </span>
