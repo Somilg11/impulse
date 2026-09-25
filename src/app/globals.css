@@ -3,6 +3,49 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ---------------------------------------------------------------------------
+ * Application chrome
+ *
+ * The workspace is a tool surface, not a document: it is always dark, dense, and
+ * independent of the light/dark theme used by the marketing and docs pages. These
+ * tokens name the surfaces so components stop hardcoding hex values - there were
+ * 253 raw hex literals across 29 files before this existed, which made any
+ * consistent change to the palette impossible.
+ *
+ * Tailwind v4 generates utilities from these automatically, so
+ * `--color-surface` gives `bg-surface`, `border-surface`, `text-surface`.
+ * --------------------------------------------------------------------------- */
+@theme {
+  /* Surfaces, darkest to lightest */
+  --color-canvas: #0b0e14;        /* app background, behind everything */
+  --color-surface: #11151e;       /* panels, sidebar, headers */
+  --color-surface-raised: #161b26; /* cards, popovers, inputs on a panel */
+  --color-surface-hover: #1c2230;  /* hover state for rows and buttons */
+
+  /* Lines */
+  --color-line: #1e2330;          /* default divider */
+  --color-line-strong: #2a3040;   /* emphasised divider, input borders */
+
+  /* Brand - blue, used for the active state and primary actions */
+  --color-brand: #2f7bff;
+  --color-brand-hover: #1f6bf0;
+  --color-brand-subtle: #12213d;  /* tinted background for active rows */
+
+  /* HTTP method colours, shared by the sidebar, tab bar, and method selector
+   * so a GET is the same green everywhere. */
+  --color-method-get: #34d399;
+  --color-method-post: #fbbf24;
+  --color-method-put: #60a5fa;
+  --color-method-patch: #c084fc;
+  --color-method-delete: #f87171;
+
+  /* Response status colours */
+  --color-status-ok: #34d399;
+  --color-status-redirect: #fbbf24;
+  --color-status-client-error: #fb923c;
+  --color-status-server-error: #f87171;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

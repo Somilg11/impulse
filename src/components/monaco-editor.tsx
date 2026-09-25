@@ -27,8 +27,8 @@ const MonacoEditor = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-full w-full items-center justify-center bg-[#1e1e1e]">
-        <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#1e2330] border-t-blue-400" />
+      <div className="flex h-full w-full items-center justify-center bg-canvas">
+        <div className="h-4 w-4 animate-spin rounded-full border-2 border-line border-t-blue-400" />
       </div>
     ),
   }

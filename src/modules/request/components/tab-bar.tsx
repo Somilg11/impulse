@@ -24,15 +24,15 @@ export default function TabBar() {
 
   return (
     <>
-      <div className="flex items-center border-b border-[#1e2330] bg-[#0e1117] h-9 overflow-x-auto no-scrollbar shrink-0">
+      <div className="flex items-center border-b border-line bg-canvas h-9 overflow-x-auto no-scrollbar shrink-0">
         {tabs.map((tab) => (
           <div
             key={tab.id}
             onDoubleClick={() => onDoubleClick(tab.id)}
             onClick={() => setActiveTab(tab.id)}
-            className={`group h-full px-3 flex items-center gap-2 cursor-pointer transition-all relative shrink-0 border-r border-[#1e2330] ${activeTabId === tab.id
-                ? "bg-[#161b26] text-white"
-                : "text-zinc-500 hover:text-zinc-300 hover:bg-[#161b26]/50"
+            className={`group h-full px-3 flex items-center gap-2 cursor-pointer transition-all relative shrink-0 border-r border-line ${activeTabId === tab.id
+                ? "bg-surface-raised text-white"
+                : "text-zinc-500 hover:text-zinc-300 hover:bg-surface-raised/50"
               }`}
           >
             {activeTabId === tab.id && (
@@ -62,7 +62,7 @@ export default function TabBar() {
         ))}
         <button
           onClick={addTab}
-          className="h-full px-3 flex items-center justify-center text-zinc-500 hover:text-zinc-300 hover:bg-[#161b26]/50 transition-all text-sm"
+          className="h-full px-3 flex items-center justify-center text-zinc-500 hover:text-zinc-300 hover:bg-surface-raised/50 transition-all text-sm"
         >
           +
         </button>

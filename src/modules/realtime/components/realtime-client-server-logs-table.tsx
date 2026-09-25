@@ -111,15 +111,15 @@ const RealtimeClientServerLogsTable = () => {
  
 
   return (
-    <div className="flex flex-col h-[400px] bg-[#161b26] border border-[#1e2330] rounded-xl overflow-hidden shadow-sm mt-4">
+    <div className="flex flex-col h-[400px] bg-surface-raised border border-line rounded-xl overflow-hidden shadow-sm mt-4">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#1e2330] bg-[#1c222d]">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-line bg-surface-hover">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 bg-zinc-800 rounded-md">
             <Clock size={16} className="text-zinc-400" />
           </div>
           <h3 className="text-sm font-bold text-zinc-100 tracking-tight">Message Logs</h3>
-          <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest ml-1 bg-[#0e1117] px-2 py-0.5 rounded-full border border-[#1e2330]">
+          <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest ml-1 bg-canvas px-2 py-0.5 rounded-full border border-line">
             {messages.length}
           </span>
         </div>
@@ -131,7 +131,7 @@ const RealtimeClientServerLogsTable = () => {
             size="sm"
             onClick={handleNavigateUp}
             disabled={messages.length === 0}
-            className="h-8 w-8 p-0 text-zinc-500 hover:text-white hover:bg-[#2a303c] disabled:opacity-30"
+            className="h-8 w-8 p-0 text-zinc-500 hover:text-white hover:bg-line-strong disabled:opacity-30"
             title="Navigate up (previous message)"
           >
             <ChevronUp size={16} />
@@ -142,13 +142,13 @@ const RealtimeClientServerLogsTable = () => {
             size="sm"
             onClick={handleNavigateDown}
             disabled={messages.length === 0}
-            className="h-8 w-8 p-0 text-zinc-500 hover:text-white hover:bg-[#2a303c] disabled:opacity-30"
+            className="h-8 w-8 p-0 text-zinc-500 hover:text-white hover:bg-line-strong disabled:opacity-30"
             title="Navigate down (next message)"
           >
             <ChevronDown size={16} />
           </Button>
 
-          <div className="w-px h-4 bg-[#1e2330] mx-1.5" />
+          <div className="w-px h-4 bg-line mx-1.5" />
 
           {/* Clear messages */}
           <Button
@@ -156,7 +156,7 @@ const RealtimeClientServerLogsTable = () => {
             size="sm"
             onClick={clearMessages}
             disabled={messages.length === 0}
-            className="h-8 w-8 p-0 text-zinc-500 hover:text-red-400 hover:bg-[#2a303c] disabled:opacity-30"
+            className="h-8 w-8 p-0 text-zinc-500 hover:text-red-400 hover:bg-line-strong disabled:opacity-30"
             title="Clear all messages"
           >
             <Trash2 size={16} />
@@ -165,10 +165,10 @@ const RealtimeClientServerLogsTable = () => {
       </div>
 
       {/* Messages Table */}
-      <div ref={tableRef} className="flex-1 overflow-auto bg-[#0e1117]/50 scrollbar-thin scrollbar-thumb-[#1e2330]">
+      <div ref={tableRef} className="flex-1 overflow-auto bg-canvas/50 scrollbar-thin scrollbar-thumb-line">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 text-zinc-500 gap-3">
-            <div className="p-4 rounded-full bg-[#1c222d] border border-[#1e2330]">
+            <div className="p-4 rounded-full bg-surface-hover border border-line">
               <ArrowDownLeft size={24} className="opacity-20" />
             </div>
             <p className="text-xs font-medium tracking-tight">Listening for messages...</p>
@@ -180,10 +180,10 @@ const RealtimeClientServerLogsTable = () => {
                 key={message.id}
                 ref={(el) => { rowRefs.current[index] = el; }}
                 className={`
-                  relative border border-[#1e2330] rounded-lg p-3 cursor-pointer transition-all duration-200
+                  relative border border-line rounded-lg p-3 cursor-pointer transition-all duration-200
                   ${selectedMessageIndex === index 
-                    ? 'bg-[#1c222d] border-blue-500/50 shadow-lg shadow-blue-500/5' 
-                    : 'bg-[#161b26] hover:border-zinc-700/50'
+                    ? 'bg-surface-hover border-blue-500/50 shadow-lg shadow-blue-500/5' 
+                    : 'bg-surface-raised hover:border-zinc-700/50'
                   }
                 `}
                 onClick={() => handleRowClick(index)}
@@ -232,7 +232,7 @@ const RealtimeClientServerLogsTable = () => {
 
                 <div className="text-[11px] leading-relaxed">
                   <div className={`font-mono rounded-md p-2.5 overflow-x-auto ${
-                      selectedMessageIndex === index ? 'bg-[#0e1117]' : 'bg-[#0e1117]/50'
+                      selectedMessageIndex === index ? 'bg-canvas' : 'bg-canvas/50'
                   }`}>
                     {selectedMessageIndex === index ? (
                        <pre className="text-zinc-300 whitespace-pre-wrap break-words selection:bg-blue-500/30">
@@ -252,7 +252,7 @@ const RealtimeClientServerLogsTable = () => {
                 {selectedMessageIndex === index && message.raw && message.raw !== formatMessageData(message.data) && (
                   <div className="mt-3 text-[11px]">
                     <div className="text-zinc-500 mb-1.5 font-bold uppercase tracking-tighter text-[9px]">Raw Data</div>
-                    <div className="font-mono bg-[#0e1117] border border-[#1e2330] rounded-md p-2.5 overflow-x-auto">
+                    <div className="font-mono bg-canvas border border-line rounded-md p-2.5 overflow-x-auto">
                       <pre className="text-zinc-500 whitespace-pre-wrap break-words">
                         {message.raw}
                       </pre>
@@ -267,7 +267,7 @@ const RealtimeClientServerLogsTable = () => {
 
       {/* Footer with selection info */}
       {messages.length > 0 && (
-        <div className="px-4 py-2 border-t border-[#1e2330] bg-[#1c222d] text-[10px] text-zinc-500 font-medium flex items-center justify-between">
+        <div className="px-4 py-2 border-t border-line bg-surface-hover text-[10px] text-zinc-500 font-medium flex items-center justify-between">
           <div>
             {selectedMessageIndex >= 0 ? (
                 <span>Entry {selectedMessageIndex + 1} of {messages.length}</span>

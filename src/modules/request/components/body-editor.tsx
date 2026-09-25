@@ -159,9 +159,9 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
   return (
     <div className={cn("w-full", className)}>
       <Form {...form}>
-        <div className="border border-[#1e2330] rounded-lg overflow-hidden bg-[#0e1117]">
+        <div className="border border-line rounded-lg overflow-hidden bg-canvas">
           {/* Header */}
-          <div className="bg-[#0e1117] border-b border-[#1e2330] px-3 py-2.5 flex items-center justify-between">
+          <div className="bg-canvas border-b border-line px-3 py-2.5 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <h3 className="text-sm font-medium text-zinc-200">Raw Request Body</h3>
               <div className="flex items-center gap-2 text-xs text-zinc-400">
@@ -170,15 +170,15 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                   value={bodyType}
                   onValueChange={(next) => onBodyTypeChange?.(next as BodyType)}
                 >
-                  <SelectTrigger className="w-[180px] h-7 bg-[#1e2330] border-[#2a3040] text-xs">
+                  <SelectTrigger className="w-[180px] h-7 bg-line border-line-strong text-xs">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#161b26] border-[#1e2330]">
+                  <SelectContent className="bg-surface-raised border-line">
                     {BODY_TYPES.map((option) => (
                       <SelectItem
                         key={option.value}
                         value={option.value}
-                        className="text-xs hover:bg-[#1e2330] focus:bg-[#1e2330]"
+                        className="text-xs hover:bg-line focus:bg-line"
                       >
                         <div className="flex flex-col items-start">
                           <span>{option.label}</span>
@@ -199,7 +199,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                   size="sm"
                   onClick={handleGenerateClick}
                   disabled={isPending}
-                  className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-[#1e2330]"
+                  className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-line"
                   title="Generate JSON Body"
                 >
                   <Sparkles className={cn('h-3 w-3', isPending ? 'animate-spin text-zinc-400' : 'text-green-400')} />
@@ -211,7 +211,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={handleFormat}
-                  className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-[#1e2330]"
+                  className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-line"
                   title="Format JSON"
                 >
                   <AlignLeft className="h-3 w-3" />
@@ -221,7 +221,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleCopy}
-                className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-[#1e2330]"
+                className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-line"
                 title="Copy content"
               >
                 {copied ? <Check className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3" />}
@@ -231,7 +231,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleReset}
-                className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-[#1e2330]"
+                className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-line"
                 title="Clear content"
               >
                 <RotateCcw className="h-3 w-3" />
@@ -310,7 +310,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
           )}
 
           {/* Footer */}
-          <div className="bg-[#0e1117] border-t border-[#1e2330] px-3 py-2.5 flex items-center justify-between">
+          <div className="bg-canvas border-t border-line px-3 py-2.5 flex items-center justify-between">
             <div className="text-xs text-zinc-400">
               Lines: {bodyValue?.split('\n').length || 0} | 
               Characters: {bodyValue?.length || 0}

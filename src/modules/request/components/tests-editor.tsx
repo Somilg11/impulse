@@ -28,7 +28,7 @@ interface Props {
 }
 
 const control =
-  "h-8 text-xs bg-[#0e1117] border-[#1e2330] text-zinc-200 focus-visible:ring-0 focus:ring-0";
+  "h-8 text-xs bg-canvas border-line text-zinc-200 focus-visible:ring-0 focus:ring-0";
 
 let counter = 0;
 const nextId = () => `a${Date.now().toString(36)}${counter++}`;
@@ -90,7 +90,7 @@ const TestsEditor = ({ value, onChange }: Props) => {
               <SelectTrigger className={`${control} w-[150px]`}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#161b26] border-[#1e2330] text-zinc-300">
+              <SelectContent className="bg-surface-raised border-line text-zinc-300">
                 {SOURCES.map((option) => (
                   <SelectItem key={option.value} value={option.value} className="text-xs">
                     {option.label}
@@ -119,7 +119,7 @@ const TestsEditor = ({ value, onChange }: Props) => {
               <SelectTrigger className={`${control} w-[150px]`}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#161b26] border-[#1e2330] text-zinc-300">
+              <SelectContent className="bg-surface-raised border-line text-zinc-300">
                 {COMPARATORS.map((option) => (
                   <SelectItem key={option.value} value={option.value} className="text-xs">
                     {option.label}

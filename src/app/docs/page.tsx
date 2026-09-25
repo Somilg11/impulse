@@ -70,7 +70,7 @@ export default function DocsPage() {
             <code className="bg-white/10 px-1.5 py-0.5 rounded text-blue-400">/workspace</code>{" "}
             to start sending requests.
           </p>
-          <div className="bg-[#1a1c23] border border-white/5 rounded-xl p-6 font-mono text-sm mb-8 overflow-hidden relative">
+          <div className="bg-surface-raised border border-white/5 rounded-xl p-6 font-mono text-sm mb-8 overflow-hidden relative">
             <div className="flex items-center gap-1.5 mb-4 border-b border-white/5 pb-3">
               <div className="w-2 h-2 rounded-full bg-red-500/50" />
               <div className="w-2 h-2 rounded-full bg-yellow-500/50" />
@@ -374,7 +374,7 @@ export default function DocsPage() {
             field, or the body &mdash; and it is replaced with that environment&apos;s
             value when the request is sent.
           </p>
-          <div className="bg-[#1a1c23] border border-white/5 rounded-xl p-6 font-mono text-sm mb-6">
+          <div className="bg-surface-raised border border-white/5 rounded-xl p-6 font-mono text-sm mb-6">
             <div className="text-zinc-500">
               <span className="text-blue-400">{"{{baseUrl}}"}</span>/users/
               <span className="text-blue-400">{"{{userId}}"}</span>

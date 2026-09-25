@@ -47,22 +47,22 @@ const WorkSpace = () => {
           if (ws) setSelectedWorkspace(ws);
         }}
       >
-        <SelectTrigger className="border border-[#1e2330] bg-[#161b26] hover:bg-[#1e2330] text-zinc-300 flex flex-row items-center gap-1.5 rounded-lg h-7 px-3 transition-all w-auto min-w-0">
+        <SelectTrigger className="border border-line bg-surface-raised hover:bg-line text-zinc-300 flex flex-row items-center gap-1.5 rounded-lg h-7 px-3 transition-all w-auto min-w-0">
           <div className="bg-blue-600 text-white text-[9px] font-bold w-4 h-4 rounded flex items-center justify-center shrink-0">W</div>
           <span className="text-xs font-medium truncate max-w-[120px]">
             <SelectValue placeholder="Workspace" />
           </span>
         </SelectTrigger>
-        <SelectContent className="bg-[#161b26] border border-[#1e2330] text-zinc-300 rounded-lg shadow-2xl">
+        <SelectContent className="bg-surface-raised border border-line text-zinc-300 rounded-lg shadow-2xl">
           {workspaces.map((ws) => (
-            <SelectItem key={ws.id} value={ws.id} className="hover:bg-[#1e2330] cursor-pointer rounded text-xs">
+            <SelectItem key={ws.id} value={ws.id} className="hover:bg-line cursor-pointer rounded text-xs">
               {ws.name}
             </SelectItem>
           ))}
-          <Separator className="my-1.5 bg-[#1e2330]" />
+          <Separator className="my-1.5 bg-line" />
           <div className="p-1.5 px-2 flex flex-row justify-between items-center">
             <span className="text-[10px] text-zinc-500">Workspaces</span>
-            <Button size="icon" variant="ghost" className="h-5 w-5 rounded hover:bg-[#1e2330]" onClick={() => setIsModalOpen(true)}>
+            <Button size="icon" variant="ghost" className="h-5 w-5 rounded hover:bg-line" onClick={() => setIsModalOpen(true)}>
               <Plus size={12} className="text-zinc-400" />
             </Button>
           </div>

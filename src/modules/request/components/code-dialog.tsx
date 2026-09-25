@@ -69,7 +69,7 @@ const CodeDialog = ({ tab, isOpen, onClose }: Props) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-[#0e1117] border-[#1e2330] text-zinc-200 max-w-3xl">
+      <DialogContent className="bg-canvas border-line text-zinc-200 max-w-3xl">
         <DialogHeader>
           <DialogTitle className="text-white">Code</DialogTitle>
           <DialogDescription className="text-zinc-500 text-xs">
@@ -86,8 +86,8 @@ const CodeDialog = ({ tab, isOpen, onClose }: Props) => {
               onClick={() => setTarget(option.value)}
               className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors border ${
                 target === option.value
-                  ? "bg-[#1e2330] text-white border-blue-500/40"
-                  : "bg-transparent text-zinc-500 border-[#1e2330] hover:text-zinc-300"
+                  ? "bg-line text-white border-blue-500/40"
+                  : "bg-transparent text-zinc-500 border-line hover:text-zinc-300"
               }`}
             >
               {option.label}
@@ -101,12 +101,12 @@ const CodeDialog = ({ tab, isOpen, onClose }: Props) => {
           </p>
         )}
 
-        <div className="relative border border-[#1e2330] rounded-lg overflow-hidden">
+        <div className="relative border border-line rounded-lg overflow-hidden">
           <Button
             size="sm"
             variant="ghost"
             onClick={handleCopy}
-            className="absolute right-2 top-2 z-10 h-7 px-2 text-xs text-zinc-400 hover:text-white bg-[#161b26]/80 backdrop-blur-sm"
+            className="absolute right-2 top-2 z-10 h-7 px-2 text-xs text-zinc-400 hover:text-white bg-surface-raised/80 backdrop-blur-sm"
           >
             {copied ? (
               <Check className="h-3.5 w-3.5 text-green-400" />

@@ -88,10 +88,10 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
   return (
     <Tabs
       defaultValue="parameters"
-      className="w-full border border-[#1e2330] rounded-lg overflow-hidden bg-[#0e1117]"
+      className="w-full border border-line rounded-lg overflow-hidden bg-canvas"
     >
       {/* Underline-style tabs matching the reference */}
-      <div className="border-b border-[#1e2330] px-1">
+      <div className="border-b border-line px-1">
         <TabsList className="bg-transparent h-9 p-0 gap-0">
           <TabsTrigger 
               value="parameters" 

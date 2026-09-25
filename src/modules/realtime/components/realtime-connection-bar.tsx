@@ -116,14 +116,14 @@ const RealtimeConnectionBar = () => {
   }
 
   return (
-    <div className='flex flex-row items-center justify-between bg-[#161b26] border border-[#1e2330] rounded-lg px-3 py-2.5 w-full shadow-sm'>
+    <div className='flex flex-row items-center justify-between bg-surface-raised border border-line rounded-lg px-3 py-2.5 w-full shadow-sm'>
       <div className="flex flex-row items-center gap-3 flex-1">
         <Input 
           value={url} 
           onChange={(e) => setUrl(e.target.value)}
           onKeyDown={handleKeyPress}
           placeholder="ws://localhost:8080"
-          className="flex-1 bg-[#0e1117] border-[#1e2330] text-zinc-200 placeholder-zinc-600 focus-visible:ring-blue-500/30 h-9"
+          className="flex-1 bg-canvas border-line text-zinc-200 placeholder-zinc-600 focus-visible:ring-blue-500/30 h-9"
           disabled={status === 'connecting' || status === 'reconnecting'}
         />
       </div>

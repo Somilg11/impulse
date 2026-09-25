@@ -39,7 +39,7 @@ const SearchBar = () => {
 
             {/* Command Dialog */}
             <CommandDialog open={open} onOpenChange={setOpen}>
-                <div className="bg-[#0b0e1a] border border-white/10 rounded-xl overflow-hidden shadow-2xl">
+                <div className="bg-canvas border border-white/10 rounded-xl overflow-hidden shadow-2xl">
                     <CommandInput
                         placeholder="Type a command or search..."
                         className="bg-transparent border-none text-zinc-200 placeholder:text-zinc-500 h-12"

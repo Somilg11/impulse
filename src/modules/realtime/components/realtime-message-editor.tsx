@@ -138,9 +138,9 @@ const RealtimeMessageEditor = () => {
   
 
   return (
-    <div className="flex flex-col space-y-4 bg-[#161b26] border border-[#1e2330] rounded-xl p-5 shadow-sm">
+    <div className="flex flex-col space-y-4 bg-surface-raised border border-line rounded-xl p-5 shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#1e2330] pb-3 mb-1">
+      <div className="flex items-center justify-between border-b border-line pb-3 mb-1">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 bg-blue-500/10 rounded-md">
             <Send size={16} className="text-blue-400" />
@@ -161,7 +161,7 @@ const RealtimeMessageEditor = () => {
     
       {/* Editor */}
       <div className="relative group">
-        <div className="border border-[#1e2330] rounded-lg overflow-hidden bg-[#0e1117]">
+        <div className="border border-line rounded-lg overflow-hidden bg-canvas">
           {/* Monaco Editor */}
           <Editor
             height="180px"
@@ -192,7 +192,7 @@ const RealtimeMessageEditor = () => {
               padding: { top: 12, bottom: 12 }
             }}
             loading={
-              <div className="w-full h-40 bg-[#0e1117] flex items-center justify-center">
+              <div className="w-full h-40 bg-canvas flex items-center justify-center">
                 <div className="text-zinc-600 text-xs animate-pulse">Initializing Editor...</div>
               </div>
             }
@@ -205,7 +205,7 @@ const RealtimeMessageEditor = () => {
             size="sm"
             variant="secondary"
             onClick={handleFormatJSON}
-            className="h-7 w-7 p-0 bg-[#1e2330] border border-[#1e2330] text-zinc-400 hover:text-white hover:bg-[#2a303c]"
+            className="h-7 w-7 p-0 bg-line border border-line text-zinc-400 hover:text-white hover:bg-line-strong"
             title="Format JSON"
           >
             <RefreshCw size={13} />
@@ -214,7 +214,7 @@ const RealtimeMessageEditor = () => {
             size="sm"
             variant="secondary"
             onClick={handleCopyMessage}
-            className="h-7 w-7 p-0 bg-[#1e2330] border border-[#1e2330] text-zinc-400 hover:text-white hover:bg-[#2a303c]"
+            className="h-7 w-7 p-0 bg-line border border-line text-zinc-400 hover:text-white hover:bg-line-strong"
             title="Copy Message"
           >
             <Copy size={13} />
@@ -223,7 +223,7 @@ const RealtimeMessageEditor = () => {
             size="sm"
             variant="secondary"
             onClick={handleClearMessage}
-            className="h-7 w-7 p-0 bg-[#1e2330] border border-[#1e2330] text-zinc-400 hover:text-red-400 hover:bg-[#2a303c]"
+            className="h-7 w-7 p-0 bg-line border border-line text-zinc-400 hover:text-red-400 hover:bg-line-strong"
             title="Clear Editor"
           >
             <Trash2 size={13} />

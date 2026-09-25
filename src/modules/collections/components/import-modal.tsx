@@ -80,7 +80,7 @@ const ImportModal = ({
                 {/* File Upload Area */}
                 <div 
                     onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-[#1e2330] rounded-xl p-8 flex flex-col items-center justify-center gap-3 hover:bg-[#161b26] cursor-pointer transition-all group"
+                    className="border-2 border-dashed border-line rounded-xl p-8 flex flex-col items-center justify-center gap-3 hover:bg-surface-raised cursor-pointer transition-all group"
                 >
                     <div className="p-3 bg-blue-500/10 rounded-full group-hover:bg-blue-500/20 transition-colors">
                         <Upload className="w-6 h-6 text-blue-400" />
@@ -99,9 +99,9 @@ const ImportModal = ({
                 </div>
 
                 <div className="relative flex items-center py-2">
-                    <div className="flex-grow border-t border-[#1e2330]"></div>
+                    <div className="flex-grow border-t border-line"></div>
                     <span className="flex-shrink mx-4 text-[10px] font-bold uppercase tracking-widest text-zinc-600">or paste JSON</span>
-                    <div className="flex-grow border-t border-[#1e2330]"></div>
+                    <div className="flex-grow border-t border-line"></div>
                 </div>
 
                 {/* JSON Editor */}
@@ -110,9 +110,9 @@ const ImportModal = ({
                         value={jsonContent}
                         onChange={(e) => setJsonContent(e.target.value)}
                         placeholder='{ "collections": [...] }'
-                        className="w-full h-40 bg-[#0e1117] border border-[#1e2330] rounded-lg p-3 text-xs font-mono text-zinc-300 placeholder-zinc-700 focus:outline-none focus:border-blue-500/50 transition-colors resize-none"
+                        className="w-full h-40 bg-canvas border border-line rounded-lg p-3 text-xs font-mono text-zinc-300 placeholder-zinc-700 focus:outline-none focus:border-blue-500/50 transition-colors resize-none"
                     />
-                    <div className="absolute top-2 right-2 p-1.5 bg-[#161b26] border border-[#1e2330] rounded text-zinc-500">
+                    <div className="absolute top-2 right-2 p-1.5 bg-surface-raised border border-line rounded text-zinc-500">
                         <FileJson className="w-3.5 h-3.5" />
                     </div>
                 </div>

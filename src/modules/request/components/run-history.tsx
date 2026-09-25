@@ -77,7 +77,7 @@ const RunHistory = ({ requestId, onSelect }: Props) => {
 
   return (
     <ScrollArea className="h-96">
-      <div className="divide-y divide-[#1e2330]">
+      <div className="divide-y divide-line">
         {runs.map((run) => {
           const results = Array.isArray(run.testResults)
             ? (run.testResults as unknown as AssertionResult[])
@@ -88,7 +88,7 @@ const RunHistory = ({ requestId, onSelect }: Props) => {
             <button
               key={run.id}
               onClick={() => onSelect?.(run as HistoryRun)}
-              className="w-full text-left px-4 py-3 hover:bg-[#1e2330]/40 transition-colors flex items-center gap-3"
+              className="w-full text-left px-4 py-3 hover:bg-line/40 transition-colors flex items-center gap-3"
             >
               <span className={`text-sm font-bold w-10 shrink-0 ${statusColor(run.status)}`}>
                 {run.status || "—"}

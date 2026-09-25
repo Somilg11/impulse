@@ -86,7 +86,7 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                 {/* Collection header */}
                 <div className="flex items-center group">
                     <CollapsibleTrigger
-                        className="flex items-center gap-1.5 flex-1 px-3 py-1.5 hover:bg-[#1e2330]/50 rounded transition-colors cursor-pointer text-left"
+                        className="flex items-center gap-1.5 flex-1 px-3 py-1.5 hover:bg-line/50 rounded transition-colors cursor-pointer text-left"
                         style={{ paddingLeft: `${12 + depth * 12}px` }}
                     >
                         {hasRequests ? (
@@ -106,48 +106,48 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                     <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity pr-1">
                         <button 
                             onClick={() => setIsAddRequestOpen(true)}
-                            className="p-1 hover:bg-[#1e2330] rounded text-zinc-500 hover:text-zinc-300 transition-colors"
+                            className="p-1 hover:bg-line rounded text-zinc-500 hover:text-zinc-300 transition-colors"
                         >
                             <FilePlus className="w-3 h-3" />
                         </button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className="p-1 hover:bg-[#1e2330] rounded text-zinc-500 hover:text-zinc-300 transition-colors">
+                                <button className="p-1 hover:bg-line rounded text-zinc-500 hover:text-zinc-300 transition-colors">
                                     <EllipsisVertical className="w-3 h-3" />
                                 </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-[#161b26] border border-[#1e2330] text-zinc-300 rounded-lg shadow-xl w-36">
-                                <DropdownMenuItem onClick={() => setIsAddRequestOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
+                            <DropdownMenuContent className="bg-surface-raised border border-line text-zinc-300 rounded-lg shadow-xl w-36">
+                                <DropdownMenuItem onClick={() => setIsAddRequestOpen(true)} className="text-xs hover:bg-line cursor-pointer gap-2">
                                     <FilePlus className="w-3 h-3 text-green-400" />
                                     Add Request
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsRunnerOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
+                                <DropdownMenuItem onClick={() => setIsRunnerOpen(true)} className="text-xs hover:bg-line cursor-pointer gap-2">
                                     <Play className="w-3 h-3" />
                                     Run collection
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsAddFolderOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
+                                <DropdownMenuItem onClick={() => setIsAddFolderOpen(true)} className="text-xs hover:bg-line cursor-pointer gap-2">
                                     <FolderPlus className="w-3 h-3" />
                                     New Folder
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
+                                <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="text-xs hover:bg-line cursor-pointer gap-2">
                                     <Edit className="w-3 h-3 text-blue-400" />
                                     Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => exportCollection("postman")}
-                                    className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2"
+                                    className="text-xs hover:bg-line cursor-pointer gap-2"
                                 >
                                     <Download className="w-3 h-3" />
                                     Export (Postman)
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => exportCollection("impulse")}
-                                    className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2"
+                                    className="text-xs hover:bg-line cursor-pointer gap-2"
                                 >
                                     <Download className="w-3 h-3" />
                                     Export (Impulse)
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-xs hover:bg-[#1e2330] cursor-pointer gap-2">
+                                <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-xs hover:bg-line cursor-pointer gap-2">
                                     <Trash className="w-3 h-3 text-red-400" />
                                     Delete
                                 </DropdownMenuItem>
@@ -170,7 +170,7 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
 
                     {isPending ? (
                         <div className="pl-7 py-2">
-                            <div className="w-3 h-3 border-2 border-[#1e2330] border-t-blue-400 rounded-full animate-spin" />
+                            <div className="w-3 h-3 border-2 border-line border-t-blue-400 rounded-full animate-spin" />
                         </div>
                     ) : isError ? (
                         <div className="pl-7 py-1.5 text-[10px] text-red-400/60">Error</div>
@@ -180,7 +180,7 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                                 <button
                                     key={request.id}
                                     onClick={() => openRequestTab(request)}
-                                    className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-[#1e2330]/50 rounded transition-colors text-left group/req"
+                                    className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-line/50 rounded transition-colors text-left group/req"
                                 >
                                     <span className={`text-[9px] font-bold px-1 py-0.5 rounded shrink-0 ${
                                         methodColorMap[request.method as keyof typeof methodColorMap] ?? 'text-zinc-500 bg-zinc-500/10'

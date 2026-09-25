@@ -21,14 +21,14 @@ const TabbedLeftPanel = () => {
     };
 
     return (
-        <div className="flex h-full w-full flex-col bg-[#0e1117] py-3 items-center gap-2">
+        <div className="flex h-full w-full flex-col bg-canvas py-3 items-center gap-2">
             {sidebarItems.map((item, index) => (
                 <Hint label={item.label} key={index} side="right">
                     <Link
                         href={item.href}
                         className={`w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-150 ${isActive(item.match)
-                                ? "bg-[#1e2330] text-blue-400"
-                                : "text-zinc-500 hover:text-zinc-300 hover:bg-[#1e2330]/50"
+                                ? "bg-line text-blue-400"
+                                : "text-zinc-500 hover:text-zinc-300 hover:bg-line/50"
                             }`}
                     >
                         <item.icon className="w-4 h-4" />

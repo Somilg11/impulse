@@ -28,9 +28,9 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   }, [searchQuery, sidebarItems]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#090b14] text-zinc-100 font-sans">
+    <div className="flex flex-col min-h-screen bg-canvas text-zinc-100 font-sans">
       {/* Header */}
-      <header className="px-6 h-16 flex items-center justify-between border-b border-white/5 bg-[#090b14]/80 backdrop-blur-md sticky top-0 z-50">
+      <header className="px-6 h-16 flex items-center justify-between border-b border-white/5 bg-canvas/80 backdrop-blur-md sticky top-0 z-50">
         <Link href="/" className="flex items-center gap-2">
           <div className="bg-blue-600 rounded-lg p-1.5">
             <Terminal className="h-5 w-5 text-white" strokeWidth={2.5} />

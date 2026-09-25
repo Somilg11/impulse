@@ -26,7 +26,7 @@ interface Props {
 }
 
 const fieldClass =
-  "bg-[#0e1117] border-[#1e2330] h-9 text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:border-blue-500/50";
+  "bg-canvas border-line h-9 text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:border-blue-500/50";
 
 const labelClass =
   "text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5 block";
@@ -59,15 +59,15 @@ const AuthEditor = ({ value, onChange }: Props) => {
           value={auth.type}
           onValueChange={(next) => update(blankFor(next as AuthType))}
         >
-          <SelectTrigger className="w-full sm:w-56 bg-[#0e1117] border-[#1e2330] h-9 text-sm text-zinc-200 focus:ring-0">
+          <SelectTrigger className="w-full sm:w-56 bg-canvas border-line h-9 text-sm text-zinc-200 focus:ring-0">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="bg-[#161b26] border-[#1e2330] text-zinc-300">
+          <SelectContent className="bg-surface-raised border-line text-zinc-300">
             {AUTH_TYPES.map((option) => (
               <SelectItem
                 key={option.value}
                 value={option.value}
-                className="text-sm hover:bg-[#1e2330]"
+                className="text-sm hover:bg-line"
               >
                 {option.label}
               </SelectItem>
@@ -183,14 +183,14 @@ const AuthEditor = ({ value, onChange }: Props) => {
                 update({ ...auth, in: next === "query" ? "query" : "header" })
               }
             >
-              <SelectTrigger className="w-full sm:w-56 bg-[#0e1117] border-[#1e2330] h-9 text-sm text-zinc-200 focus:ring-0">
+              <SelectTrigger className="w-full sm:w-56 bg-canvas border-line h-9 text-sm text-zinc-200 focus:ring-0">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#161b26] border-[#1e2330] text-zinc-300">
-                <SelectItem value="header" className="text-sm hover:bg-[#1e2330]">
+              <SelectContent className="bg-surface-raised border-line text-zinc-300">
+                <SelectItem value="header" className="text-sm hover:bg-line">
                   Header
                 </SelectItem>
-                <SelectItem value="query" className="text-sm hover:bg-[#1e2330]">
+                <SelectItem value="query" className="text-sm hover:bg-line">
                   Query parameter
                 </SelectItem>
               </SelectContent>

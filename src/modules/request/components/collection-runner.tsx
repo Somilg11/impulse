@@ -144,7 +144,7 @@ const CollectionRunner = ({ collectionId, collectionName, isOpen, onClose }: Pro
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && !running && onClose()}>
-      <DialogContent className="bg-[#0e1117] border-[#1e2330] text-zinc-200 max-w-2xl">
+      <DialogContent className="bg-canvas border-line text-zinc-200 max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-white">Run &ldquo;{collectionName}&rdquo;</DialogTitle>
           <DialogDescription className="text-zinc-500 text-xs">
@@ -211,7 +211,7 @@ const CollectionRunner = ({ collectionId, collectionName, isOpen, onClose }: Pro
           )}
         </div>
 
-        <ScrollArea className="h-[340px] border border-[#1e2330] rounded-lg">
+        <ScrollArea className="h-[340px] border border-line rounded-lg">
           {rows.length === 0 ? (
             <div className="h-[330px] flex items-center justify-center">
               <p className="text-xs text-zinc-600">
@@ -219,7 +219,7 @@ const CollectionRunner = ({ collectionId, collectionName, isOpen, onClose }: Pro
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-[#1e2330]">
+            <div className="divide-y divide-line">
               {rows.map((row) => {
                 const failed =
                   row.error ||

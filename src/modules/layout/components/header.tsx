@@ -19,7 +19,7 @@ const Header = ({ user }: Props) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
-        <header className="px-4 h-12 flex items-center justify-between border-b border-[#1e2330] bg-[#0e1117] sticky top-0 z-50 relative">
+        <header className="px-4 h-12 flex items-center justify-between border-b border-line bg-canvas sticky top-0 z-50 relative">
             {/* Left: logo */}
             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
                 <div className="bg-blue-600 rounded-md p-1 flex items-center justify-center">
@@ -37,7 +37,7 @@ const Header = ({ user }: Props) => {
             <div className="hidden md:flex items-center gap-3">
                 <EnvironmentSelector />
                 <SearchBar />
-                <div className="h-4 w-px bg-[#1e2330]" />
+                <div className="h-4 w-px bg-line" />
                 <InviteMember />
                 <UserButton user={user} size="sm" />
             </div>
@@ -52,7 +52,7 @@ const Header = ({ user }: Props) => {
 
             {/* Mobile dropdown */}
             {mobileMenuOpen && (
-                <div className="absolute top-12 left-0 right-0 bg-[#0e1117] border-b border-[#1e2330] p-3 space-y-3 md:hidden z-50">
+                <div className="absolute top-12 left-0 right-0 bg-canvas border-b border-line p-3 space-y-3 md:hidden z-50">
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                             <InviteMember />

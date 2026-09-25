@@ -98,22 +98,22 @@ const RequestBar = ({ tab, updateTab }: Props) => {
 
   return (
     <div className='flex flex-col gap-2 w-full'>
-      <div className='flex items-center gap-0 bg-[#161b26] border border-[#1e2330] rounded-lg w-full overflow-hidden'>
+      <div className='flex items-center gap-0 bg-surface-raised border border-line rounded-lg w-full overflow-hidden'>
         {/* Method selector */}
         <Select
           value={tab.method}
           onValueChange={(value) => updateTab(tab.id, { method: value })}
         >
-          <SelectTrigger className={`w-auto min-w-[80px] sm:min-w-[90px] bg-transparent border-0 border-r border-[#1e2330] rounded-none h-10 px-3 font-bold text-sm tracking-wide shrink-0 focus:ring-0 ${methodColorMap[tab.method] || "text-zinc-400"}`}>
+          <SelectTrigger className={`w-auto min-w-[80px] sm:min-w-[90px] bg-transparent border-0 border-r border-line rounded-none h-10 px-3 font-bold text-sm tracking-wide shrink-0 focus:ring-0 ${methodColorMap[tab.method] || "text-zinc-400"}`}>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="bg-[#161b26] border border-[#1e2330] text-zinc-300 rounded-lg shadow-xl">
+          <SelectContent className="bg-surface-raised border border-line text-zinc-300 rounded-lg shadow-xl">
             <SelectGroup>
               {METHODS.map((method) => (
                 <SelectItem
                   key={method}
                   value={method}
-                  className={`${methodColorMap[method]} font-bold hover:bg-[#1e2330]`}
+                  className={`${methodColorMap[method]} font-bold hover:bg-line`}
                 >
                   {method}
                 </SelectItem>
@@ -140,7 +140,7 @@ const RequestBar = ({ tab, updateTab }: Props) => {
             type="button"
             onClick={() => setCodeOpen(true)}
             disabled={!tab.url}
-            className="h-10 px-3 border-l border-[#1e2330] text-zinc-500 hover:text-zinc-200 disabled:opacity-40 transition-colors shrink-0"
+            className="h-10 px-3 border-l border-line text-zinc-500 hover:text-zinc-200 disabled:opacity-40 transition-colors shrink-0"
           >
             <Code2 className="w-4 h-4" />
           </button>
@@ -161,12 +161,12 @@ const RequestBar = ({ tab, updateTab }: Props) => {
       <div className='flex items-center gap-2 text-[11px] text-zinc-500'>
         <span className='uppercase tracking-widest font-semibold'>Send via</span>
         <Select value={sendMode} onValueChange={(value) => setSendMode(value as SendMode)}>
-          <SelectTrigger className="h-7 w-auto min-w-[110px] bg-[#161b26] border border-[#1e2330] text-xs text-zinc-300 focus:ring-0">
+          <SelectTrigger className="h-7 w-auto min-w-[110px] bg-surface-raised border border-line text-xs text-zinc-300 focus:ring-0">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="bg-[#161b26] border border-[#1e2330] text-zinc-300">
+          <SelectContent className="bg-surface-raised border border-line text-zinc-300">
             {SEND_MODES.map((mode) => (
-              <SelectItem key={mode.value} value={mode.value} className="text-xs hover:bg-[#1e2330]">
+              <SelectItem key={mode.value} value={mode.value} className="text-xs hover:bg-line">
                 {mode.label}
               </SelectItem>
             ))}

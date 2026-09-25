@@ -41,15 +41,15 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
     const { data: collections, isLoading, isError } = useCollections(currentWorkspace?.id);
 
     if (isLoading) return (
-        <div className="flex-1 flex items-center justify-center bg-[#0e1117]">
+        <div className="flex-1 flex items-center justify-center bg-canvas">
             <Loader className="w-5 h-5 text-zinc-500 animate-spin" />
         </div>
     );
 
     return (
-        <div className="flex flex-col h-full bg-[#0e1117] border-r border-[#1e2330] overflow-hidden">
+        <div className="flex flex-col h-full bg-canvas border-r border-line overflow-hidden">
             {/* Top actions: + New and Import */}
-            <div className="flex items-center gap-2 px-3 py-2.5 border-b border-[#1e2330]">
+            <div className="flex items-center gap-2 px-3 py-2.5 border-b border-line">
                 <button 
                     onClick={() => setIsModalOpen(true)}
                     className="flex items-center gap-1 text-xs text-zinc-300 hover:text-white transition-colors font-medium"
@@ -67,7 +67,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
             </div>
 
             {/* Search */}
-            <div className="px-3 py-2 border-b border-[#1e2330]">
+            <div className="px-3 py-2 border-b border-line">
                 <div className="relative">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
                     <input
@@ -75,7 +75,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search..."
-                        className="w-full bg-[#161b26] border border-[#1e2330] rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-[#2a3040] transition-colors"
+                        className="w-full bg-surface-raised border border-line rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-line-strong transition-colors"
                     />
                 </div>
             </div>

@@ -133,10 +133,10 @@ const ResponseViewer = ({
   const headerEntries = Object.entries(headers ?? {});
 
   return (
-    <div className="w-full bg-[#0e1117] text-white p-3 md:p-4">
+    <div className="w-full bg-canvas text-white p-3 md:p-4">
       <div className="w-full mx-auto">
         {/* Status header */}
-        <Card className="bg-[#161b26] border-[#1e2330] mb-4">
+        <Card className="bg-surface-raised border-line mb-4">
           <CardHeader className="pb-3">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex flex-wrap items-center gap-3 md:gap-4">
@@ -158,7 +158,7 @@ const ResponseViewer = ({
                 </div>
                 <Badge
                   variant="secondary"
-                  className="bg-[#1e2330] text-zinc-400 border-0 gap-1.5"
+                  className="bg-line text-zinc-400 border-0 gap-1.5"
                   title={
                     via === "browser"
                       ? "Sent from your browser"
@@ -207,10 +207,10 @@ const ResponseViewer = ({
         </Card>
 
         {/* Body */}
-        <Card className="bg-[#161b26] border-[#1e2330]">
+        <Card className="bg-surface-raised border-line">
           <CardContent className="p-0">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <div className="px-3 md:px-4 border-b border-[#1e2330]">
+              <div className="px-3 md:px-4 border-b border-line">
                 <TabsList className="bg-transparent p-0 h-auto">
                   <TabsTrigger
                     value="json"

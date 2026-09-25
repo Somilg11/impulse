@@ -102,27 +102,27 @@ export default function PlaygroundPage() {
 
   if (!activeTab) {
     return (
-      <div className="flex flex-col gap-6 h-full items-center justify-center bg-[#0e1117]">
-        <div className="flex flex-col justify-center items-center h-20 w-20 border border-[#1e2330] rounded-2xl bg-[#161b26]">
+      <div className="flex flex-col gap-6 h-full items-center justify-center bg-canvas">
+        <div className="flex flex-col justify-center items-center h-20 w-20 border border-line rounded-2xl bg-surface-raised">
           <Terminal size={32} className='text-zinc-500' strokeWidth={1.5} />
         </div>
        
         <div className="flex flex-col items-center gap-3">
             <p className="text-sm text-zinc-400">Ready to test?</p>
-            <div className="bg-[#161b26] border border-[#1e2330] px-5 py-4 rounded-lg space-y-2.5 text-xs">
+            <div className="bg-surface-raised border border-line px-5 py-4 rounded-lg space-y-2.5 text-xs">
               <div className="flex justify-between items-center gap-10">
                 <span className="text-zinc-400">New Request</span>
                 <div className="flex gap-0.5">
-                    <kbd className="px-1.5 py-0.5 bg-[#1e2330] text-zinc-500 text-[10px] rounded">⌘</kbd>
-                    <kbd className="px-1.5 py-0.5 bg-[#1e2330] text-zinc-500 text-[10px] rounded">⇧</kbd>
-                    <kbd className="px-1.5 py-0.5 bg-[#1e2330] text-zinc-500 text-[10px] rounded">N</kbd>
+                    <kbd className="px-1.5 py-0.5 bg-line text-zinc-500 text-[10px] rounded">⌘</kbd>
+                    <kbd className="px-1.5 py-0.5 bg-line text-zinc-500 text-[10px] rounded">⇧</kbd>
+                    <kbd className="px-1.5 py-0.5 bg-line text-zinc-500 text-[10px] rounded">N</kbd>
                 </div>
               </div>
               <div className="flex justify-between items-center gap-10">
                 <span className="text-zinc-400">Save Request</span>
                 <div className="flex gap-0.5">
-                    <kbd className="px-1.5 py-0.5 bg-[#1e2330] text-zinc-500 text-[10px] rounded">⌘</kbd>
-                    <kbd className="px-1.5 py-0.5 bg-[#1e2330] text-zinc-500 text-[10px] rounded">S</kbd>
+                    <kbd className="px-1.5 py-0.5 bg-line text-zinc-500 text-[10px] rounded">⌘</kbd>
+                    <kbd className="px-1.5 py-0.5 bg-line text-zinc-500 text-[10px] rounded">S</kbd>
                 </div>
               </div>
             </div>

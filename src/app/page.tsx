@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button'
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#090b14] text-white font-sans overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-canvas text-white font-sans overflow-hidden">
       
       {/* Header */}
-      <header className="px-6 lg:px-12 py-5 flex items-center justify-between z-50 bg-[#090b14]/80 backdrop-blur-md sticky top-0 z-50">
+      <header className="px-6 lg:px-12 py-5 flex items-center justify-between z-50 bg-canvas/80 backdrop-blur-md sticky top-0 z-50">
         <div className="flex flex-col">
           <Link href="/" className="flex items-center gap-2">
             <div className="bg-blue-600 rounded-lg p-1.5 flex items-center justify-center">
@@ -21,12 +21,12 @@ export default function LandingPage() {
         
         <div className="flex items-center gap-3">
           <Link href="/docs">
-            <Button variant="ghost" className="text-zinc-200 bg-[#1e2330]/50 hover:bg-[#1e2330] hover:text-white border border-white/5 rounded-full px-5 h-9 font-medium text-[15px]">
+            <Button variant="ghost" className="text-zinc-200 bg-line/50 hover:bg-line hover:text-white border border-white/5 rounded-full px-5 h-9 font-medium text-[15px]">
               Docs
             </Button>
           </Link>
           <Link href="/sign-in">
-            <Button className="bg-[#1265ff] hover:bg-[#1265ff]/90 text-white rounded-full px-5 h-9 font-medium text-[15px]">
+            <Button className="bg-brand hover:bg-brand/90 text-white rounded-full px-5 h-9 font-medium text-[15px]">
               Get Started
             </Button>
           </Link>
@@ -39,7 +39,7 @@ export default function LandingPage() {
         <div className="max-w-[800px] mx-auto flex flex-col items-center">
           <h1 className="text-6xl md:text-[80px] font-bold tracking-tight mb-6 leading-[1.1]">
             <span className="text-white">The </span>
-            <span className="text-[#3b82f6]">Open-Source</span><br />
+            <span className="text-brand">Open-Source</span><br />
             <span className="text-white">API client</span>
           </h1>
           
@@ -49,12 +49,12 @@ export default function LandingPage() {
           
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-10">
             <Link href="/sign-in">
-              <Button size="lg" className="bg-[#1265ff] hover:bg-[#1265ff]/90 text-white rounded-full px-8 h-14 text-[17px] font-semibold gap-2 shadow-[0_0_20px_rgba(18,101,255,0.4)]">
+              <Button size="lg" className="bg-brand hover:bg-brand/90 text-white rounded-full px-8 h-14 text-[17px] font-semibold gap-2 shadow-[0_0_20px_rgba(18,101,255,0.4)]">
                 Get Started <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
             <Link href="https://github.com/Somilg11/impulse" target="_blank">
-              <Button size="lg" className="bg-[#242938]/80 hover:bg-[#2e3344] text-white rounded-full px-8 h-14 text-[17px] font-medium border border-[#3b4154] gap-2 transition-all">
+              <Button size="lg" className="bg-line-strong/80 hover:bg-line-strong text-white rounded-full px-8 h-14 text-[17px] font-medium border border-line-strong gap-2 transition-all">
                 <Github className="h-5 w-5" /> Star on GitHub
               </Button>
             </Link>
@@ -63,7 +63,7 @@ export default function LandingPage() {
           <div className="flex items-center text-[15px] font-medium text-zinc-300">
             <span>4.8</span>
             <Star className="h-4 w-4 text-yellow-500 fill-current mx-1.5" />
-            <span className="text-[#3b82f6] ml-1">2,400+</span> <span className="ml-1">Stars on GitHub</span>
+            <span className="text-brand ml-1">2,400+</span> <span className="ml-1">Stars on GitHub</span>
           </div>
         </div>
 
@@ -76,15 +76,15 @@ export default function LandingPage() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[100%] bg-blue-500/10 blur-[120px] -z-10 rounded-full pointer-events-none" />
             
             {/* Mac OS Window frame */}
-            <div className="w-full aspect-[16/9] bg-[#1a1c23] rounded-t-xl border border-[#3b4154] shadow-2xl overflow-hidden flex flex-col backdrop-blur-xl">
+            <div className="w-full aspect-[16/9] bg-surface-raised rounded-t-xl border border-line-strong shadow-2xl overflow-hidden flex flex-col backdrop-blur-xl">
                 {/* Window header */}
-                <div className="h-10 bg-[#252833] flex items-center px-4 border-b border-[#3b4154]">
+                <div className="h-10 bg-surface-hover flex items-center px-4 border-b border-line-strong">
                     <div className="flex space-x-2">
                         <div className="w-3.5 h-3.5 rounded-full bg-[#ff5f56]" />
                         <div className="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]" />
                         <div className="w-3.5 h-3.5 rounded-full bg-[#27c93f]" />
                     </div>
-                    <div className="mx-auto flex items-center gap-2 bg-[#1a1c23] px-3 py-1 rounded text-xs text-zinc-400 border border-[#3b4154]">
+                    <div className="mx-auto flex items-center gap-2 bg-surface-raised px-3 py-1 rounded text-xs text-zinc-400 border border-line-strong">
                         <span className="w-4 h-4 rounded-sm bg-zinc-700 flex items-center justify-center text-[10px] text-white">W</span>
                         <span>Local workspace</span>
                         <ChevronDown className="h-3 w-3" />
@@ -94,18 +94,18 @@ export default function LandingPage() {
                 {/* Window body (mocking the app layout) */}
                 <div className="flex-1 flex text-sm">
                     {/* Sidebar left */}
-                    <div className="w-14 items-center flex flex-col py-4 border-r border-[#3b4154] bg-[#1d1f27] space-y-6">
+                    <div className="w-14 items-center flex flex-col py-4 border-r border-line-strong bg-surface-raised space-y-6">
                         <div className="w-8 h-8 rounded text-zinc-400 bg-white/5 flex items-center justify-center"><Terminal className="h-4 w-4" /></div>
                         <div className="w-8 h-8 rounded text-zinc-500 hover:text-zinc-300 flex items-center justify-center"><Zap className="h-4 w-4" /></div>
                         <div className="w-8 h-8 rounded text-zinc-500 hover:text-zinc-300 flex items-center justify-center"><Activity className="h-4 w-4" /></div>
                     </div>
                     
-                    <div className="w-64 border-r border-[#3b4154] bg-[#1a1c23] p-4 hidden md:block">
+                    <div className="w-64 border-r border-line-strong bg-surface-raised p-4 hidden md:block">
                         <div className="flex text-xs font-semibold text-zinc-300 mb-6 gap-2">
                             <span className="cursor-pointer hover:text-white">+ New</span>
                             <span className="cursor-pointer hover:text-white ml-2 text-zinc-500">Import</span>
                         </div>
-                        <div className="flex items-center gap-2 px-2 py-1.5 bg-[#252833] rounded text-zinc-400 border border-[#3b4154] mb-4 text-xs">
+                        <div className="flex items-center gap-2 px-2 py-1.5 bg-surface-hover rounded text-zinc-400 border border-line-strong mb-4 text-xs">
                            Search...
                         </div>
                         <div className="space-y-4">
@@ -130,9 +130,9 @@ export default function LandingPage() {
                     </div>
 
                     {/* Main content right */}
-                    <div className="flex-1 bg-[#15171e] flex flex-col p-6">
-                        <div className="flex items-center text-xs text-zinc-400 mb-6 gap-2 border-b border-[#3b4154] pb-4">
-                            <span className="bg-[#1a1c23] px-2 py-1 rounded border border-[#3b4154] flex items-center gap-1.5">
+                    <div className="flex-1 bg-surface flex flex-col p-6">
+                        <div className="flex items-center text-xs text-zinc-400 mb-6 gap-2 border-b border-line-strong pb-4">
+                            <span className="bg-surface-raised px-2 py-1 rounded border border-line-strong flex items-center gap-1.5">
                                 Local workspace <ChevronDown className="h-3 w-3" />
                             </span>
                             <span>API Reference</span>
@@ -145,19 +145,19 @@ export default function LandingPage() {
                         </div>
                         
                         <div className="flex items-stretch mb-6">
-                            <div className="w-24 bg-[#1a1c23] border border-[#3b4154] rounded-l-lg border-r-0 flex items-center justify-between px-3 text-[#eab308] font-bold text-xs cursor-pointer">
+                            <div className="w-24 bg-surface-raised border border-line-strong rounded-l-lg border-r-0 flex items-center justify-between px-3 text-[#eab308] font-bold text-xs cursor-pointer">
                                 POST <ChevronDown className="h-3 w-3 text-zinc-400" />
                             </div>
-                            <div className="flex-1 bg-[#1a1c23] border border-[#3b4154] px-4 py-2.5 text-zinc-400 text-sm flex items-center">
+                            <div className="flex-1 bg-surface-raised border border-line-strong px-4 py-2.5 text-zinc-400 text-sm flex items-center">
                                 http://api.impulse.dev/v1/auth/refresh
                             </div>
-                            <Button className="bg-[#1265ff] hover:bg-[#1265ff]/90 text-white rounded-none rounded-r-lg px-6 h-auto font-medium">
+                            <Button className="bg-brand hover:bg-brand/90 text-white rounded-none rounded-r-lg px-6 h-auto font-medium">
                                 Send
                             </Button>
                         </div>
                         
-                        <div className="flex-1 border border-[#3b4154] rounded-lg bg-[#1a1c23] overflow-hidden flex flex-col">
-                            <div className="flex border-b border-[#3b4154] px-4 pt-2 gap-6 text-[13px] font-medium text-zinc-400">
+                        <div className="flex-1 border border-line-strong rounded-lg bg-surface-raised overflow-hidden flex flex-col">
+                            <div className="flex border-b border-line-strong px-4 pt-2 gap-6 text-[13px] font-medium text-zinc-400">
                                 <span className="pb-2 border-b-2 border-transparent hover:text-zinc-200 cursor-pointer">Params</span>
                                 <span className="pb-2 text-zinc-100 border-b-2 border-blue-500 cursor-pointer">Body</span>
                                 <span className="pb-2 border-b-2 border-transparent hover:text-zinc-200 cursor-pointer">Headers</span>
