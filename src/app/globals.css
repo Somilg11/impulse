@@ -18,6 +18,8 @@
 @theme {
   /* Surfaces, darkest to lightest */
   --color-canvas: #0b0e14;        /* app background, behind everything */
+  --color-ink: #000000;           /* marketing surface - true black, like macOS */
+  --color-ink-raised: #0a0a0c;    /* panels on the marketing surface */
   --color-surface: #11151e;       /* panels, sidebar, headers */
   --color-surface-raised: #161b26; /* cards, popovers, inputs on a panel */
   --color-surface-hover: #1c2230;  /* hover state for rows and buttons */
@@ -26,10 +28,17 @@
   --color-line: #1e2330;          /* default divider */
   --color-line-strong: #2a3040;   /* emphasised divider, input borders */
 
-  /* Brand - blue, used for the active state and primary actions */
-  --color-brand: #2f7bff;
-  --color-brand-hover: #1f6bf0;
-  --color-brand-subtle: #12213d;  /* tinted background for active rows */
+  /* Brand - Apple's system blue for dark interfaces. Chosen deliberately: the
+   * product is a developer tool that should feel native on macOS, and this is
+   * the exact hue those users see in every system control. */
+  --color-brand: #0a84ff;
+  --color-brand-hover: #3395ff;
+  --color-brand-subtle: #0d2544;  /* tinted background for active rows */
+
+  /* Hairlines. Apple's chrome is built from translucent white rules rather than
+   * opaque grey lines, so they sit correctly on any surface beneath them. */
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --color-hairline-strong: rgba(255, 255, 255, 0.14);
 
   /* HTTP method colours, shared by the sidebar, tab bar, and method selector
    * so a GET is the same green everywhere. */
@@ -153,6 +162,33 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.552 0.016 285.938);
+}
+
+
+/* Entrance motion for the marketing surface.
+ *
+ * One easing curve, used everywhere: a decelerating cubic that settles rather
+ * than bounces. Movement is 12px - enough to read as motion, small enough not
+ * to feel like a slide deck. Disabled entirely under reduced-motion. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
 }
 
 @layer base {
