@@ -121,7 +121,7 @@ const ImportModal = ({
                 <div className="flex items-start gap-3 p-3 bg-blue-500/5 border border-blue-500/10 rounded-lg">
                     <AlertCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                     <p className="text-[11px] leading-relaxed text-zinc-400">
-                        Impulse supports nested Postman collections. Requests will be imported with their headers, body, and methods preserved.
+                        Requests are imported with their methods, URLs, query parameters, headers, and bodies. Postman folders are flattened into one collection, with the folder name kept as a prefix on each request.
                     </p>
                 </div>
             </div>

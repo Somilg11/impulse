@@ -44,7 +44,7 @@ export default function LandingPage() {
           </h1>
           
           <p className="text-[19px] md:text-[21px] text-[#9ba1a6] max-w-[700px] mb-10 leading-relaxed font-medium">
-            Build, test, and sync APIs your way. Stay local with Git, sync instantly with Team Projects, or Self-Host for total privacy. No login required. No cloud lock-in.
+            Build and test APIs in the browser, then share them with your team. Send requests from your own machine to reach localhost, or through a guarded server proxy when CORS gets in the way. Open source and self-hostable.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-10">
