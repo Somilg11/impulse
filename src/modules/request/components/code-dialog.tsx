@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import dynamic from "next/dynamic";
 import { Check, Copy } from "lucide-react";
 import { toast } from "sonner";
 
@@ -13,12 +12,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import MonacoEditor from "@/components/monaco-editor";
 import { CODE_TARGETS, generateCode, type CodeTarget } from "@/lib/codegen";
 import { composeRequest } from "@/lib/request-pipeline";
 import { useActiveVariables } from "@/modules/environments/hooks/use-active-variables";
 import type { RequestTab } from "../store/useRequestStore";
-
-const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
 interface Props {
   tab: RequestTab;

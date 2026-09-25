@@ -34,6 +34,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# Monaco is copied out of node_modules at build time (scripts/copy-monaco.mjs)
+/public/monaco
+
 # vercel
 .vercel
 
