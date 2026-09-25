@@ -42,6 +42,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Unit tests
+        run: npm test
+
       - name: Build
         # Real secrets are not available to CI; the app only needs the env
         # schema to be satisfiable, not the values to be valid.
