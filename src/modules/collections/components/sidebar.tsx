@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react'
-import { useCollections } from '../hooks/collections'
+import { useCollections, useExportWorkspace } from '../hooks/collections'
 import { MEMBER_ROLE } from '@prisma/client';
-import { Archive, Clock, Code, ExternalLink, HelpCircle, Loader, Plus, Search, Share2, Upload } from 'lucide-react';
+import { Download, Loader, Plus, Search, Upload } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import CreateCollection from './create-collection';
 import EmptyCollections from './empty-collections';
@@ -39,6 +45,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
     const [searchQuery, setSearchQuery] = useState('');
 
     const { data: collections, isLoading, isError } = useCollections(currentWorkspace?.id);
+    const exportWorkspace = useExportWorkspace(currentWorkspace?.id);
 
     // The server returns a flat list; the tree is assembled here so nesting costs
     // one query instead of a recursive include of unknown depth. Rendering the
@@ -73,13 +80,35 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
                     <Plus className="w-3.5 h-3.5" />
                     New
                 </button>
-                <button 
+                <button
                     onClick={() => setIsImportModalOpen(true)}
-                    className="flex items-center gap-1 text-[12px] text-zinc-400 hover:text-zinc-300 transition-colors duration-[--duration-fast] ease-[--ease-ios] font-medium"
+                    className="flex items-center gap-1 text-[12px] font-medium text-zinc-400 transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:text-zinc-300"
                 >
                     <Upload className="w-3 h-3" />
                     Import
                 </button>
+
+                {/* Export every collection at once - previously only reachable
+                    one collection at a time. */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <button
+                            disabled={!collections?.length}
+                            className="ml-auto flex items-center gap-1 text-[12px] font-medium text-zinc-400 transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:text-zinc-300 disabled:opacity-40"
+                        >
+                            <Download className="w-3 h-3" />
+                            Export
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-52">
+                        <DropdownMenuItem onClick={() => exportWorkspace("postman")}>
+                            Export all &middot; Postman v2.1
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => exportWorkspace("impulse")}>
+                            Export all &middot; Impulse JSON
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             {/* Search */}
@@ -110,6 +139,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
                             key={collection.id}
                             collection={collection}
                             childrenOf={query ? undefined : childrenOf}
+                            allCollections={all}
                         />
                     ))
                 )}

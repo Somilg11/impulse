@@ -56,19 +56,28 @@ const InviteMember = () => {
     <DropdownMenu>
       <Hint label="Invite Member">
         <DropdownMenuTrigger asChild>
-          <Button className="border border-emerald-400 bg-emerald-400/10 hover:bg-emerald-400/20 text-emerald-400 hover:text-emerald-300">
-            <UserPlus className="size-4 text-emerald-400" />
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Invite a member"
+            className="size-8 text-zinc-400 hover:bg-surface-hover hover:text-zinc-100"
+          >
+            <UserPlus className="size-4" />
           </Button>
         </DropdownMenuTrigger>
       </Hint>
 
       <DropdownMenuContent className="w-80 rounded-xl" align="end">
-        <div className="p-4">
-          {/* <DropdownMenuLabel>Invite to {selectedWorkspace?.name}</DropdownMenuLabel> */}
-          <DropdownMenuSeparator />
+        <div className="p-3">
+          <p className="mb-0.5 text-[13px] font-medium text-zinc-200">
+            Invite to {selectedWorkspace?.name ?? "this workspace"}
+          </p>
+          <p className="mb-3 text-[12px] leading-relaxed text-zinc-500">
+            Anyone with the link joins as a Viewer. It expires in 7 days.
+          </p>
 
-          {/* Members Avatars */}
-          <div className="flex -space-x-2 overflow-hidden mb-3">
+          {/* Members */}
+          <div className="mb-3 flex -space-x-2 overflow-hidden">
             {isLoading ? (
               <p className="text-[12px] text-muted-foreground">Loading members...</p>
             ) : (
@@ -104,7 +113,7 @@ const InviteMember = () => {
 
           {/* Generate Button */}
           <Button
-            className="mt-3 w-full bg-emerald-500 hover:bg-emerald-600 text-white"
+            className="mt-2.5 w-full"
             onClick={generateInviteLink}
             disabled={isPending}
           >

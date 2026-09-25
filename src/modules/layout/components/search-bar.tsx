@@ -29,7 +29,7 @@ const SearchBar = () => {
             >
                 <span className="inline-flex flex-1 items-center">
                     <Search size={14} className="mr-2 text-zinc-500" />
-                    <span className="text-[12px] text-left pr-2">Search documentation...</span>
+                    <span className="text-[12px] text-left pr-2">Search collections and docs</span>
                 </span>
                 <span className="flex space-x-1 items-center">
                     <kbd className="px-1.5 py-0.5 text-[10px] bg-white/10 text-zinc-500 border border-white/5 rounded">⌘</kbd>

@@ -21,7 +21,8 @@ const SaveRequestToCollectionModal = ({
     method: REST_METHOD.GET,
   },
   initialName = "Untitled",
-  collectionId
+  collectionId,
+  linkTabId = null,
 }: {
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
@@ -37,7 +38,10 @@ const SaveRequestToCollectionModal = ({
     tests?: string;
   };
   initialName?: string;
-  collectionId?: string
+  collectionId?: string;
+  /** The tab this save came from. Omitted when saving from a collection menu,
+   *  where no tab should be re-pointed at the new request. */
+  linkTabId?: string | null
 }) => {
   const [requestName, setRequestName] = useState(initialName);
   // Only the user's explicit pick is stored; the effective selection below is
@@ -67,7 +71,7 @@ const SaveRequestToCollectionModal = ({
   const selectedCollectionId =
     pickedCollectionId || collectionId || collections?.[0]?.id || "";
 
-  const { mutateAsync, isPending } = useAddRequestToCollection(selectedCollectionId);
+  const { mutateAsync, isPending } = useAddRequestToCollection(selectedCollectionId, linkTabId);
 
 
   

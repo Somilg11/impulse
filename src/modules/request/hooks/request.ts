@@ -1,9 +1,11 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import {
   addRequestToCollection,
+  deleteRequest,
   getAllRequestFromCollection,
   getRequestRuns,
   recordRun,
@@ -18,7 +20,19 @@ import {
   type RequestTab,
 } from "../store/useRequestStore";
 
-export function useAddRequestToCollection(collectionId: string) {
+/**
+ * Saves a request into a collection.
+ *
+ * `linkTabId` is the tab this save came from, and it must be passed explicitly.
+ * Previously the hook linked whatever tab happened to be active, so using
+ * "Add request" from a collection's own menu silently re-pointed the tab you
+ * were working in at the new, empty request - the tab kept your URL and body on
+ * screen while its `requestId` now addressed a different row.
+ */
+export function useAddRequestToCollection(
+  collectionId: string,
+  linkTabId?: string | null
+) {
   const queryClient = useQueryClient();
   const updateTabFromSavedRequest = useRequestPlaygroundStore(
     (s) => s.updateTabFromSavedRequest
@@ -29,8 +43,7 @@ export function useAddRequestToCollection(collectionId: string) {
       addRequestToCollection(collectionId, value),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["requests", collectionId] });
-      const { activeTabId } = useRequestPlaygroundStore.getState();
-      if (activeTabId) updateTabFromSavedRequest(activeTabId, data);
+      if (linkTabId) updateTabFromSavedRequest(linkTabId, data);
     },
   });
 }
@@ -102,7 +115,13 @@ export function useSendRequest() {
         try {
           await recordRun(tab.requestId, result, testResults.length ? testResults : undefined);
         } catch (error) {
+          // The send itself succeeded, so this must not throw - but it must be
+          // visible, or History silently stays empty forever.
           console.error("Failed to record run history:", error);
+          toast.warning("Could not save this run to history", {
+            description:
+              error instanceof Error ? error.message : "Unknown error",
+          });
         }
       }
 
@@ -125,5 +144,25 @@ export function useRequestRuns(requestId?: string) {
     queryKey: ["request-runs", requestId],
     queryFn: async () => getRequestRuns(requestId!),
     enabled: Boolean(requestId),
+  });
+}
+
+/**
+ * Removes a saved request, and closes its tab if one is open - leaving a tab
+ * pointed at a row that no longer exists would fail on the next send with a
+ * confusing "not found".
+ */
+export function useDeleteRequest(collectionId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (requestId: string) => deleteRequest(requestId),
+    onSuccess: (_data, requestId) => {
+      const { tabs, closeTab } = useRequestPlaygroundStore.getState();
+      const open = tabs.find((t) => t.requestId === requestId);
+      if (open) closeTab(open.id);
+
+      queryClient.invalidateQueries({ queryKey: ["requests", collectionId] });
+    },
   });
 }

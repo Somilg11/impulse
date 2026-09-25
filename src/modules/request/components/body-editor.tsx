@@ -24,6 +24,8 @@ import {
 import { RotateCcw, Copy, Check, Code, AlignLeft, FileText, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useGenerateJsonBody } from '@/modules/ai/hooks/ai-suggestion'
+import { validateGeneratedJson } from '@/lib/ai-agents'
+import { toast } from 'sonner'
 
 import { useWorkspaceStore } from '@/modules/layout/store'
 import { useRequestPlaygroundStore } from '../store/useRequestStore'
@@ -131,11 +133,25 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
 
       if (result?.jsonBody) {
         form.setValue('body', JSON.stringify(result.jsonBody, null, 2));
+
+        // A model can return JSON that parses but is not a usable request body
+        // - empty, or full of nulls. Say so now rather than letting the user
+        // discover it from a 400 later.
+        const check = validateGeneratedJson(
+          result.jsonBody as Record<string, unknown>
+        );
+        if (!check.isValid) {
+          toast.warning(check.errors[0] ?? 'The generated body looks incomplete');
+        } else if (check.suggestions.length) {
+          toast.info(check.suggestions[0]);
+        }
       }
       setShowGenerateDialog(false);
       setPrompt('');
     } catch (error) {
-      console.error('Failed to generate JSON body:', error);
+      toast.error(
+        error instanceof Error ? error.message : 'Could not generate a body'
+      );
     }
   }
 
@@ -163,15 +179,14 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
           {/* Header */}
           <div className="bg-canvas border-b border-line px-3 py-2.5 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <h3 className="text-[13px] font-medium text-zinc-200">Raw Request Body</h3>
+              <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-zinc-600">Body</span>
               <div className="flex items-center gap-2 text-[12px] text-zinc-400">
-                <span>Type</span>
-                <Select
+                                <Select
                   value={bodyType}
                   onValueChange={(next) => onBodyTypeChange?.(next as BodyType)}
                 >
-                  <SelectTrigger className="h-7 w-[180px] text-[12px]">
-                    <SelectValue />
+                  <SelectTrigger className="h-7 w-[132px] text-[12px]">
+                    {BODY_TYPES.find((o) => o.value === bodyType)?.label ?? bodyType}
                   </SelectTrigger>
                   <SelectContent className="bg-surface-raised border-line">
                     {BODY_TYPES.map((option) => (

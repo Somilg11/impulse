@@ -159,6 +159,7 @@ export default function PlaygroundPage() {
         setIsModalOpen={setShowSaveModal}
         requestData={getCurrentRequestData()}
         initialName={getCurrentRequestData().name}
+        linkTabId={activeTab?.id ?? null}
       />
     </div>
   );

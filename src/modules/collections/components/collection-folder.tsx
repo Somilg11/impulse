@@ -7,6 +7,7 @@ import {
     ChevronRight,
     Download,
     FolderPlus,
+    FolderInput,
     Play,
 } from "lucide-react";
 import { useState } from "react";
@@ -14,6 +15,10 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -22,12 +27,13 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import EditCollectionModal from "./edit-collection";
-import { useExportCollection } from "../hooks/collections";
+import { useExportCollection, useMoveCollection } from "../hooks/collections";
 import CreateCollection from "./create-collection";
 import CollectionRunner from "@/modules/request/components/collection-runner";
 import DeleteCollectionModal from "./delete-collection";
 import SaveRequestToCollectionModal from "./add-request-modal";
-import { useGetAllRequestFromCollection } from "@/modules/request/hooks/request";
+import { useDeleteRequest, useGetAllRequestFromCollection } from "@/modules/request/hooks/request";
+import { toast } from "sonner";
 import { methodBadge } from "@/lib/http-display";
 import { useRequestPlaygroundStore } from "@/modules/request/store/useRequestStore";
 
@@ -41,14 +47,19 @@ interface CollectionNode {
 
 interface Props {
     collection: CollectionNode;
-    /** Sibling folders nested under this one. */
-    children?: CollectionNode[];
     /** Look up a node's own children, so the tree can recurse. */
     childrenOf?: (parentId: string) => CollectionNode[];
+    /** Every collection in the workspace - used to offer move targets. */
+    allCollections?: CollectionNode[];
     depth?: number;
 }
 
-const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
+const CollectionFolder = ({
+    collection,
+    childrenOf,
+    allCollections = [],
+    depth = 0,
+}: Props) => {
     const childFolders = childrenOf?.(collection.id) ?? [];
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -65,6 +76,53 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
 
   const { openRequestTab, activeTabId } = useRequestPlaygroundStore();
     const exportCollection = useExportCollection(collection.id, collection.name);
+    const deleteRequest = useDeleteRequest(collection.id);
+    const moveCollection = useMoveCollection(collection.workspaceId);
+
+    // A folder cannot move into itself or anything beneath it - the server
+    // refuses such a move, but offering it as a choice would be a trap.
+    const descendantIds = (() => {
+        const ids = new Set<string>([collection.id]);
+        let frontier = [collection.id];
+        while (frontier.length) {
+            const next = allCollections
+                .filter((c) => c.parentId && frontier.includes(c.parentId))
+                .map((c) => c.id);
+            frontier = next.filter((id) => !ids.has(id));
+            frontier.forEach((id) => ids.add(id));
+        }
+        return ids;
+    })();
+
+    const moveTargets = allCollections.filter((c) => !descendantIds.has(c.id));
+
+    const onMove = async (parentId: string | null, label: string) => {
+        try {
+            await moveCollection.mutateAsync({ collectionId: collection.id, parentId });
+            toast.success(`Moved "${collection.name}" to ${label}`);
+        } catch (error) {
+            toast.error(
+                error instanceof Error ? error.message : "Could not move the collection"
+            );
+        }
+    };
+
+    const onDeleteRequest = async (
+        event: React.MouseEvent,
+        requestId: string,
+        name: string
+    ) => {
+        // The row itself opens the request, so the delete control must not.
+        event.stopPropagation();
+        try {
+            await deleteRequest.mutateAsync(requestId);
+            toast.success(`Deleted "${name || "Untitled"}"`);
+        } catch (error) {
+            toast.error(
+                error instanceof Error ? error.message : "Could not delete the request"
+            );
+        }
+    };
 
     const hasRequests = requestData && requestData.length > 0;
 
@@ -115,39 +173,68 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                                     <EllipsisVertical className="w-3 h-3" />
                                 </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-surface-raised border border-line text-zinc-300 rounded-lg shadow-xl w-36">
-                                <DropdownMenuItem onClick={() => setIsAddRequestOpen(true)} className="text-[12px] hover:bg-line cursor-pointer gap-2">
-                                    <FilePlus className="w-3 h-3 text-green-400" />
+                            <DropdownMenuContent align="start" className="w-52">
+                                <DropdownMenuItem onClick={() => setIsAddRequestOpen(true)} className="gap-2">
+                                    <FilePlus className="h-3.5 w-3.5" />
                                     Add Request
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsRunnerOpen(true)} className="text-[12px] hover:bg-line cursor-pointer gap-2">
-                                    <Play className="w-3 h-3" />
+                                <DropdownMenuItem onClick={() => setIsRunnerOpen(true)} className="gap-2">
+                                    <Play className="h-3.5 w-3.5" />
                                     Run collection
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsAddFolderOpen(true)} className="text-[12px] hover:bg-line cursor-pointer gap-2">
-                                    <FolderPlus className="w-3 h-3" />
+                                <DropdownMenuItem onClick={() => setIsAddFolderOpen(true)} className="gap-2">
+                                    <FolderPlus className="h-3.5 w-3.5" />
                                     New Folder
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="text-[12px] hover:bg-line cursor-pointer gap-2">
-                                    <Edit className="w-3 h-3 text-brand" />
+                                {moveTargets.length > 0 && (
+                                    <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger className="gap-2">
+                                            <FolderInput className="h-3.5 w-3.5" />
+                                            Move to
+                                        </DropdownMenuSubTrigger>
+                                        <DropdownMenuSubContent className="max-h-64 overflow-y-auto">
+                                            {collection.parentId && (
+                                                <>
+                                                    <DropdownMenuItem
+                                                        onClick={() => onMove(null, "the top level")}
+                                                    >
+                                                        Top level
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                </>
+                                            )}
+                                            {moveTargets.map((target) => (
+                                                <DropdownMenuItem
+                                                    key={target.id}
+                                                    disabled={target.id === collection.parentId}
+                                                    onClick={() => onMove(target.id, target.name)}
+                                                >
+                                                    {target.name}
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuSub>
+                                )}
+                                <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="gap-2">
+                                    <Edit className="h-3.5 w-3.5" />
                                     Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => exportCollection("postman")}
-                                    className="text-[12px] hover:bg-line cursor-pointer gap-2"
+                                    className="gap-2"
                                 >
-                                    <Download className="w-3 h-3" />
-                                    Export (Postman)
+                                    <Download className="h-3.5 w-3.5" />
+                                    Export · Postman
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => exportCollection("impulse")}
-                                    className="text-[12px] hover:bg-line cursor-pointer gap-2"
+                                    className="gap-2"
                                 >
-                                    <Download className="w-3 h-3" />
-                                    Export (Impulse)
+                                    <Download className="h-3.5 w-3.5" />
+                                    Export · Impulse
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setIsDeleteOpen(true)} className="text-[12px] hover:bg-line cursor-pointer gap-2">
-                                    <Trash className="w-3 h-3 text-red-400" />
+                                <DropdownMenuItem variant="destructive" onClick={() => setIsDeleteOpen(true)} className="gap-2">
+                                    <Trash className="h-3.5 w-3.5" />
                                     Delete
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -163,6 +250,7 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                             key={child.id}
                             collection={child}
                             childrenOf={childrenOf}
+                            allCollections={allCollections}
                             depth={depth + 1}
                         />
                     ))}
@@ -176,20 +264,39 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                     ) : hasRequests ? (
                         <div className="ml-3 space-y-0.5">
                             {requestData.map((request) => (
-                                <button
+                                <div
                                     key={request.id}
+                                    role="button"
+                                    tabIndex={0}
                                     onClick={() => openRequestTab(request)}
-                                    className="group/req flex w-full items-center gap-2 rounded-md px-2 py-[5px] text-left transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:bg-surface-hover"
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" || e.key === " ") {
+                                            e.preventDefault();
+                                            openRequestTab(request);
+                                        }
+                                    }}
+                                    className="group/req flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-[5px] text-left transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:bg-surface-hover"
                                 >
                                     <span className={`text-[9px] font-bold px-1 py-0.5 rounded shrink-0 ${
                                         methodBadge(request.method)
                                     }`}>
                                         {request.method}
                                     </span>
-                                    <span className="text-[12px] text-zinc-300 truncate">
+                                    <span className="flex-1 truncate text-[12px] text-zinc-300">
                                         {request.name || "Untitled"}
                                     </span>
-                                </button>
+                                    {/* Revealed on hover so the tree stays quiet, but
+                                        always focusable for keyboard users. */}
+                                    <button
+                                        type="button"
+                                        aria-label={`Delete ${request.name || "request"}`}
+                                        onClick={(e) => onDeleteRequest(e, request.id, request.name)}
+                                        disabled={deleteRequest.isPending}
+                                        className="shrink-0 rounded p-0.5 text-zinc-600 opacity-0 transition-[opacity,color] duration-[--duration-fast] hover:text-status-server-error focus-visible:opacity-100 group-hover/req:opacity-100 disabled:opacity-40"
+                                    >
+                                        <Trash className="h-3 w-3" />
+                                    </button>
+                                </div>
                             ))}
                         </div>
                     ) : (
