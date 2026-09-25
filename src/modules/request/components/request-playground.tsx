@@ -134,7 +134,7 @@ export default function PlaygroundPage() {
   return (
     <div className="flex flex-col h-full">
       <TabBar />
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 min-h-0">
         <RequestEditor />
       </div>
 

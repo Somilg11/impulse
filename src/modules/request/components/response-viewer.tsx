@@ -4,7 +4,6 @@ import React, { useMemo, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Editor from "@/components/monaco-editor";
 import {
@@ -123,8 +122,8 @@ const ResponseViewer = ({
   const headerEntries = Object.entries(headers ?? {});
 
   return (
-    <div className="w-full bg-canvas text-white">
-      <div className="w-full mx-auto">
+    <div className="flex h-full min-h-0 w-full flex-col bg-canvas text-white">
+      <div className="flex min-h-0 w-full flex-1 flex-col">
         {/* Status bar - the summary a developer reads first, so it leads with the
             status code at display size rather than as one label among many. */}
         <div className="flex flex-col gap-2 border-b border-line bg-surface px-3 py-2 md:flex-row md:items-center md:justify-between">
@@ -204,10 +203,12 @@ const ResponseViewer = ({
         )}
 
         {/* Body */}
-        <Card className="bg-surface-raised border-line">
-          <CardContent className="p-0">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <div className="px-3 md:px-4 border-b border-line">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="flex min-h-0 w-full flex-1 flex-col"
+        >
+              <div className="shrink-0 border-b border-line bg-surface px-2">
                 <TabsList className="bg-transparent p-0 h-auto">
                   <TabsTrigger
                     value="json"
@@ -262,8 +263,8 @@ const ResponseViewer = ({
                 </TabsList>
               </div>
 
-              <TabsContent value="json" className="mt-0">
-                <div className="h-96">
+              <TabsContent value="json" className="mt-0 min-h-0 flex-1">
+                <div className="h-full">
                   <Editor
                     height="100%"
                     language={isJson ? "json" : "plaintext"}
@@ -274,8 +275,8 @@ const ResponseViewer = ({
                 </div>
               </TabsContent>
 
-              <TabsContent value="raw" className="mt-0">
-                <div className="h-96">
+              <TabsContent value="raw" className="mt-0 min-h-0 flex-1">
+                <div className="h-full">
                   <Editor
                     height="100%"
                     language="plaintext"
@@ -286,8 +287,8 @@ const ResponseViewer = ({
                 </div>
               </TabsContent>
 
-              <TabsContent value="tests" className="mt-0">
-                <ScrollArea className="h-96">
+              <TabsContent value="tests" className="mt-0 min-h-0 flex-1">
+                <ScrollArea className="h-full">
                   <div className="p-4 space-y-2">
                     {testResults.map((result) => (
                       <div
@@ -318,12 +319,12 @@ const ResponseViewer = ({
                 </ScrollArea>
               </TabsContent>
 
-              <TabsContent value="history" className="mt-0">
+              <TabsContent value="history" className="mt-0 min-h-0 flex-1">
                 <RunHistory requestId={requestId} onSelect={onReplayRun} />
               </TabsContent>
 
-              <TabsContent value="headers" className="mt-0">
-                <ScrollArea className="h-96">
+              <TabsContent value="headers" className="mt-0 min-h-0 flex-1">
+                <ScrollArea className="h-full">
                   <div className="p-6">
                     {headerEntries.length === 0 ? (
                       <p className="text-sm text-zinc-500">
@@ -359,9 +360,7 @@ const ResponseViewer = ({
                   </div>
                 </ScrollArea>
               </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+        </Tabs>
       </div>
     </div>
   );

@@ -61,7 +61,7 @@ const RunHistory = ({ requestId, onSelect }: Props) => {
   }
 
   return (
-    <ScrollArea className="h-96">
+    <ScrollArea className="h-full">
       <div className="divide-y divide-line">
         {runs.map((run) => {
           const results = Array.isArray(run.testResults)

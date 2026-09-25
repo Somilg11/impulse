@@ -1,5 +1,12 @@
 "use client";
 
+import { Send } from "lucide-react";
+
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 import { useRequestPlaygroundStore } from "../store/useRequestStore";
 import RequestBar from "./request-bar";
 import RequestEditorArea from "./request-editor-area";
@@ -30,6 +37,25 @@ function runToResult(run: HistoryRun): ExecResult {
   };
 }
 
+/** Shown in the response pane before anything has been sent. */
+const AwaitingResponse = () => (
+  <div className="flex h-full flex-col items-center justify-center gap-3 bg-canvas px-6 text-center">
+    <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-surface-raised">
+      <Send className="h-4 w-4 text-zinc-600" strokeWidth={1.75} />
+    </div>
+    <div>
+      <p className="text-sm text-zinc-400">No response yet</p>
+      <p className="mt-1 text-xs text-zinc-600">
+        Press{" "}
+        <kbd className="rounded border border-line bg-surface-raised px-1.5 py-0.5 font-mono text-[10px] text-zinc-400">
+          Enter
+        </kbd>{" "}
+        in the URL bar, or click Send.
+      </p>
+    </div>
+  </div>
+);
+
 export default function RequestEditor() {
   const { tabs, activeTabId, updateTab, responseViewerData, testResultsByTabId } =
     useRequestPlaygroundStore();
@@ -50,33 +76,56 @@ export default function RequestEditor() {
     );
   };
 
+  // The response pane stays available for saved requests even before a send, so
+  // History is reachable without re-running the request first.
+  const showResponse = Boolean(responseViewerData || activeTab.requestId);
+
   return (
-    <div className="flex flex-col items-stretch py-3 px-3 md:py-4 md:px-4 gap-3 md:gap-4">
-      <RequestBar tab={activeTab} updateTab={updateTab} />
+    <div className="flex h-full min-h-0 flex-col">
+      {/* URL bar stays fixed: it is the control you reach for most. */}
+      <div className="shrink-0 border-b border-line bg-surface px-3 py-2.5">
+        <RequestBar tab={activeTab} updateTab={updateTab} />
+      </div>
 
-      <RequestEditorArea tab={activeTab} updateTab={updateTab} />
+      {/* Request configuration above, response below, with a draggable divider -
+          the layout every API client converges on, because you read the response
+          while editing the request. */}
+      <ResizablePanelGroup direction="vertical" className="flex-1 min-h-0">
+        <ResizablePanel defaultSize={45} minSize={15} className="flex">
+          <div className="min-h-0 flex-1 overflow-auto">
+            <RequestEditorArea tab={activeTab} updateTab={updateTab} />
+          </div>
+        </ResizablePanel>
 
-      {/* Rendered even before a send so History stays reachable. */}
-      {(responseViewerData || activeTab.requestId) && (
-        <ResponseViewer
-          responseData={
-            responseViewerData ?? {
-              ok: false,
-              status: 0,
-              statusText: "",
-              headers: {},
-              body: "",
-              contentType: "",
-              durationMs: 0,
-              size: 0,
-              via: "browser",
-            }
-          }
-          requestId={activeTab.requestId}
-          testResults={testResultsByTabId[activeTab.id] ?? []}
-          onReplayRun={handleReplayRun}
-        />
-      )}
+        <ResizableHandle withHandle />
+
+        <ResizablePanel defaultSize={55} minSize={15} className="flex">
+          <div className="min-h-0 flex-1 overflow-auto">
+            {showResponse ? (
+              <ResponseViewer
+                responseData={
+                  responseViewerData ?? {
+                    ok: false,
+                    status: 0,
+                    statusText: "",
+                    headers: {},
+                    body: "",
+                    contentType: "",
+                    durationMs: 0,
+                    size: 0,
+                    via: "browser",
+                  }
+                }
+                requestId={activeTab.requestId}
+                testResults={testResultsByTabId[activeTab.id] ?? []}
+                onReplayRun={handleReplayRun}
+              />
+            ) : (
+              <AwaitingResponse />
+            )}
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 }

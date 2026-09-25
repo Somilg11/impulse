@@ -88,10 +88,10 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
   return (
     <Tabs
       defaultValue="parameters"
-      className="w-full border border-line rounded-lg overflow-hidden bg-canvas"
+      className="flex h-full min-h-0 w-full flex-col bg-canvas"
     >
       {/* Underline-style tabs matching the reference */}
-      <div className="border-b border-line px-1">
+      <div className="shrink-0 border-b border-line bg-surface px-1">
         <TabsList className="bg-transparent h-9 p-0 gap-0">
           <TabsTrigger 
               value="parameters" 
@@ -133,7 +133,7 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
       </div>
       
       {/* Tab content */}
-      <div className="min-h-[250px] md:min-h-[350px]">
+      <div className="min-h-0 flex-1 overflow-auto">
         <TabsContent value="parameters" className="mt-0 p-3 focus-visible:outline-none">
             <KeyValueFormEditor
             initialData={getParametersData()}
