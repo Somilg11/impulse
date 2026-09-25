@@ -92,7 +92,8 @@ export const deleteRequest = async (id: string) => {
  */
 export const recordRun = async (
   requestId: string,
-  result: ExecResult
+  result: ExecResult,
+  testResults?: unknown
 ): Promise<{ runId: string }> => {
   await assertRequestAccess(requestId);
 
@@ -106,6 +107,7 @@ export const recordRun = async (
       durationMs: Math.round(result.durationMs ?? 0),
       size: result.size ?? 0,
       via: result.via,
+      ...(testResults !== undefined ? { testResults: testResults as object } : {}),
     },
     select: { id: true },
   });

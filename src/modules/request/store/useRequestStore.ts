@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { nanoid } from "nanoid";
 import type { ExecResult } from "@/lib/http";
 import type { BodyType } from "@/lib/body-types";
+import type { AssertionResult } from "@/lib/assertions";
 import type { SendMode } from "../lib/send-request";
 
 /** Mirrors a Prisma `Request` row: the Json columns come back as JsonValue,
@@ -57,6 +58,7 @@ type PlaygroundState = {
   sendMode: SendMode;
   responseViewerData: ExecResult | null;
   responseByTabId: Record<string, ExecResult>;
+  testResultsByTabId: Record<string, AssertionResult[]>;
 
   addTab: () => void;
   closeTab: (id: string) => void;
@@ -67,6 +69,7 @@ type PlaygroundState = {
   updateTabFromSavedRequest: (tabId: string, savedRequest: SavedRequest) => void;
   setSendMode: (mode: SendMode) => void;
   setResponseViewerData: (data: ExecResult | null, tabId?: string) => void;
+  setTestResults: (tabId: string, results: AssertionResult[]) => void;
 };
 
 const initialTab: RequestTab = {
@@ -83,6 +86,12 @@ export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
   sendMode: "auto",
   responseViewerData: null,
   responseByTabId: {},
+  testResultsByTabId: {},
+
+  setTestResults: (tabId, results) =>
+    set((state) => ({
+      testResultsByTabId: { ...state.testResultsByTabId, [tabId]: results },
+    })),
 
   setSendMode: (mode) => set({ sendMode: mode }),
 

@@ -5,6 +5,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import KeyValueFormEditor from "./key-value-form";
 import BodyEditor from "./body-editor";
 import AuthEditor from "./auth-editor";
+import TestsEditor from "./tests-editor";
+import { parseAssertions } from "@/lib/assertions";
 import { toast } from "sonner";
 import { parseAuth, describeAuth } from "@/lib/auth-schemes";
 import type { BodyType } from "@/lib/body-types";
@@ -77,6 +79,11 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
   };
 
   const authSummary = describeAuth(parseAuth(tab.auth));
+  const assertionCount = parseAssertions(tab.tests).filter((a) => a.enabled !== false).length;
+
+  const handleTestsChange = (serialized: string) => {
+    updateTab(tab.id, { tests: serialized });
+  };
 
   return (
     <Tabs
@@ -111,6 +118,15 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
             Authorization
             {authSummary !== "No auth" && (
               <span className="ml-1.5 h-1.5 w-1.5 rounded-full bg-blue-500 inline-block" />
+            )}
+          </TabsTrigger>
+          <TabsTrigger
+              value="tests"
+              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
+          >
+            Tests
+            {assertionCount > 0 && (
+              <span className="ml-1.5 text-[10px] text-zinc-500">{assertionCount}</span>
             )}
           </TabsTrigger>
         </TabsList>
@@ -153,6 +169,10 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
         
         <TabsContent value="auth" className="mt-0 p-4 focus-visible:outline-none">
             <AuthEditor value={tab.auth} onChange={handleAuthChange} />
+        </TabsContent>
+
+        <TabsContent value="tests" className="mt-0 p-4 focus-visible:outline-none">
+            <TestsEditor value={tab.tests} onChange={handleTestsChange} />
         </TabsContent>
       </div>
     </Tabs>

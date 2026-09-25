@@ -11,6 +11,7 @@ import {
   saveRequest,
 } from "../actions";
 import { sendRequest } from "../lib/send-request";
+import { parseAssertions, runAssertions } from "@/lib/assertions";
 import { useActiveVariables } from "@/modules/environments/hooks/use-active-variables";
 import {
   useRequestPlaygroundStore,
@@ -72,6 +73,7 @@ export function useSendRequest() {
     (s) => s.setResponseViewerData
   );
   const { variables } = useActiveVariables();
+  const setTestResults = useRequestPlaygroundStore((s) => s.setTestResults);
 
   return useMutation({
     mutationFn: async (tab: RequestTab) => {
@@ -91,18 +93,24 @@ export function useSendRequest() {
         sendMode
       );
 
+      // Assertions run against the real response, so they are evaluated here
+      // rather than in the component - one send, one evaluation.
+      const assertions = parseAssertions(tab.tests);
+      const testResults = assertions.length ? runAssertions(assertions, result) : [];
+
       if (tab.requestId) {
         try {
-          await recordRun(tab.requestId, result);
+          await recordRun(tab.requestId, result, testResults.length ? testResults : undefined);
         } catch (error) {
           console.error("Failed to record run history:", error);
         }
       }
 
-      return { tab, result, missingVariables };
+      return { tab, result, missingVariables, testResults };
     },
-    onSuccess: ({ tab, result }) => {
+    onSuccess: ({ tab, result, testResults }) => {
       setResponseViewerData(result, tab.id);
+      setTestResults(tab.id, testResults);
       if (tab.requestId) {
         queryClient.invalidateQueries({
           queryKey: ["request-runs", tab.requestId],

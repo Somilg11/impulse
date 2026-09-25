@@ -18,12 +18,22 @@ import {
   Settings,
   Globe,
   Server,
+  History,
+  TestTube,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { ExecResult } from "@/lib/http";
+import { summarize, type AssertionResult } from "@/lib/assertions";
+import RunHistory, { type HistoryRun } from "./run-history";
 
 interface Props {
   responseData: ExecResult;
+  /** Saved-request id, if any - drives the History tab. */
+  requestId?: string;
+  testResults?: AssertionResult[];
+  onReplayRun?: (run: HistoryRun) => void;
 }
 
 const MONACO_OPTIONS = {
@@ -73,8 +83,14 @@ function extensionFor(contentType: string): string {
   return "txt";
 }
 
-const ResponseViewer = ({ responseData }: Props) => {
+const ResponseViewer = ({
+  responseData,
+  requestId,
+  testResults = [],
+  onReplayRun,
+}: Props) => {
   const [activeTab, setActiveTab] = useState("json");
+  const testSummary = summarize(testResults);
 
   const { status, statusText, durationMs, size, headers, body, contentType, via, error } =
     responseData;
@@ -220,6 +236,32 @@ const ResponseViewer = ({ responseData }: Props) => {
                       {headerEntries.length}
                     </Badge>
                   </TabsTrigger>
+                  {testResults.length > 0 && (
+                    <TabsTrigger
+                      value="tests"
+                      className="bg-transparent data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-gray-400 rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 py-2"
+                    >
+                      <TestTube className="w-4 h-4 mr-2" />
+                      Tests
+                      <Badge
+                        variant="secondary"
+                        className={`ml-2 text-xs border-0 ${
+                          testSummary.failed
+                            ? "bg-red-500/15 text-red-400"
+                            : "bg-green-500/15 text-green-400"
+                        }`}
+                      >
+                        {testSummary.passed}/{testSummary.total}
+                      </Badge>
+                    </TabsTrigger>
+                  )}
+                  <TabsTrigger
+                    value="history"
+                    className="bg-transparent data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-gray-400 rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 py-2"
+                  >
+                    <History className="w-4 h-4 mr-2" />
+                    History
+                  </TabsTrigger>
                 </TabsList>
               </div>
 
@@ -245,6 +287,42 @@ const ResponseViewer = ({ responseData }: Props) => {
                     theme="vs-dark"
                   />
                 </div>
+              </TabsContent>
+
+              <TabsContent value="tests" className="mt-0">
+                <ScrollArea className="h-96">
+                  <div className="p-4 space-y-2">
+                    {testResults.map((result) => (
+                      <div
+                        key={result.id}
+                        className={`flex items-start gap-3 rounded-lg border p-3 ${
+                          result.passed
+                            ? "border-green-500/20 bg-green-500/5"
+                            : "border-red-500/20 bg-red-500/5"
+                        }`}
+                      >
+                        {result.passed ? (
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-400" />
+                        ) : (
+                          <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm text-zinc-200">{result.label}</p>
+                          <p className="mt-0.5 text-xs text-zinc-500 break-all">
+                            actual: <span className="font-mono">{result.actual}</span>
+                          </p>
+                          {result.error && (
+                            <p className="mt-0.5 text-xs text-amber-400/90">{result.error}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+
+              <TabsContent value="history" className="mt-0">
+                <RunHistory requestId={requestId} onSelect={onReplayRun} />
               </TabsContent>
 
               <TabsContent value="headers" className="mt-0">
