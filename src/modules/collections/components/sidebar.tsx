@@ -91,7 +91,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search collections"
-                        className="w-full bg-surface-raised border border-line rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-line-strong transition-colors"
+                        className="h-7 w-full rounded-lg border border-line bg-surface-raised pl-8 pr-3 text-[12.5px] text-zinc-200 placeholder-zinc-600 outline-none transition-colors focus:border-line-strong"
                     />
                 </div>
             </div>
@@ -99,7 +99,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
             {/* Collections list */}
             <div className="flex-1 overflow-y-auto px-1 py-1">
                 {all.length === 0 ? (
-                    <EmptyCollections onImport={() => setIsImportModalOpen(true)} />
+                    <EmptyCollections onImport={() => setIsImportModalOpen(true)} onCreate={() => setIsModalOpen(true)} />
                 ) : visible.length === 0 ? (
                     <p className="px-3 py-6 text-center text-xs text-zinc-600">
                         Nothing matches &ldquo;{searchQuery.trim()}&rdquo;.

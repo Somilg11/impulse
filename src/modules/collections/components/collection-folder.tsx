@@ -78,7 +78,7 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                 {/* Collection header */}
                 <div className="flex items-center group">
                     <CollapsibleTrigger
-                        className="flex items-center gap-1.5 flex-1 px-3 py-1.5 hover:bg-line/50 rounded transition-colors cursor-pointer text-left"
+                        className="flex flex-1 cursor-pointer items-center gap-1.5 rounded-md px-2 py-[5px] text-left transition-colors hover:bg-surface-hover"
                         style={{ paddingLeft: `${12 + depth * 12}px` }}
                     >
                         {hasRequests ? (
@@ -179,7 +179,7 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                                 <button
                                     key={request.id}
                                     onClick={() => openRequestTab(request)}
-                                    className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-line/50 rounded transition-colors text-left group/req"
+                                    className="group/req flex w-full items-center gap-2 rounded-md px-2 py-[5px] text-left transition-colors hover:bg-surface-hover"
                                 >
                                     <span className={`text-[9px] font-bold px-1 py-0.5 rounded shrink-0 ${
                                         methodBadge(request.method)

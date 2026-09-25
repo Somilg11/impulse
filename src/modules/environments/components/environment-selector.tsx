@@ -50,7 +50,7 @@ const EnvironmentSelector = () => {
 
         <DropdownMenuContent
           align="end"
-          className="w-60 bg-surface-raised border-line text-zinc-300"
+          className="w-60 rounded-xl border-line bg-surface-raised text-zinc-300"
         >
           <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-zinc-500">
             Environment

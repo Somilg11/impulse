@@ -90,7 +90,7 @@ const TestsEditor = ({ value, onChange }: Props) => {
               <SelectTrigger className={`${control} w-[150px]`}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-surface-raised border-line text-zinc-300">
+              <SelectContent className="rounded-xl border-line bg-surface-raised text-zinc-300">
                 {SOURCES.map((option) => (
                   <SelectItem key={option.value} value={option.value} className="text-xs">
                     {option.label}
@@ -119,7 +119,7 @@ const TestsEditor = ({ value, onChange }: Props) => {
               <SelectTrigger className={`${control} w-[150px]`}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-surface-raised border-line text-zinc-300">
+              <SelectContent className="rounded-xl border-line bg-surface-raised text-zinc-300">
                 {COMPARATORS.map((option) => (
                   <SelectItem key={option.value} value={option.value} className="text-xs">
                     {option.label}

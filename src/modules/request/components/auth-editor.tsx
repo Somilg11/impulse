@@ -59,10 +59,10 @@ const AuthEditor = ({ value, onChange }: Props) => {
           value={auth.type}
           onValueChange={(next) => update(blankFor(next as AuthType))}
         >
-          <SelectTrigger className="w-full sm:w-56 bg-canvas border-line h-9 text-sm text-zinc-200 focus:ring-0">
+          <SelectTrigger className="w-full sm:w-56 h-9 rounded-lg border-line bg-surface-raised text-[13px] text-zinc-200 focus:ring-0">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="bg-surface-raised border-line text-zinc-300">
+          <SelectContent className="rounded-xl border-line bg-surface-raised text-zinc-300">
             {AUTH_TYPES.map((option) => (
               <SelectItem
                 key={option.value}
@@ -183,10 +183,10 @@ const AuthEditor = ({ value, onChange }: Props) => {
                 update({ ...auth, in: next === "query" ? "query" : "header" })
               }
             >
-              <SelectTrigger className="w-full sm:w-56 bg-canvas border-line h-9 text-sm text-zinc-200 focus:ring-0">
+              <SelectTrigger className="w-full sm:w-56 h-9 rounded-lg border-line bg-surface-raised text-[13px] text-zinc-200 focus:ring-0">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-surface-raised border-line text-zinc-300">
+              <SelectContent className="rounded-xl border-line bg-surface-raised text-zinc-300">
                 <SelectItem value="header" className="text-sm hover:bg-line">
                   Header
                 </SelectItem>

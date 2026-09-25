@@ -110,7 +110,7 @@ const ImportModal = ({
                         value={jsonContent}
                         onChange={(e) => setJsonContent(e.target.value)}
                         placeholder='{ "collections": [...] }'
-                        className="w-full h-40 bg-canvas border border-line rounded-lg p-3 text-xs font-mono text-zinc-300 placeholder-zinc-700 focus:outline-none focus:border-brand/50 transition-colors resize-none"
+                        className="h-40 w-full resize-none rounded-lg border border-line bg-canvas p-3 font-mono text-[12px] text-zinc-300 placeholder-zinc-700 outline-none transition-colors focus:border-line-strong"
                     />
                     <div className="absolute top-2 right-2 p-1.5 bg-surface-raised border border-line rounded text-zinc-500">
                         <FileJson className="w-3.5 h-3.5" />

@@ -138,7 +138,7 @@ const SaveRequestToCollectionModal = ({
           <label className="block text-sm font-medium mb-2 text-zinc-200">Request name</label>
           <div className="relative">
             <input
-              className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent pr-20"
+              className="w-full rounded-lg border border-line bg-surface-raised p-3 pr-20 text-[13px] text-zinc-100 placeholder-zinc-600 outline-none transition-colors focus:border-line-strong"
               placeholder="Enter request name..."
               value={requestName}
               onChange={(e) => setRequestName(e.target.value)}

@@ -58,23 +58,24 @@ const Modal: React.FC<ModalProps> = ({
           )}
         </DialogHeader>
         
-        <div className="py-4">
+        <div className="py-1">
           {children}
         </div>
 
         {showFooter && (
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-2">
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={onClose}
+              className="h-9 rounded-lg px-4 text-[13px] font-medium text-zinc-400 hover:bg-surface-hover hover:text-zinc-200"
             >
               {cancelText}
             </Button>
             {onSubmit && (
               <Button
-                className='bg-blue-400 hover:bg-blue-500 text-white'
                 onClick={handleSubmit}
                 disabled={disabled}
+                className="h-9 rounded-lg bg-brand px-4 text-[13px] font-medium text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
               >
                 {submitText}
               </Button>
