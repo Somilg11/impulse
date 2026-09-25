@@ -26,7 +26,7 @@ interface Props {
 }
 
 const fieldClass =
-  "bg-canvas border-line h-9 text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:border-blue-500/50";
+  "bg-canvas border-line h-9 text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:border-brand/50";
 
 const labelClass =
   "text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1.5 block";
@@ -200,10 +200,10 @@ const AuthEditor = ({ value, onChange }: Props) => {
       )}
 
       {auth.type !== "none" && (
-        <div className="flex items-start gap-2.5 rounded-lg border border-blue-500/10 bg-blue-500/5 p-3">
-          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-400" />
+        <div className="flex items-start gap-2.5 rounded-lg border border-brand/10 bg-brand/5 p-3">
+          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand" />
           <p className="text-[11px] leading-relaxed text-zinc-400">
-            Values support <code className="text-blue-300">{"{{variables}}"}</code> from
+            Values support <code className="text-brand">{"{{variables}}"}</code> from
             the active environment. A header you set manually on the Headers tab takes
             precedence over this scheme.
           </p>

@@ -24,13 +24,13 @@ export default function TabBar() {
             key={tab.id}
             onDoubleClick={() => onDoubleClick(tab.id)}
             onClick={() => setActiveTab(tab.id)}
-            className={`group h-full px-3 flex items-center gap-2 cursor-pointer transition-all relative shrink-0 border-r border-line ${activeTabId === tab.id
-                ? "bg-surface-raised text-white"
-                : "text-zinc-500 hover:text-zinc-300 hover:bg-surface-raised/50"
+            className={`group relative h-full shrink-0 cursor-pointer border-r border-line px-3 flex items-center gap-2 transition-colors ${activeTabId === tab.id
+                ? "bg-surface text-white"
+                : "text-zinc-500 hover:bg-surface/60 hover:text-zinc-300"
               }`}
           >
             {activeTabId === tab.id && (
-              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-blue-500" />
+              <div className="absolute inset-x-0 top-0 h-[2px] bg-brand" />
             )}
             
             <span className={`text-[9px] font-bold px-1 py-0.5 rounded ${methodBadge(tab.method)}`}>
@@ -42,7 +42,7 @@ export default function TabBar() {
             </p>
 
             {tab.unsavedChanges && (
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
+                <div className="w-1.5 h-1.5 rounded-full bg-brand shrink-0" />
             )}
 
             <X

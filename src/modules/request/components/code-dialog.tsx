@@ -86,7 +86,7 @@ const CodeDialog = ({ tab, isOpen, onClose }: Props) => {
               onClick={() => setTarget(option.value)}
               className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors border ${
                 target === option.value
-                  ? "bg-line text-white border-blue-500/40"
+                  ? "bg-line text-white border-brand/40"
                   : "bg-transparent text-zinc-500 border-line hover:text-zinc-300"
               }`}
             >

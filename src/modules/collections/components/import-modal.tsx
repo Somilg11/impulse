@@ -82,8 +82,8 @@ const ImportModal = ({
                     onClick={() => fileInputRef.current?.click()}
                     className="border-2 border-dashed border-line rounded-xl p-8 flex flex-col items-center justify-center gap-3 hover:bg-surface-raised cursor-pointer transition-all group"
                 >
-                    <div className="p-3 bg-blue-500/10 rounded-full group-hover:bg-blue-500/20 transition-colors">
-                        <Upload className="w-6 h-6 text-blue-400" />
+                    <div className="p-3 bg-brand/10 rounded-full group-hover:bg-brand/20 transition-colors">
+                        <Upload className="w-6 h-6 text-brand" />
                     </div>
                     <div className="text-center">
                         <p className="text-sm font-medium text-zinc-200">Click to upload or drag and drop</p>
@@ -110,7 +110,7 @@ const ImportModal = ({
                         value={jsonContent}
                         onChange={(e) => setJsonContent(e.target.value)}
                         placeholder='{ "collections": [...] }'
-                        className="w-full h-40 bg-canvas border border-line rounded-lg p-3 text-xs font-mono text-zinc-300 placeholder-zinc-700 focus:outline-none focus:border-blue-500/50 transition-colors resize-none"
+                        className="w-full h-40 bg-canvas border border-line rounded-lg p-3 text-xs font-mono text-zinc-300 placeholder-zinc-700 focus:outline-none focus:border-brand/50 transition-colors resize-none"
                     />
                     <div className="absolute top-2 right-2 p-1.5 bg-surface-raised border border-line rounded text-zinc-500">
                         <FileJson className="w-3.5 h-3.5" />
@@ -118,8 +118,8 @@ const ImportModal = ({
                 </div>
 
                 {/* Help Alert */}
-                <div className="flex items-start gap-3 p-3 bg-blue-500/5 border border-blue-500/10 rounded-lg">
-                    <AlertCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 p-3 bg-brand/5 border border-brand/10 rounded-lg">
+                    <AlertCircle className="w-4 h-4 text-brand shrink-0 mt-0.5" />
                     <p className="text-[11px] leading-relaxed text-zinc-400">
                         Requests are imported with their methods, URLs, query parameters, headers, and bodies. Postman folders are flattened into one collection, with the folder name kept as a prefix on each request.
                     </p>

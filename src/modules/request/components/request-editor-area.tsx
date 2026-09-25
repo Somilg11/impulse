@@ -95,34 +95,34 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
         <TabsList className="bg-transparent h-9 p-0 gap-0">
           <TabsTrigger 
               value="parameters" 
-              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
+              className="h-9 rounded-none border-b-2 border-transparent bg-transparent px-3.5 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
           >
             Params
           </TabsTrigger>
           <TabsTrigger 
               value="body" 
-              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
+              className="h-9 rounded-none border-b-2 border-transparent bg-transparent px-3.5 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
           >
             Body
           </TabsTrigger>
           <TabsTrigger 
               value="headers" 
-              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
+              className="h-9 rounded-none border-b-2 border-transparent bg-transparent px-3.5 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
           >
             Headers
           </TabsTrigger>
           <TabsTrigger 
               value="auth" 
-              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
+              className="h-9 rounded-none border-b-2 border-transparent bg-transparent px-3.5 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
           >
             Authorization
             {authSummary !== "No auth" && (
-              <span className="ml-1.5 h-1.5 w-1.5 rounded-full bg-blue-500 inline-block" />
+              <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-brand" />
             )}
           </TabsTrigger>
           <TabsTrigger
               value="tests"
-              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
+              className="h-9 rounded-none border-b-2 border-transparent bg-transparent px-3.5 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
           >
             Tests
             {assertionCount > 0 && (

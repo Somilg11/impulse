@@ -35,7 +35,7 @@ const Page = () => {
           onClick={() => setShowMobileSidebar(!showMobileSidebar)}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-all ${
             showMobileSidebar
-              ? "bg-line text-blue-400"
+              ? "bg-line text-brand"
               : "text-zinc-400 hover:text-zinc-300"
           }`}
         >

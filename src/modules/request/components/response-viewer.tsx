@@ -212,21 +212,21 @@ const ResponseViewer = ({
                 <TabsList className="bg-transparent p-0 h-auto">
                   <TabsTrigger
                     value="json"
-                    className="bg-transparent data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-gray-400 rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 py-2"
+                    className="rounded-none border-b-2 border-transparent bg-transparent px-3.5 py-2 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
                   >
                     <Code className="w-4 h-4 mr-2" />
                     {isJson ? "JSON" : "Pretty"}
                   </TabsTrigger>
                   <TabsTrigger
                     value="raw"
-                    className="bg-transparent data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-gray-400 rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 py-2"
+                    className="rounded-none border-b-2 border-transparent bg-transparent px-3.5 py-2 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
                   >
                     <FileText className="w-4 h-4 mr-2" />
                     Raw
                   </TabsTrigger>
                   <TabsTrigger
                     value="headers"
-                    className="bg-transparent data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-gray-400 rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 py-2"
+                    className="rounded-none border-b-2 border-transparent bg-transparent px-3.5 py-2 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
                   >
                     <Settings className="w-4 h-4 mr-2" />
                     Headers
@@ -237,7 +237,7 @@ const ResponseViewer = ({
                   {testResults.length > 0 && (
                     <TabsTrigger
                       value="tests"
-                      className="bg-transparent data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-gray-400 rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 py-2"
+                      className="rounded-none border-b-2 border-transparent bg-transparent px-3.5 py-2 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
                     >
                       <TestTube className="w-4 h-4 mr-2" />
                       Tests
@@ -255,7 +255,7 @@ const ResponseViewer = ({
                   )}
                   <TabsTrigger
                     value="history"
-                    className="bg-transparent data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-gray-400 rounded-t-md rounded-b-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 py-2"
+                    className="rounded-none border-b-2 border-transparent bg-transparent px-3.5 py-2 text-[12.5px] font-medium text-zinc-500 transition-colors data-[state=active]:border-brand data-[state=active]:text-white data-[state=active]:shadow-none"
                   >
                     <History className="w-4 h-4 mr-2" />
                     History
@@ -340,7 +340,7 @@ const ResponseViewer = ({
                             className="flex items-start justify-between py-2 border-b border-zinc-800 last:border-b-0"
                           >
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium text-blue-300 text-sm">{key}</div>
+                              <div className="font-medium text-brand text-sm">{key}</div>
                               <div className="text-gray-300 text-sm break-all">
                                 {String(value)}
                               </div>

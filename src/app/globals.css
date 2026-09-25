@@ -16,17 +16,25 @@
  * `--color-surface` gives `bg-surface`, `border-surface`, `text-surface`.
  * --------------------------------------------------------------------------- */
 @theme {
-  /* Surfaces, darkest to lightest */
-  --color-canvas: #0b0e14;        /* app background, behind everything */
+  /* Surfaces, darkest to lightest.
+   *
+   * Near-neutral greys rather than the blue-tinted slate this started with.
+   * A tool you stare at for hours should not push a hue at you, and a neutral
+   * chrome lets the method and status colours be the only saturated things on
+   * screen - which is what makes them readable at a glance. */
+  --color-canvas: #0c0d10;        /* app background, behind everything */
   --color-ink: #000000;           /* marketing surface - true black, like macOS */
   --color-ink-raised: #0a0a0c;    /* panels on the marketing surface */
-  --color-surface: #11151e;       /* panels, sidebar, headers */
-  --color-surface-raised: #161b26; /* cards, popovers, inputs on a panel */
-  --color-surface-hover: #1c2230;  /* hover state for rows and buttons */
+  --color-surface: #111216;       /* panels, sidebar, headers */
+  --color-surface-raised: #17181d; /* cards, popovers, inputs on a panel */
+  --color-surface-hover: #1e2026;  /* hover state for rows and buttons */
 
-  /* Lines */
-  --color-line: #1e2330;          /* default divider */
-  --color-line-strong: #2a3040;   /* emphasised divider, input borders */
+  /* Lines.
+   *
+   * Translucent white rather than an opaque grey, so a divider reads correctly
+   * whichever surface sits beneath it instead of being tuned for one of them. */
+  --color-line: rgba(255, 255, 255, 0.07);
+  --color-line-strong: rgba(255, 255, 255, 0.13);
 
   /* Brand - Apple's system blue for dark interfaces. Chosen deliberately: the
    * product is a developer tool that should feel native on macOS, and this is

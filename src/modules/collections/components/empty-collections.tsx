@@ -21,7 +21,7 @@ const EmptyCollections = ({ onImport }: EmptyCollectionsProps) => {
                 <div className="space-y-3 w-full max-w-xs">
                     <button 
                         onClick={onImport}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center space-x-2"
+                        className="w-full bg-brand hover:bg-brand-hover text-white py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center space-x-2"
                     >
                         <Upload className="w-4 h-4" />
                         <span>Import</span>

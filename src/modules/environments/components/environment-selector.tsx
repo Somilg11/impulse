@@ -61,7 +61,7 @@ const EnvironmentSelector = () => {
             className="text-xs focus:bg-line cursor-pointer"
           >
             <span className="flex-1">No environment</span>
-            {!activeId && <Check className="h-3.5 w-3.5 text-blue-400" />}
+            {!activeId && <Check className="h-3.5 w-3.5 text-brand" />}
           </DropdownMenuItem>
 
           {environments?.length ? <DropdownMenuSeparator className="bg-line" /> : null}
@@ -74,7 +74,7 @@ const EnvironmentSelector = () => {
             >
               <span className="flex-1 truncate">{environment.name}</span>
               {activeId === environment.id && (
-                <Check className="h-3.5 w-3.5 text-blue-400" />
+                <Check className="h-3.5 w-3.5 text-brand" />
               )}
             </DropdownMenuItem>
           ))}

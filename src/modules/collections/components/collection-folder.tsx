@@ -129,7 +129,7 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                                     New Folder
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => setIsEditOpen(true)} className="text-xs hover:bg-line cursor-pointer gap-2">
-                                    <Edit className="w-3 h-3 text-blue-400" />
+                                    <Edit className="w-3 h-3 text-brand" />
                                     Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -169,7 +169,7 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
 
                     {isPending ? (
                         <div className="pl-7 py-2">
-                            <div className="w-3 h-3 border-2 border-line border-t-blue-400 rounded-full animate-spin" />
+                            <div className="w-3 h-3 border-2 border-line border-t-brand rounded-full animate-spin" />
                         </div>
                     ) : isError ? (
                         <div className="pl-7 py-1.5 text-[10px] text-red-400/60">Error</div>

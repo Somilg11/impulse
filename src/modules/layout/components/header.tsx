@@ -19,13 +19,11 @@ const Header = ({ user }: Props) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
-        <header className="px-4 h-12 flex items-center justify-between border-b border-line bg-canvas sticky top-0 z-50 relative">
+        <header className="sticky top-0 z-50 flex h-12 items-center justify-between border-b border-line bg-canvas px-4">
             {/* Left: logo */}
             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
-                <div className="bg-blue-600 rounded-md p-1 flex items-center justify-center">
-                    <Terminal className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
-                </div>
-                <span className="text-sm font-bold tracking-tight text-white hidden sm:inline" style={{ lineHeight: 1 }}>impulse</span>
+                <Terminal className="h-[15px] w-[15px] text-white" strokeWidth={2.5} />
+                <span className="hidden text-[13px] font-semibold tracking-[-0.01em] text-white sm:inline">Impulse</span>
             </Link>
 
             {/* Center: workspace selector */}

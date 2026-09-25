@@ -27,7 +27,7 @@ const TabbedLeftPanel = () => {
                     <Link
                         href={item.href}
                         className={`w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-150 ${isActive(item.match)
-                                ? "bg-line text-blue-400"
+                                ? "bg-line text-brand"
                                 : "text-zinc-500 hover:text-zinc-300 hover:bg-line/50"
                             }`}
                     >

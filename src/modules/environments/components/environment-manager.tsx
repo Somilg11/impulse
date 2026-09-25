@@ -142,7 +142,7 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
           <DialogTitle className="text-white">Environments</DialogTitle>
           <DialogDescription className="text-zinc-500 text-xs">
             Variables defined here can be used anywhere in a request as{" "}
-            <code className="text-blue-400">{"{{name}}"}</code> &mdash; in the URL,
+            <code className="text-brand">{"{{name}}"}</code> &mdash; in the URL,
             headers, query params, auth fields, or body.
           </DialogDescription>
         </DialogHeader>
@@ -162,7 +162,7 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
                 size="sm"
                 onClick={handleCreate}
                 disabled={!newName.trim() || createEnvironment.isPending}
-                className="h-7 px-2 bg-blue-600 hover:bg-blue-700 shrink-0"
+                className="h-7 px-2 bg-brand hover:bg-brand-hover shrink-0"
               >
                 <Plus className="h-3.5 w-3.5" />
               </Button>
@@ -237,7 +237,7 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
                         type="checkbox"
                         checked={row.enabled !== false}
                         onChange={(e) => updateRow(index, { enabled: e.target.checked })}
-                        className="accent-blue-500 shrink-0"
+                        className="accent-[var(--color-brand)] shrink-0"
                         title="Enabled"
                       />
                       <Input
@@ -307,7 +307,7 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
                     size="sm"
                     onClick={handleSave}
                     disabled={!dirty || updateEnvironment.isPending}
-                    className="h-7 text-xs bg-blue-600 hover:bg-blue-700"
+                    className="h-7 text-xs bg-brand hover:bg-brand-hover"
                   >
                     {updateEnvironment.isPending ? "Saving…" : "Save changes"}
                   </Button>

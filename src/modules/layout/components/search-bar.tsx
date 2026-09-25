@@ -25,7 +25,7 @@ const SearchBar = () => {
             {/* Search Button */}
             <button
                 onClick={() => setOpen(true)}
-                className="relative flex flex-1 cursor-text items-center justify-between self-stretch rounded-full bg-white/5 border border-white/10 px-4 py-1.5 text-zinc-400 transition hover:bg-white/10 hover:text-zinc-200 focus-visible:ring-2 focus-visible:ring-blue-500/50 overflow-hidden"
+                className="relative flex flex-1 cursor-text items-center justify-between self-stretch rounded-full bg-white/5 border border-white/10 px-4 py-1.5 text-zinc-400 transition hover:bg-white/10 hover:text-zinc-200 focus-visible:ring-2 focus-visible:ring-brand/50 overflow-hidden"
             >
                 <span className="inline-flex flex-1 items-center">
                     <Search size={14} className="mr-2 text-zinc-500" />
@@ -48,7 +48,7 @@ const SearchBar = () => {
                         <CommandEmpty className="text-zinc-500 py-6 text-center text-sm">No results found.</CommandEmpty>
                         <CommandGroup heading="Suggestions" className="px-2 pb-2">
                             <CommandItem onSelect={() => setOpen(false)} className="text-zinc-300 hover:bg-white/5 rounded-lg flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors">
-                                <span className="p-1 bg-blue-500/10 rounded text-blue-400 text-xs font-bold uppercase tracking-wider">REST</span>
+                                <span className="p-1 bg-brand/10 rounded text-brand text-xs font-bold uppercase tracking-wider">REST</span>
                                 <span className="text-sm">Pre-request Script</span>
                             </CommandItem>
                             <CommandItem onSelect={() => setOpen(false)} className="text-zinc-300 hover:bg-white/5 rounded-lg flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors">

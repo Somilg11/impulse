@@ -48,7 +48,7 @@ const WorkSpace = () => {
         }}
       >
         <SelectTrigger className="border border-line bg-surface-raised hover:bg-line text-zinc-300 flex flex-row items-center gap-1.5 rounded-lg h-7 px-3 transition-all w-auto min-w-0">
-          <div className="bg-blue-600 text-white text-[9px] font-bold w-4 h-4 rounded flex items-center justify-center shrink-0">W</div>
+          <div className="bg-brand text-white text-[9px] font-bold w-4 h-4 rounded flex items-center justify-center shrink-0">W</div>
           <span className="text-xs font-medium truncate max-w-[120px]">
             <SelectValue placeholder="Workspace" />
           </span>

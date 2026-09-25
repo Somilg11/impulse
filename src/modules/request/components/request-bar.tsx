@@ -91,7 +91,7 @@ const RequestBar = ({ tab, updateTab }: Props) => {
 
   return (
     <div className='flex flex-col gap-2 w-full'>
-      <div className='flex items-center gap-0 bg-surface-raised border border-line rounded-lg w-full overflow-hidden'>
+      <div className='flex w-full items-center overflow-hidden rounded-xl border border-line bg-surface-raised focus-within:border-line-strong transition-colors'>
         {/* Method selector */}
         <Select
           value={tab.method}
@@ -144,7 +144,7 @@ const RequestBar = ({ tab, updateTab }: Props) => {
           type='button'
           onClick={onSendRequest}
           disabled={isPending || !tab.url}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-none rounded-r-lg px-5 sm:px-6 h-10 transition-colors shrink-0 text-sm"
+          className="h-10 shrink-0 rounded-none bg-brand px-5 text-sm font-medium text-white transition-colors hover:bg-brand-hover sm:px-6"
         >
           {isPending ? <Loader className="animate-spin size-4" /> : "Send"}
         </Button>

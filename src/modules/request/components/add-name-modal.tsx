@@ -89,7 +89,7 @@ const AddNameModal = ({
           }} 
           disabled={isPending}
         >
-          <Sparkles className="h-5 w-5 text-blue-500" />
+          <Sparkles className="h-5 w-5 text-brand" />
         </Button>
         </div>
         {suggestions.length > 0 && (

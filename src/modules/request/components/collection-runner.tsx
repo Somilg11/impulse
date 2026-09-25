@@ -160,7 +160,7 @@ const CollectionRunner = ({ collectionId, collectionName, isOpen, onClose }: Pro
             size="sm"
             onClick={run}
             disabled={running}
-            className="h-8 bg-blue-600 hover:bg-blue-700 text-xs"
+            className="h-8 bg-brand hover:bg-brand-hover text-xs"
           >
             {running ? (
               <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
@@ -230,7 +230,7 @@ const CollectionRunner = ({ collectionId, collectionName, isOpen, onClose }: Pro
                   <div key={row.id} className="px-3 py-2.5 flex items-center gap-3">
                     <span className="w-5 shrink-0">
                       {row.state === "running" ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-400" />
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-brand" />
                       ) : row.state === "pending" ? (
                         <Clock className="h-3.5 w-3.5 text-zinc-700" />
                       ) : failed ? (

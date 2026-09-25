@@ -74,7 +74,7 @@ const TestsEditor = ({ value, onChange }: Props) => {
               type="checkbox"
               checked={assertion.enabled !== false}
               onChange={(e) => update(assertion.id, { enabled: e.target.checked })}
-              className="accent-blue-500 shrink-0"
+              className="accent-[var(--color-brand)] shrink-0"
               title="Enabled"
             />
 
@@ -160,8 +160,8 @@ const TestsEditor = ({ value, onChange }: Props) => {
         </Button>
       </div>
 
-      <div className="flex items-start gap-2.5 rounded-lg border border-blue-500/10 bg-blue-500/5 p-3">
-        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-400" />
+      <div className="flex items-start gap-2.5 rounded-lg border border-brand/10 bg-brand/5 p-3">
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand" />
         <p className="text-[11px] leading-relaxed text-zinc-400">
           Assertions are declarative rather than scripted &mdash; no JavaScript is
           executed. Results appear on the response&apos;s Tests tab after each send,

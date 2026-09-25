@@ -104,7 +104,7 @@ const RealtimeClientServerLogsTable = () => {
 
   const getMessageTypeIcon = (type: 'sent' | 'received') => {
     return type === 'sent' 
-      ? <ArrowUpRight size={16} className="text-blue-400" />
+      ? <ArrowUpRight size={16} className="text-brand" />
       : <ArrowDownLeft size={16} className="text-green-400" />
   }
 
@@ -182,7 +182,7 @@ const RealtimeClientServerLogsTable = () => {
                 className={`
                   relative border border-line rounded-lg p-3 cursor-pointer transition-all duration-200
                   ${selectedMessageIndex === index 
-                    ? 'bg-surface-hover border-blue-500/50 shadow-lg shadow-blue-500/5' 
+                    ? 'bg-surface-hover border-brand/50 shadow-lg shadow-brand/5' 
                     : 'bg-surface-raised hover:border-zinc-700/50'
                   }
                 `}
@@ -190,18 +190,18 @@ const RealtimeClientServerLogsTable = () => {
               >
                 {/* Visual indicator for message type */}
                 <div className={`absolute top-0 left-0 bottom-0 w-1 rounded-l-lg ${
-                    message.type === 'sent' ? 'bg-blue-500/50' : 'bg-green-500/50'
+                    message.type === 'sent' ? 'bg-brand/50' : 'bg-green-500/50'
                 }`} />
 
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center gap-2">
                     <div className={`p-1 rounded ${
-                        message.type === 'sent' ? 'bg-blue-500/10' : 'bg-green-500/10'
+                        message.type === 'sent' ? 'bg-brand/10' : 'bg-green-500/10'
                     }`}>
                       {getMessageTypeIcon(message.type)}
                     </div>
                     <span className={`text-[11px] font-bold uppercase tracking-wider ${
-                      message.type === 'sent' ? 'text-blue-400' : 'text-green-400'
+                      message.type === 'sent' ? 'text-brand' : 'text-green-400'
                     }`}>
                       {message.type}
                     </span>
@@ -235,7 +235,7 @@ const RealtimeClientServerLogsTable = () => {
                       selectedMessageIndex === index ? 'bg-canvas' : 'bg-canvas/50'
                   }`}>
                     {selectedMessageIndex === index ? (
-                       <pre className="text-zinc-300 whitespace-pre-wrap break-words selection:bg-blue-500/30">
+                       <pre className="text-zinc-300 whitespace-pre-wrap break-words selection:bg-brand/30">
                         {formatMessageData(message.data)}
                       </pre>
                     ) : (

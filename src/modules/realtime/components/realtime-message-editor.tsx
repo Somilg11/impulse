@@ -142,8 +142,8 @@ const RealtimeMessageEditor = () => {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-line pb-3 mb-1">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 bg-blue-500/10 rounded-md">
-            <Send size={16} className="text-blue-400" />
+          <div className="p-1.5 bg-brand/10 rounded-md">
+            <Send size={16} className="text-brand" />
           </div>
           <h3 className="text-sm font-bold text-zinc-100 tracking-tight">Message Editor</h3>
         </div>
@@ -239,7 +239,7 @@ const RealtimeMessageEditor = () => {
         <Button
           onClick={handleSendMessage}
           disabled={status !== 'connected' || isSending}
-          className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-9 px-6 shadow-lg shadow-blue-500/10 transition-all active:scale-95"
+          className="bg-brand hover:bg-brand text-white font-bold h-9 px-6 shadow-lg shadow-brand/10 transition-all active:scale-95"
         >
           {isSending ? (
             <RefreshCw size={14} className="mr-2 animate-spin" />
