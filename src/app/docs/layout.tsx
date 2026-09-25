@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import { Terminal, ScrollText, BookOpen, Cpu, Share2, Layers, Search, Zap, ArrowRight } from "lucide-react";
+import { Terminal, ScrollText, BookOpen, Cpu, Share2, Layers, Search, Zap, ArrowRight, Globe, Radio } from "lucide-react";
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,7 +13,9 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
     { name: "Workspaces", icon: <Layers className="h-4 w-4" />, href: "/docs#workspaces" },
     { name: "Collections", icon: <ScrollText className="h-4 w-4" />, href: "/docs#collections" },
     { name: "Sending Requests", icon: <Terminal className="h-4 w-4" />, href: "/docs#sending-requests" },
-    { name: "AI Integration", icon: <Cpu className="h-4 w-4" />, href: "/docs#ai-integration" },
+    { name: "Execution Modes", icon: <Globe className="h-4 w-4" />, href: "/docs#execution-modes" },
+    { name: "WebSockets", icon: <Radio className="h-4 w-4" />, href: "/docs#realtime" },
+    { name: "AI Assistance", icon: <Cpu className="h-4 w-4" />, href: "/docs#ai-integration" },
     { name: "Collaboration", icon: <Share2 className="h-4 w-4" />, href: "/docs#collaboration" },
   ], []);
 

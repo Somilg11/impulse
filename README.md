@@ -6,26 +6,26 @@ Impulse is a high-performance, collaborative API development platform designed f
 
 ## ✨ Key Features
 
-### 🚀 Advanced REST Client
-- **Dynamic Request Builder**: Support for all HTTP methods (GET, POST, PUT, DELETE, PATCH).
-- **Embedded Monaco Editor**: Experience VS Code-grade editing for JSON bodies and headers.
-- **AI-Powered Suggestions**: Automatically suggest request names and structure based on your endpoint.
-- **Response History**: Track and compare response times, sizes, and headers over time.
-- **Browser & Proxy Execution**: Send requests from your own machine or through the server. See [Execution modes](#-execution-modes).
+### 🚀 REST Client
+- **Request Builder**: GET, POST, PUT, PATCH, and DELETE, with query params, headers, and a JSON body.
+- **Embedded Monaco Editor**: VS Code-grade editing for JSON bodies, with formatting and invalid-JSON detection.
+- **AI-Powered Suggestions**: Gemini suggests request names from a method and URL, and drafts JSON bodies from a description.
+- **Browser & Proxy Execution**: Send from your own machine to reach `localhost`, or through a hardened server proxy when CORS blocks you. See [Execution modes](#-execution-modes).
+- **Run History**: Every send against a saved request is recorded with its status, headers, body, and duration. *(Stored in the database; no UI to browse it yet.)*
 
-### 🔌 Realtime WebSocket Debugger
-- **Live Stream**: Monitor incoming and outgoing WebSocket messages in a structured log table.
-- **Message Editor**: Send complex JSON payloads with auto-formatting and syntax highlighting.
-- **Connection Management**: Handle auto-reconnection and status tracking with ease.
+### 🔌 WebSocket Debugger
+- **Live Stream**: Monitor incoming and outgoing WebSocket frames in a structured log table.
+- **Message Editor**: Send JSON payloads with auto-formatting and syntax highlighting.
+- **Connection Management**: Auto-reconnection with status and attempt tracking. *(Sessions are not persisted.)*
 
 ### 👥 Collaborative Workspaces
 - **Team Isolation**: Organize projects into shared workspaces.
-- **Invite System**: Scale your team with secure, token-based invitation links.
-- **Role-Based Access**: Manage permissions with Admin, Editor, and Viewer roles.
+- **Invite System**: Single-use, 32-byte invite tokens that expire after 7 days.
+- **Role-Based Access**: Admin, Editor, and Viewer roles, enforced server-side on every operation via `src/lib/authz.ts` — not just hidden in the UI.
 
 ### 📂 Collection Management & Import
-- **Instant Migration**: Seamlessly import your existing collections from **Postman v2.1** or native Impulse JSON formats.
-- **Folder Organization**: Group requests into logical collections for better discoverability.
+- **Postman Import**: Import existing collections from **Postman v2.1** exports, or native Impulse JSON. Postman folders are flattened, with the folder name kept as a prefix on each request.
+- **Collections**: Group requests into a collection within a workspace. *(A single flat level — nested folders are not implemented yet.)*
 
 ### ⌨️ Developer Experience
 - **Command Palette (Cmd+K)**: Instant global search for documentation and collections.
@@ -148,7 +148,11 @@ will block on are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Vulnerabilities: please report privately — see [SECURITY.md](SECURITY.md).
 
-Architecture, design decisions, and a deeper write-up of the execution modes:
+New here? [about.md](about.md) explains the project from scratch — what an API
+client is, why the execution modes exist, and the security work — plus an
+interview-style Q&A.
+
+Architecture, design decisions, and a deeper technical write-up:
 [docs/summary.md](docs/summary.md).
 
 ---
