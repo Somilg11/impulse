@@ -170,7 +170,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                   value={bodyType}
                   onValueChange={(next) => onBodyTypeChange?.(next as BodyType)}
                 >
-                  <SelectTrigger className="w-[180px] h-7 bg-line border-line-strong text-[12px]">
+                  <SelectTrigger className="h-7 w-[180px] text-[12px]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-surface-raised border-line">

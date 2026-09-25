@@ -101,7 +101,7 @@ const RequestBar = ({ tab, updateTab }: Props) => {
           onValueChange={(value) => updateTab(tab.id, { method: value })}
         >
           <SelectTrigger
-            className={`h-7 w-auto shrink-0 gap-1 rounded-[7px] border-0 bg-transparent pl-2.5 pr-1.5 ml-[3px] text-[12px] font-semibold tracking-[0.02em] shadow-none transition-colors duration-[--duration-fast] hover:bg-white/[0.06] focus:ring-0 ${methodText(tab.method)}`}
+            className={`h-7 w-auto shrink-0 gap-1 rounded-[7px] border-0 bg-transparent pl-2.5 pr-1.5 ml-[3px] font-mono text-[12px] font-semibold tracking-[0.03em] shadow-none hover:bg-white/[0.07] focus-visible:border-0 ${methodText(tab.method)}`}
           >
             <SelectValue />
           </SelectTrigger>
@@ -161,7 +161,7 @@ const RequestBar = ({ tab, updateTab }: Props) => {
       {/* Execution mode, as a quiet trailing control rather than a labelled row */}
       <Select value={sendMode} onValueChange={(value) => setSendMode(value as SendMode)}>
         <SelectTrigger
-          className="h-9 w-auto shrink-0 gap-1.5 rounded-[10px] border-line bg-surface-raised px-2.5 text-[12px] text-zinc-400 focus:ring-0"
+          className="h-9 w-auto shrink-0 gap-1.5 px-2.5 text-[12px] text-zinc-400"
           title={SEND_MODES.find((m) => m.value === sendMode)?.hint}
         >
           {sendMode === "proxy" ? (

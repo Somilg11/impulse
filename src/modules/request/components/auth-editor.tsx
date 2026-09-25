@@ -59,7 +59,7 @@ const AuthEditor = ({ value, onChange }: Props) => {
           value={auth.type}
           onValueChange={(next) => update(blankFor(next as AuthType))}
         >
-          <SelectTrigger className="w-full sm:w-56 h-9 rounded-lg border-line bg-surface-raised text-[13px] text-zinc-200 focus:ring-0">
+          <SelectTrigger className="w-full sm:w-56">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="rounded-xl border-line bg-surface-raised text-zinc-300">
@@ -183,7 +183,7 @@ const AuthEditor = ({ value, onChange }: Props) => {
                 update({ ...auth, in: next === "query" ? "query" : "header" })
               }
             >
-              <SelectTrigger className="w-full sm:w-56 h-9 rounded-lg border-line bg-surface-raised text-[13px] text-zinc-200 focus:ring-0">
+              <SelectTrigger className="w-full sm:w-56">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-line bg-surface-raised text-zinc-300">
