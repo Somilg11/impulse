@@ -40,6 +40,22 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
 
     const { data: collections, isLoading, isError } = useCollections(currentWorkspace?.id);
 
+    // The server returns a flat list; the tree is assembled here so nesting costs
+    // one query instead of a recursive include of unknown depth. Rendering the
+    // flat list directly would show every folder twice - once nested under its
+    // parent and once at the root.
+    const all = collections ?? [];
+    const childrenOf = (parentId: string) => all.filter((c) => c.parentId === parentId);
+
+    const query = searchQuery.trim().toLowerCase();
+    const roots = all.filter((c) => !c.parentId);
+
+    // While searching, match at any depth and show the hits as a flat list -
+    // keeping the hierarchy would hide matches inside collapsed folders.
+    const visible = query
+        ? all.filter((c) => c.name.toLowerCase().includes(query))
+        : roots;
+
     if (isLoading) return (
         <div className="flex-1 flex items-center justify-center bg-canvas">
             <Loader className="w-5 h-5 text-zinc-500 animate-spin" />
@@ -74,7 +90,7 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search..."
+                        placeholder="Search collections"
                         className="w-full bg-surface-raised border border-line rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-line-strong transition-colors"
                     />
                 </div>
@@ -82,14 +98,20 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
 
             {/* Collections list */}
             <div className="flex-1 overflow-y-auto px-1 py-1">
-                {collections && collections.length > 0 ? (
-                    collections
-                        .filter(c => !searchQuery || c.name.toLowerCase().includes(searchQuery.toLowerCase()))
-                        .map((collection) => (
-                            <CollectionFolder key={collection.id} collection={collection} />
-                        ))
-                ) : (
+                {all.length === 0 ? (
                     <EmptyCollections onImport={() => setIsImportModalOpen(true)} />
+                ) : visible.length === 0 ? (
+                    <p className="px-3 py-6 text-center text-xs text-zinc-600">
+                        Nothing matches &ldquo;{searchQuery.trim()}&rdquo;.
+                    </p>
+                ) : (
+                    visible.map((collection) => (
+                        <CollectionFolder
+                            key={collection.id}
+                            collection={collection}
+                            childrenOf={query ? undefined : childrenOf}
+                        />
+                    ))
                 )}
             </div>
 

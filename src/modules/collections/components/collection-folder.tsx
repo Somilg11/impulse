@@ -93,6 +93,13 @@ const CollectionFolder = ({ collection, childrenOf, depth = 0 }: Props) => {
                         <span className="text-xs text-zinc-300 font-medium truncate">
                             {collection.name}
                         </span>
+                        {/* Count conveys size without expanding; folders are counted
+                            too so a container of folders does not look empty. */}
+                        {!isPending && (requestData?.length || childFolders.length) ? (
+                            <span className="ml-auto shrink-0 pl-1 text-[10px] tabular-nums text-zinc-600">
+                                {(requestData?.length ?? 0) + childFolders.length}
+                            </span>
+                        ) : null}
                     </CollapsibleTrigger>
 
                     <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity pr-1">
