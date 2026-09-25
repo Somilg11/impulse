@@ -52,10 +52,11 @@ model Session {
 model Account {
   id String @id
 
-  // Better Auth 1.7 scopes account identity by the OIDC issuer (e.g.
-  // "https://accounts.google.com") rather than by providerId alone, so the same
-  // account id from two different issuers cannot collide.
-  issuer                String
+  // Better Auth 1.7.0-1.7.2 scoped account identity by OIDC issuer and required
+  // this column; 1.7.6 reverted that and no longer writes it. Kept nullable so
+  // existing rows retain their value while new inserts succeed - a required
+  // column the library never writes fails every insert.
+  issuer                String?
   accountId             String
   providerId            String
   userId                String
@@ -70,7 +71,7 @@ model Account {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
-  @@unique([issuer, accountId])
+  // The (issuer, accountId) uniqueness went away with the column's meaning.
   @@index([userId])
   @@map("account")
 }
