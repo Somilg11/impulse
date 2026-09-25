@@ -37,6 +37,9 @@ export default function PlaygroundPage() {
       body: activeTab.body,
       headers: activeTab.headers,
       parameters: activeTab.parameters,
+      bodyType: activeTab.bodyType,
+      auth: activeTab.auth,
+      tests: activeTab.tests,
     };
   };
 
@@ -63,7 +66,9 @@ export default function PlaygroundPage() {
           body: activeTab.body,
           headers: activeTab.headers,
           parameters: activeTab.parameters,
-          
+          bodyType: activeTab.bodyType,
+          auth: activeTab.auth,
+          tests: activeTab.tests,
         });
         toast.success("Request updated");
       } catch (err) {

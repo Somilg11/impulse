@@ -6,7 +6,7 @@ import { Folder, Plus, Search, X } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { useAddRequestToCollection } from "@/modules/request/hooks/request";
-import { REST_METHOD } from "@prisma/client";
+import { BODY_TYPE, REST_METHOD } from "@prisma/client";
 import { useWorkspaceStore } from "@/modules/layout/store";
 import { useCollections } from "../hooks/collections";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,9 @@ const SaveRequestToCollectionModal = ({
     body?: string;
     headers?: string;
     parameters?: string;
+    bodyType?: BODY_TYPE;
+    auth?: string;
+    tests?: string;
   };
   initialName?: string;
   collectionId?: string
@@ -106,6 +109,9 @@ const SaveRequestToCollectionModal = ({
         body: requestData.body,
         headers: requestData.headers,
         parameters: requestData.parameters,
+        bodyType: requestData.bodyType,
+        auth: requestData.auth,
+        tests: requestData.tests,
       });
      
       toast.success(`Request saved to "${selectedCollection?.name}" collection`);

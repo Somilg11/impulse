@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
 import type { ExecResult } from "@/lib/http";
+import type { BodyType } from "@/lib/body-types";
 import type { SendMode } from "../lib/send-request";
 
 /** Mirrors a Prisma `Request` row: the Json columns come back as JsonValue,
@@ -13,6 +14,9 @@ interface SavedRequest {
   body?: unknown;
   headers?: unknown;
   parameters?: unknown;
+  bodyType?: BodyType | null;
+  auth?: unknown;
+  tests?: unknown;
   collectionId?: string;
 }
 
@@ -34,6 +38,11 @@ export type RequestTab = {
   body?: string;
   headers?: string;
   parameters?: string;
+  bodyType?: BodyType;
+  /** Serialized AuthConfig - see src/lib/auth-schemes.ts */
+  auth?: string;
+  /** Serialized Assertion[] - see src/lib/assertions.ts */
+  tests?: string;
   unsavedChanges?: boolean;
   requestId?: string; // set once the tab is backed by a DB row
   collectionId?: string;
@@ -96,6 +105,7 @@ export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
         body: "",
         headers: "",
         parameters: "",
+        bodyType: "JSON",
         unsavedChanges: true,
       };
       return {
@@ -162,6 +172,9 @@ export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
         body: toEditorString(req.body),
         headers: toEditorString(req.headers),
         parameters: toEditorString(req.parameters),
+        bodyType: (req.bodyType as BodyType | undefined) ?? "JSON",
+        auth: toEditorString(req.auth),
+        tests: toEditorString(req.tests),
         requestId: req.id,
         collectionId: req.collectionId,
         workspaceId: req.workspaceId,
@@ -192,6 +205,9 @@ export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
               body: toEditorString(savedRequest.body),
               headers: toEditorString(savedRequest.headers),
               parameters: toEditorString(savedRequest.parameters),
+              bodyType: (savedRequest.bodyType as BodyType | undefined) ?? "JSON",
+              auth: toEditorString(savedRequest.auth),
+              tests: toEditorString(savedRequest.tests),
               requestId: savedRequest.id,
               collectionId: savedRequest.collectionId ?? t.collectionId,
               unsavedChanges: false,

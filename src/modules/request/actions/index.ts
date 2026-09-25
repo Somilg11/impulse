@@ -1,7 +1,7 @@
 "use server";
 
 import db from "@/lib/db";
-import { MEMBER_ROLE, REST_METHOD } from "@prisma/client";
+import { BODY_TYPE, MEMBER_ROLE, REST_METHOD } from "@prisma/client";
 
 import {
   assertCollectionAccess,
@@ -17,6 +17,11 @@ export type Request = {
   body?: string;
   headers?: string;
   parameters?: string;
+  bodyType?: BODY_TYPE;
+  /** Serialized AuthConfig - see src/lib/auth-schemes.ts */
+  auth?: string;
+  /** Serialized Assertion[] - see src/lib/assertions.ts */
+  tests?: string;
 };
 
 export type RunResponse = {
@@ -40,6 +45,9 @@ export const addRequestToCollection = async (
       body: value.body,
       headers: value.headers,
       parameters: value.parameters,
+      bodyType: value.bodyType ?? BODY_TYPE.JSON,
+      auth: value.auth,
+      tests: value.tests,
     },
   });
 };
@@ -56,6 +64,9 @@ export const saveRequest = async (id: string, value: Request) => {
       body: value.body,
       headers: value.headers,
       parameters: value.parameters,
+      ...(value.bodyType ? { bodyType: value.bodyType } : {}),
+      ...(value.auth !== undefined ? { auth: value.auth } : {}),
+      ...(value.tests !== undefined ? { tests: value.tests } : {}),
     },
   });
 };
@@ -93,6 +104,8 @@ export const recordRun = async (
       headers: result.headers ?? {},
       body: result.body ?? "",
       durationMs: Math.round(result.durationMs ?? 0),
+      size: result.size ?? 0,
+      via: result.via,
     },
     select: { id: true },
   });

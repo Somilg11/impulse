@@ -45,7 +45,14 @@ const RequestBar = ({ tab, updateTab }: Props) => {
 
   const onSendRequest = async () => {
     try {
-      const { result } = await mutateAsync(tab);
+      const { result, missingVariables } = await mutateAsync(tab);
+
+      if (missingVariables.length) {
+        toast.warning(
+          `Unresolved: ${missingVariables.map((v) => `{{${v}}}`).join(", ")}`,
+          { description: "Select an environment that defines them." }
+        );
+      }
 
       if (result.error) {
         toast.error(result.error);

@@ -94,9 +94,10 @@ model Workspace {
   ownerId     String
   owner       User    @relation("UserWorkspaces", fields: [ownerId], references: [id])
 
-  members     WorkspaceMember[]
-  invites     WorkspaceInvite[]
-  collections Collection[]
+  members      WorkspaceMember[]
+  invites      WorkspaceInvite[]
+  collections  Collection[]
+  environments Environment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -146,12 +147,34 @@ model Collection {
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
+  // Self-relation so a collection can contain folders. A null parentId means a
+  // root-level collection.
+  parentId String?
+  parent   Collection?  @relation("CollectionTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children Collection[] @relation("CollectionTree")
+
   requests Request[]
+
+  // Manual ordering among siblings.
+  position Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  @@unique([name, workspaceId])
+  // Names are unique among siblings, not across the whole workspace.
+  @@unique([name, workspaceId, parentId])
+  @@index([workspaceId])
+  @@index([parentId])
+}
+
+enum BODY_TYPE {
+  NONE
+  JSON
+  TEXT
+  XML
+  FORM_DATA
+  URL_ENCODED
+  GRAPHQL
 }
 
 enum REST_METHOD {
@@ -171,14 +194,28 @@ model Request {
   headers    Json?
 
   body     Json?
+  /// A string for JSON/TEXT/XML/GRAPHQL, or [{ key, value, enabled }] for
+  /// FORM_DATA / URL_ENCODED.
+  bodyType BODY_TYPE @default(JSON)
+
+  /// { type: "none" | "bearer" | "basic" | "apiKey", ... } - see src/lib/auth-schemes.ts
+  auth Json?
+
+  /// [{ id, source, comparator, target, enabled }] - see src/lib/assertions.ts
+  tests Json?
+
   response Json?
 
   collectionId String
   collection   Collection   @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   runs         RequestRun[]
 
+  position Int @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([collectionId])
 }
 
 model RequestRun {
@@ -186,12 +223,36 @@ model RequestRun {
   requestId String
   request   Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
-  status     Int
-  statusText String?
-  headers    Json?
-  body       Json?
-  durationMs Int
+  status      Int
+  statusText  String?
+  headers     Json?
+  body        Json?
+  durationMs  Int
+  size        Int?
+  /// "browser" | "proxy"
+  via         String?
+  /// Assertion outcomes for this run, when the request had tests.
+  testResults Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+}
+
+/// Workspace-scoped variable sets. `{{name}}` appearing in a URL, header, query
+/// param, or body is substituted from the active environment before sending.
+model Environment {
+  id   String @id @default(cuid())
+  name String
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  /// [{ key, value, enabled, secret }]
+  variables Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([name, workspaceId])
+  @@index([workspaceId])
 }

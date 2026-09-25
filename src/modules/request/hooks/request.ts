@@ -11,6 +11,7 @@ import {
   saveRequest,
 } from "../actions";
 import { sendRequest } from "../lib/send-request";
+import { useActiveVariables } from "@/modules/environments/hooks/use-active-variables";
 import {
   useRequestPlaygroundStore,
   type RequestTab,
@@ -70,19 +71,23 @@ export function useSendRequest() {
   const setResponseViewerData = useRequestPlaygroundStore(
     (s) => s.setResponseViewerData
   );
+  const { variables } = useActiveVariables();
 
   return useMutation({
     mutationFn: async (tab: RequestTab) => {
       const { sendMode } = useRequestPlaygroundStore.getState();
 
-      const result = await sendRequest(
+      const { result, missingVariables } = await sendRequest(
         {
           method: tab.method,
           url: tab.url,
           headers: tab.headers,
           parameters: tab.parameters,
           body: tab.body,
+          bodyType: tab.bodyType,
+          auth: tab.auth,
         },
+        variables,
         sendMode
       );
 
@@ -94,7 +99,7 @@ export function useSendRequest() {
         }
       }
 
-      return { tab, result };
+      return { tab, result, missingVariables };
     },
     onSuccess: ({ tab, result }) => {
       setResponseViewerData(result, tab.id);
