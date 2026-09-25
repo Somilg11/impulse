@@ -7,9 +7,21 @@ import BodyEditor from "./body-editor";
 import AuthEditor from "./auth-editor";
 import TestsEditor from "./tests-editor";
 import { parseAssertions } from "@/lib/assertions";
-import { toast } from "sonner";
 import { parseAuth, describeAuth } from "@/lib/auth-schemes";
 import type { BodyType } from "@/lib/body-types";
+import { toKeyValueMap } from "@/lib/http";
+
+/** A count beside a segment label, so state is visible without opening it. */
+const Count = ({ n }: { n: number }) => (
+  <span className="ml-1 rounded-full bg-white/[0.12] px-1.5 text-[10px] font-medium leading-[15px] text-zinc-300 tabular">
+    {n}
+  </span>
+);
+
+/** Used where a count would be meaningless - the tab is either set or not. */
+const Dot = () => (
+  <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-brand" />
+);
 
 interface Props {
   tab: RequestTab;
@@ -53,7 +65,6 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
       item.enabled !== false && (item.key.trim() || item.value.trim())
     );
     updateTab(tab.id, { headers: JSON.stringify(filteredHeaders) });
-    toast.success("Headers updated successfully")
   };
 
   const handleParametersChange = (data: { key: string; value: string; enabled?: boolean }[]) => {
@@ -62,12 +73,10 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
       item.enabled !== false && (item.key.trim() || item.value.trim())
     );
     updateTab(tab.id, { parameters: JSON.stringify(filteredParams) });
-    toast.success("Parameters updated successfully")
   };
 
   const handleBodyChange = (data: { contentType: string; body?: string }) => {
     updateTab(tab.id, { body: data.body || '' });
-    toast.success("Body updated successfully")
   };
 
   const handleBodyTypeChange = (bodyType: BodyType) => {
@@ -79,6 +88,10 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
   };
 
   const authSummary = describeAuth(parseAuth(tab.auth));
+  const paramCount = Object.keys(toKeyValueMap(tab.parameters)).length;
+  const headerCount = Object.keys(toKeyValueMap(tab.headers)).length;
+  const hasBody =
+    (tab.bodyType ?? "JSON") !== "NONE" && Boolean((tab.body ?? "").trim());
   const assertionCount = parseAssertions(tab.tests).filter((a) => a.enabled !== false).length;
 
   const handleTestsChange = (serialized: string) => {
@@ -88,52 +101,46 @@ const RequestEditorArea = ({ tab, updateTab }: Props) => {
   return (
     <Tabs
       defaultValue="parameters"
-      className="w-full border border-[#1e2330] rounded-lg overflow-hidden bg-[#0e1117]"
+      className="flex h-full min-h-0 w-full flex-col bg-canvas"
     >
       {/* Underline-style tabs matching the reference */}
-      <div className="border-b border-[#1e2330] px-1">
-        <TabsList className="bg-transparent h-9 p-0 gap-0">
+      <div className="shrink-0 border-b border-line bg-surface px-2.5 py-2">
+        <TabsList>
           <TabsTrigger 
               value="parameters" 
-              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
-          >
+              >
             Params
+            {paramCount > 0 && <Count n={paramCount} />}
           </TabsTrigger>
           <TabsTrigger 
               value="body" 
-              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
-          >
+              >
             Body
+            {hasBody && <Dot />}
           </TabsTrigger>
           <TabsTrigger 
               value="headers" 
-              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
-          >
+              >
             Headers
+            {headerCount > 0 && <Count n={headerCount} />}
           </TabsTrigger>
           <TabsTrigger 
               value="auth" 
-              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
-          >
-            Authorization
-            {authSummary !== "No auth" && (
-              <span className="ml-1.5 h-1.5 w-1.5 rounded-full bg-blue-500 inline-block" />
-            )}
+              >
+            Auth
+            {authSummary !== "No auth" && <Dot />}
           </TabsTrigger>
           <TabsTrigger
               value="tests"
-              className="rounded-none bg-transparent text-xs font-medium text-zinc-500 data-[state=active]:text-white data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-4 h-9 transition-all"
-          >
+              >
             Tests
-            {assertionCount > 0 && (
-              <span className="ml-1.5 text-[10px] text-zinc-500">{assertionCount}</span>
-            )}
+            {assertionCount > 0 && <Count n={assertionCount} />}
           </TabsTrigger>
         </TabsList>
       </div>
       
       {/* Tab content */}
-      <div className="min-h-[250px] md:min-h-[350px]">
+      <div className="min-h-0 flex-1 overflow-auto">
         <TabsContent value="parameters" className="mt-0 p-3 focus-visible:outline-none">
             <KeyValueFormEditor
             initialData={getParametersData()}

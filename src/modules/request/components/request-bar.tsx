@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Code2, Loader } from 'lucide-react'
+import { Code2, Globe, Loader, Server, Zap } from 'lucide-react'
 import { useState } from 'react'
 import { looksLikeCurl, parseCurl } from '@/lib/curl'
 import CodeDialog from './code-dialog'
@@ -20,20 +20,13 @@ import { Hint } from '@/components/ui/hint'
 import { useSendRequest } from '../hooks/request'
 import { toast } from 'sonner'
 import { METHODS } from '@/lib/http'
+import { methodText } from '@/lib/http-display'
 import type { SendMode } from '../lib/send-request'
 
 interface Props {
     tab: RequestTab,
     updateTab: (id: string, data: Partial<RequestTab>) => void;
 }
-
-const methodColorMap: Record<string, string> = {
-  GET: "text-green-400",
-  POST: "text-amber-400",
-  PUT: "text-blue-400",
-  PATCH: "text-purple-400",
-  DELETE: "text-red-400",
-};
 
 const SEND_MODES: { value: SendMode; label: string; hint: string }[] = [
   { value: "auto", label: "Auto", hint: "Browser first, proxy if CORS blocks it" },
@@ -87,7 +80,6 @@ const RequestBar = ({ tab, updateTab }: Props) => {
       if (result.error) {
         toast.error(result.error);
       } else if (result.ok) {
-        toast.success(`${result.status} in ${result.durationMs} ms`);
       } else {
         toast.warning(`${result.status} ${result.statusText}`);
       }
@@ -97,23 +89,28 @@ const RequestBar = ({ tab, updateTab }: Props) => {
   }
 
   return (
-    <div className='flex flex-col gap-2 w-full'>
-      <div className='flex items-center gap-0 bg-[#161b26] border border-[#1e2330] rounded-lg w-full overflow-hidden'>
-        {/* Method selector */}
+    <div className="flex w-full items-center gap-2">
+      {/* One continuous control: method, URL, and send read as a single field
+          with segments, the way a browser address bar does, rather than three
+          adjacent controls. */}
+      <div className="group flex h-9 min-w-0 flex-1 items-center rounded-[10px] border border-line bg-surface-raised transition-colors duration-[--duration-fast] ease-[--ease-ios] focus-within:border-brand/60">
+        {/* Method */}
         <Select
           value={tab.method}
           onValueChange={(value) => updateTab(tab.id, { method: value })}
         >
-          <SelectTrigger className={`w-auto min-w-[80px] sm:min-w-[90px] bg-transparent border-0 border-r border-[#1e2330] rounded-none h-10 px-3 font-bold text-sm tracking-wide shrink-0 focus:ring-0 ${methodColorMap[tab.method] || "text-zinc-400"}`}>
+          <SelectTrigger
+            className={`h-7 w-auto shrink-0 gap-1 rounded-[7px] border-0 bg-transparent pl-2.5 pr-1.5 ml-[3px] font-mono text-[12px] font-semibold tracking-[0.03em] shadow-none hover:bg-white/[0.07] focus-visible:border-0 ${methodText(tab.method)}`}
+          >
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="bg-[#161b26] border border-[#1e2330] text-zinc-300 rounded-lg shadow-xl">
+          <SelectContent align="start" className="min-w-[7rem]">
             <SelectGroup>
               {METHODS.map((method) => (
                 <SelectItem
                   key={method}
                   value={method}
-                  className={`${methodColorMap[method]} font-bold hover:bg-[#1e2330]`}
+                  className={`font-semibold ${methodText(method)}`}
                 >
                   {method}
                 </SelectItem>
@@ -122,60 +119,70 @@ const RequestBar = ({ tab, updateTab }: Props) => {
           </SelectContent>
         </Select>
 
-        {/* URL input */}
+        <span className="h-4 w-px shrink-0 bg-line" aria-hidden />
+
+        {/* URL */}
         <Input
-          value={tab.url || ''}
+          value={tab.url || ""}
           onPaste={onUrlPaste}
           onChange={(e) => updateTab(tab.id, { url: e.target.value })}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && tab.url && !isPending) onSendRequest();
+            if (e.key === "Enter" && tab.url && !isPending) onSendRequest();
           }}
-          placeholder="https://api.example.com/users — or paste a cURL command"
-          className="flex-1 min-w-0 bg-transparent border-0 rounded-none h-10 px-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:ring-offset-0"
+          placeholder="Enter a URL, or paste a cURL command"
+          spellCheck={false}
+          className="h-full min-w-0 flex-1 rounded-none border-0 bg-transparent px-2.5 font-mono text-[13px] text-zinc-100 placeholder:font-sans placeholder:text-zinc-600 focus-visible:border-0"
         />
 
-        {/* Code snippet */}
+        {/* Code snippet - a quiet affordance inside the field, not a segment */}
         <Hint label="View as code" side="bottom">
           <button
             type="button"
             onClick={() => setCodeOpen(true)}
             disabled={!tab.url}
-            className="h-10 px-3 border-l border-[#1e2330] text-zinc-500 hover:text-zinc-200 disabled:opacity-40 transition-colors shrink-0"
+            className="mr-[3px] flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] text-zinc-600 transition-colors duration-[--duration-fast] hover:bg-white/[0.06] hover:text-zinc-300 disabled:opacity-30 disabled:hover:bg-transparent"
           >
-            <Code2 className="w-4 h-4" />
+            <Code2 className="h-3.5 w-3.5" />
           </button>
         </Hint>
+      </div>
 
-        {/* Send button */}
-        <Button
-          type='button'
-          onClick={onSendRequest}
-          disabled={isPending || !tab.url}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-none rounded-r-lg px-5 sm:px-6 h-10 transition-colors shrink-0 text-sm"
+      {/* Send sits outside the field, as the one primary action on screen */}
+      <Button
+        type="button"
+        onClick={onSendRequest}
+        disabled={isPending || !tab.url}
+        className="h-9 w-[84px] shrink-0 gap-1.5 rounded-[10px] bg-brand text-[13px] font-medium text-white transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:bg-brand-hover active:scale-[0.97] disabled:opacity-40"
+      >
+        {isPending ? <Loader className="size-3.5 animate-spin" /> : "Send"}
+      </Button>
+
+      {/* Execution mode, as a quiet trailing control rather than a labelled row */}
+      <Select value={sendMode} onValueChange={(value) => setSendMode(value as SendMode)}>
+        <SelectTrigger
+          className="h-9 w-auto shrink-0 gap-1.5 px-2.5 text-[12px] text-zinc-400"
+          title={SEND_MODES.find((m) => m.value === sendMode)?.hint}
         >
-          {isPending ? <Loader className="animate-spin size-4" /> : "Send"}
-        </Button>
-      </div>
-
-      {/* Execution mode */}
-      <div className='flex items-center gap-2 text-[11px] text-zinc-500'>
-        <span className='uppercase tracking-widest font-semibold'>Send via</span>
-        <Select value={sendMode} onValueChange={(value) => setSendMode(value as SendMode)}>
-          <SelectTrigger className="h-7 w-auto min-w-[110px] bg-[#161b26] border border-[#1e2330] text-xs text-zinc-300 focus:ring-0">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-[#161b26] border border-[#1e2330] text-zinc-300">
-            {SEND_MODES.map((mode) => (
-              <SelectItem key={mode.value} value={mode.value} className="text-xs hover:bg-[#1e2330]">
-                {mode.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <span className='hidden sm:inline text-zinc-600'>
-          {SEND_MODES.find((m) => m.value === sendMode)?.hint}
-        </span>
-      </div>
+          {sendMode === "proxy" ? (
+            <Server className="h-3.5 w-3.5" />
+          ) : sendMode === "browser" ? (
+            <Globe className="h-3.5 w-3.5" />
+          ) : (
+            <Zap className="h-3.5 w-3.5" />
+          )}
+          <span className="hidden capitalize sm:inline">{sendMode}</span>
+        </SelectTrigger>
+        <SelectContent align="end" className="min-w-[15rem]">
+          {SEND_MODES.map((mode) => (
+            <SelectItem key={mode.value} value={mode.value}>
+              <div className="flex flex-col gap-0.5 py-0.5">
+                <span className="text-[13px] text-zinc-200">{mode.label}</span>
+                <span className="text-[11px] leading-snug text-zinc-500">{mode.hint}</span>
+              </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       <CodeDialog tab={tab} isOpen={codeOpen} onClose={() => setCodeOpen(false)} />
     </div>

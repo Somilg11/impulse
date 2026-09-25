@@ -20,7 +20,7 @@ const CreateWorkspace = ({
     if (!name.trim()) return;
     try {
       await mutateAsync(name); 
-      toast.success("Workspace created successfully");
+      toast.success(`Created "${name}"`);
       setName("");
       setIsModalOpen(false);
     } catch (err) {

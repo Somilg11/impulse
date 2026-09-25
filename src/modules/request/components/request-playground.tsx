@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import SaveRequestToCollectionModal from "@/modules/collections/components/add-request-modal";
 import { REST_METHOD } from "@prisma/client";
 
-import { Terminal } from "lucide-react";
 import { useSaveRequest } from "../hooks/request";
 
 export default function PlaygroundPage() {
@@ -91,7 +90,6 @@ export default function PlaygroundPage() {
       e.preventDefault();
       e.stopPropagation();
       addTab();
-      toast.success("New request created");
     },
     {
       preventDefault: true,
@@ -102,30 +100,46 @@ export default function PlaygroundPage() {
 
   if (!activeTab) {
     return (
-      <div className="flex flex-col gap-6 h-full items-center justify-center bg-[#0e1117]">
-        <div className="flex flex-col justify-center items-center h-20 w-20 border border-[#1e2330] rounded-2xl bg-[#161b26]">
-          <Terminal size={32} className='text-zinc-500' strokeWidth={1.5} />
+      <div className="flex h-full flex-col items-center justify-center gap-6 bg-canvas px-6">
+        <div className="text-center">
+          <p className="text-[15px] font-medium text-zinc-300">No request open</p>
+          <p className="mt-1.5 text-[13px] text-zinc-600">
+            Start a new one, or pick a saved request from the sidebar.
+          </p>
         </div>
-       
-        <div className="flex flex-col items-center gap-3">
-            <p className="text-sm text-zinc-400">Ready to test?</p>
-            <div className="bg-[#161b26] border border-[#1e2330] px-5 py-4 rounded-lg space-y-2.5 text-xs">
-              <div className="flex justify-between items-center gap-10">
-                <span className="text-zinc-400">New Request</span>
-                <div className="flex gap-0.5">
-                    <kbd className="px-1.5 py-0.5 bg-[#1e2330] text-zinc-500 text-[10px] rounded">⌘</kbd>
-                    <kbd className="px-1.5 py-0.5 bg-[#1e2330] text-zinc-500 text-[10px] rounded">⇧</kbd>
-                    <kbd className="px-1.5 py-0.5 bg-[#1e2330] text-zinc-500 text-[10px] rounded">N</kbd>
-                </div>
-              </div>
-              <div className="flex justify-between items-center gap-10">
-                <span className="text-zinc-400">Save Request</span>
-                <div className="flex gap-0.5">
-                    <kbd className="px-1.5 py-0.5 bg-[#1e2330] text-zinc-500 text-[10px] rounded">⌘</kbd>
-                    <kbd className="px-1.5 py-0.5 bg-[#1e2330] text-zinc-500 text-[10px] rounded">S</kbd>
-                </div>
+
+        <button
+          onClick={addTab}
+          className="h-9 rounded-lg bg-brand px-4 text-[13px] font-medium text-white transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:bg-brand-hover"
+        >
+          New request
+        </button>
+
+        {/* Shortcuts stated here rather than hidden behind a menu: this is the
+            only screen where the user has nothing else to read. */}
+        <div className="mt-2 space-y-2">
+          {[
+            { label: "New request", keys: ["\u2318", "G"] },
+            { label: "Save request", keys: ["\u2318", "S"] },
+            { label: "Search", keys: ["\u2318", "K"] },
+          ].map((row) => (
+            <div
+              key={row.label}
+              className="flex items-center justify-between gap-12 text-[12px]"
+            >
+              <span className="text-zinc-600">{row.label}</span>
+              <div className="flex gap-1">
+                {row.keys.map((key) => (
+                  <kbd
+                    key={key}
+                    className="rounded border border-line bg-surface-raised px-1.5 py-0.5 font-sans text-[10px] text-zinc-500"
+                  >
+                    {key}
+                  </kbd>
+                ))}
               </div>
             </div>
+          ))}
         </div>
       </div>
     );
@@ -134,7 +148,7 @@ export default function PlaygroundPage() {
   return (
     <div className="flex flex-col h-full">
       <TabBar />
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 min-h-0">
         <RequestEditor />
       </div>
 
@@ -144,6 +158,7 @@ export default function PlaygroundPage() {
         setIsModalOpen={setShowSaveModal}
         requestData={getCurrentRequestData()}
         initialName={getCurrentRequestData().name}
+        linkTabId={activeTab?.id ?? null}
       />
     </div>
   );

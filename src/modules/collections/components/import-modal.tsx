@@ -31,7 +31,6 @@ const ImportModal = ({
         reader.onload = (event) => {
             const content = event.target?.result as string;
             setJsonContent(content);
-            toast.success("File loaded successfully");
         };
         reader.onerror = () => {
             toast.error("Failed to read file");
@@ -51,7 +50,9 @@ const ImportModal = ({
             const result = await importCollections(workspaceId, parsedData);
 
             if (result.success) {
-                toast.success("Collections imported successfully");
+                toast.success("Collections imported", {
+                    description: "Folders and requests are in the sidebar.",
+                });
                 setJsonContent("");
                 queryClient.invalidateQueries({ queryKey: ["collections", workspaceId] });
                 setIsModalOpen(false);
@@ -80,14 +81,14 @@ const ImportModal = ({
                 {/* File Upload Area */}
                 <div 
                     onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-[#1e2330] rounded-xl p-8 flex flex-col items-center justify-center gap-3 hover:bg-[#161b26] cursor-pointer transition-all group"
+                    className="border-2 border-dashed border-line rounded-xl p-8 flex flex-col items-center justify-center gap-3 hover:bg-surface-raised cursor-pointer transition-all group"
                 >
-                    <div className="p-3 bg-blue-500/10 rounded-full group-hover:bg-blue-500/20 transition-colors">
-                        <Upload className="w-6 h-6 text-blue-400" />
+                    <div className="p-3 bg-brand/10 rounded-full group-hover:bg-brand/20 transition-colors duration-[--duration-fast] ease-[--ease-ios]">
+                        <Upload className="w-6 h-6 text-brand" />
                     </div>
                     <div className="text-center">
-                        <p className="text-sm font-medium text-zinc-200">Click to upload or drag and drop</p>
-                        <p className="text-xs text-zinc-500 mt-1">JSON files (Postman or Impulse export)</p>
+                        <p className="text-[13px] font-medium text-zinc-200">Click to upload or drag and drop</p>
+                        <p className="text-[12px] text-zinc-500 mt-1">JSON files (Postman or Impulse export)</p>
                     </div>
                     <input 
                         type="file" 
@@ -99,9 +100,9 @@ const ImportModal = ({
                 </div>
 
                 <div className="relative flex items-center py-2">
-                    <div className="flex-grow border-t border-[#1e2330]"></div>
+                    <div className="flex-grow border-t border-line"></div>
                     <span className="flex-shrink mx-4 text-[10px] font-bold uppercase tracking-widest text-zinc-600">or paste JSON</span>
-                    <div className="flex-grow border-t border-[#1e2330]"></div>
+                    <div className="flex-grow border-t border-line"></div>
                 </div>
 
                 {/* JSON Editor */}
@@ -110,18 +111,18 @@ const ImportModal = ({
                         value={jsonContent}
                         onChange={(e) => setJsonContent(e.target.value)}
                         placeholder='{ "collections": [...] }'
-                        className="w-full h-40 bg-[#0e1117] border border-[#1e2330] rounded-lg p-3 text-xs font-mono text-zinc-300 placeholder-zinc-700 focus:outline-none focus:border-blue-500/50 transition-colors resize-none"
+                        className="h-40 w-full resize-none rounded-lg border border-line bg-canvas p-3 font-mono text-[12px] text-zinc-300 placeholder-zinc-700 outline-none transition-colors duration-[--duration-fast] ease-[--ease-ios] focus:border-line-strong"
                     />
-                    <div className="absolute top-2 right-2 p-1.5 bg-[#161b26] border border-[#1e2330] rounded text-zinc-500">
+                    <div className="absolute top-2 right-2 p-1.5 bg-surface-raised border border-line rounded text-zinc-500">
                         <FileJson className="w-3.5 h-3.5" />
                     </div>
                 </div>
 
                 {/* Help Alert */}
-                <div className="flex items-start gap-3 p-3 bg-blue-500/5 border border-blue-500/10 rounded-lg">
-                    <AlertCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 p-3 bg-brand/5 border border-brand/10 rounded-lg">
+                    <AlertCircle className="w-4 h-4 text-brand shrink-0 mt-0.5" />
                     <p className="text-[11px] leading-relaxed text-zinc-400">
-                        Requests are imported with their methods, URLs, query parameters, headers, and bodies. Postman folders are flattened into one collection, with the folder name kept as a prefix on each request.
+                        Requests are imported with their methods, URLs, query parameters, headers, and bodies. Postman folders are recreated as real nested folders, so the collection keeps the structure it had in Postman.
                     </p>
                 </div>
             </div>

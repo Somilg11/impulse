@@ -137,32 +137,32 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-[#0e1117] border-[#1e2330] text-zinc-200 max-w-3xl">
+      <DialogContent className="bg-canvas border-line text-zinc-200 max-w-3xl">
         <DialogHeader>
           <DialogTitle className="text-white">Environments</DialogTitle>
-          <DialogDescription className="text-zinc-500 text-xs">
+          <DialogDescription className="text-zinc-500 text-[12px]">
             Variables defined here can be used anywhere in a request as{" "}
-            <code className="text-blue-400">{"{{name}}"}</code> &mdash; in the URL,
+            <code className="text-brand">{"{{name}}"}</code> &mdash; in the URL,
             headers, query params, auth fields, or body.
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid grid-cols-1 sm:grid-cols-[190px_1fr] gap-4 min-h-[340px]">
           {/* Environment list */}
-          <div className="border border-[#1e2330] rounded-lg p-2 flex flex-col gap-1 bg-[#161b26]">
+          <div className="border border-line rounded-lg p-2 flex flex-col gap-1 bg-surface-raised">
             <div className="flex gap-1.5 mb-1">
               <Input
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCreate()}
                 placeholder="New environment"
-                className="h-7 text-xs bg-[#0e1117] border-[#1e2330] focus-visible:ring-0"
+                className="h-7 text-[12px] bg-canvas border-line focus-visible:ring-0"
               />
               <Button
                 size="sm"
                 onClick={handleCreate}
                 disabled={!newName.trim() || createEnvironment.isPending}
-                className="h-7 px-2 bg-blue-600 hover:bg-blue-700 shrink-0"
+                className="h-7 px-2 bg-brand hover:bg-brand-hover shrink-0"
               >
                 <Plus className="h-3.5 w-3.5" />
               </Button>
@@ -173,10 +173,10 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
                 <button
                   key={environment.id}
                   onClick={() => setPickedId(environment.id)}
-                  className={`text-left text-xs px-2.5 py-1.5 rounded transition-colors truncate ${
+                  className={`text-left text-[12px] px-2.5 py-1.5 rounded transition-colors duration-[--duration-fast] ease-[--ease-ios] truncate ${
                     selectedId === environment.id
-                      ? "bg-[#1e2330] text-white"
-                      : "text-zinc-400 hover:bg-[#1e2330]/60"
+                      ? "bg-line text-white"
+                      : "text-zinc-400 hover:bg-line/60"
                   }`}
                 >
                   {environment.name}
@@ -191,10 +191,10 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
           </div>
 
           {/* Variable editor */}
-          <div className="border border-[#1e2330] rounded-lg p-3 bg-[#161b26] flex flex-col">
+          <div className="border border-line rounded-lg p-3 bg-surface-raised flex flex-col">
             {!selected ? (
               <div className="flex-1 flex items-center justify-center">
-                <p className="text-xs text-zinc-600">Select or create an environment.</p>
+                <p className="text-[12px] text-zinc-600">Select or create an environment.</p>
               </div>
             ) : (
               <>
@@ -202,7 +202,7 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
                   <Input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="h-8 text-sm bg-[#0e1117] border-[#1e2330] focus-visible:ring-0"
+                    className="h-8 text-[13px] bg-canvas border-line focus-visible:ring-0"
                   />
                   <Button
                     size="sm"
@@ -237,14 +237,14 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
                         type="checkbox"
                         checked={row.enabled !== false}
                         onChange={(e) => updateRow(index, { enabled: e.target.checked })}
-                        className="accent-blue-500 shrink-0"
+                        className="h-[14px] w-[14px] shrink-0 cursor-pointer accent-[var(--color-brand)]"
                         title="Enabled"
                       />
                       <Input
                         value={row.key}
                         onChange={(e) => updateRow(index, { key: e.target.value })}
                         placeholder="baseUrl"
-                        className="h-7 text-xs font-mono bg-[#0e1117] border-[#1e2330] focus-visible:ring-0"
+                        className="h-7 text-[12px] font-mono bg-canvas border-line focus-visible:ring-0"
                       />
                       <div className="relative flex-1">
                         <Input
@@ -252,7 +252,7 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
                           value={row.value}
                           onChange={(e) => updateRow(index, { value: e.target.value })}
                           placeholder="https://api.example.com"
-                          className="h-7 text-xs font-mono bg-[#0e1117] border-[#1e2330] focus-visible:ring-0 pr-7"
+                          className="h-7 text-[12px] font-mono bg-canvas border-line focus-visible:ring-0 pr-7"
                         />
                         {row.secret && (
                           <button
@@ -273,10 +273,10 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
                       <button
                         type="button"
                         onClick={() => updateRow(index, { secret: !row.secret })}
-                        className={`shrink-0 px-1.5 h-7 rounded text-[10px] font-bold border transition-colors ${
+                        className={`shrink-0 px-1.5 h-7 rounded text-[10px] font-bold border transition-colors duration-[--duration-fast] ease-[--ease-ios] ${
                           row.secret
                             ? "border-amber-500/30 text-amber-400 bg-amber-500/10"
-                            : "border-[#1e2330] text-zinc-600 hover:text-zinc-400"
+                            : "border-line text-zinc-600 hover:text-zinc-400"
                         }`}
                         title="Mask this value in the UI (it is still sent in requests)"
                       >
@@ -294,12 +294,12 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
                   ))}
                 </div>
 
-                <div className="flex items-center justify-between gap-2 pt-3 mt-2 border-t border-[#1e2330]">
+                <div className="flex items-center justify-between gap-2 pt-3 mt-2 border-t border-line">
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={addRow}
-                    className="h-7 text-xs text-zinc-400 hover:text-zinc-200"
+                    className="h-7 text-[12px] text-zinc-400 hover:text-zinc-200"
                   >
                     <Plus className="h-3.5 w-3.5 mr-1" /> Add variable
                   </Button>
@@ -307,7 +307,7 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
                     size="sm"
                     onClick={handleSave}
                     disabled={!dirty || updateEnvironment.isPending}
-                    className="h-7 text-xs bg-blue-600 hover:bg-blue-700"
+                    className="h-7 text-[12px] bg-brand hover:bg-brand-hover"
                   >
                     {updateEnvironment.isPending ? "Saving…" : "Save changes"}
                   </Button>

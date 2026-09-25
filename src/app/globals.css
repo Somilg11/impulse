@@ -3,11 +3,91 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  /* Motion.
+   *
+   * One curve for things entering and settling, one for things moving under a
+   * finger. Neither overshoots - iOS animation decelerates into place rather
+   * than bouncing, and the absence of a bounce is what reads as considered. */
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-slow: 320ms;
+}
+
+/* ---------------------------------------------------------------------------
+ * Application chrome
+ *
+ * The workspace is a tool surface, not a document: it is always dark, dense, and
+ * independent of the light/dark theme used by the marketing and docs pages. These
+ * tokens name the surfaces so components stop hardcoding hex values - there were
+ * 253 raw hex literals across 29 files before this existed, which made any
+ * consistent change to the palette impossible.
+ *
+ * Tailwind v4 generates utilities from these automatically, so
+ * `--color-surface` gives `bg-surface`, `border-surface`, `text-surface`.
+ * --------------------------------------------------------------------------- */
+@theme {
+  /* Surfaces, darkest to lightest.
+   *
+   * Near-neutral greys rather than the blue-tinted slate this started with.
+   * A tool you stare at for hours should not push a hue at you, and a neutral
+   * chrome lets the method and status colours be the only saturated things on
+   * screen - which is what makes them readable at a glance. */
+  --color-canvas: #0c0d10;        /* app background, behind everything */
+  --color-ink: #000000;           /* marketing surface - true black, like macOS */
+  --color-ink-raised: #0a0a0c;    /* panels on the marketing surface */
+  --color-surface: #111216;       /* panels, sidebar, headers */
+  --color-surface-raised: #17181d; /* cards, popovers, inputs on a panel */
+  --color-surface-hover: #1e2026;  /* hover state for rows and buttons */
+
+  /* Lines.
+   *
+   * Translucent white rather than an opaque grey, so a divider reads correctly
+   * whichever surface sits beneath it instead of being tuned for one of them. */
+  --color-line: rgba(255, 255, 255, 0.07);
+  --color-line-strong: rgba(255, 255, 255, 0.13);
+
+  /* Brand - Apple's system blue for dark interfaces. Chosen deliberately: the
+   * product is a developer tool that should feel native on macOS, and this is
+   * the exact hue those users see in every system control. */
+  --color-brand: #0a84ff;
+  --color-brand-hover: #3395ff;
+  --color-brand-subtle: #0d2544;  /* tinted background for active rows */
+
+  /* Hairlines. Apple's chrome is built from translucent white rules rather than
+   * opaque grey lines, so they sit correctly on any surface beneath them. */
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --color-hairline-strong: rgba(255, 255, 255, 0.14);
+
+  /* HTTP method colours, shared by the sidebar, tab bar, and method selector
+   * so a GET is the same green everywhere. */
+  --color-method-get: #34d399;
+  --color-method-post: #fbbf24;
+  --color-method-put: #60a5fa;
+  --color-method-patch: #c084fc;
+  --color-method-delete: #f87171;
+
+  /* Response status colours */
+  --color-status-ok: #34d399;
+  --color-status-redirect: #fbbf24;
+  --color-status-client-error: #fb923c;
+  --color-status-server-error: #f87171;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* San Francisco first, so on macOS and iOS the interface is set in the same
+   * face as the operating system - the single largest contributor to an app
+   * reading as native rather than as a web page. Geist is the fallback
+   * everywhere else, and was chosen originally because it is SF-adjacent. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    var(--font-geist-sans), "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo,
+    var(--font-geist-mono), "Liberation Mono", monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -112,11 +192,97 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
+
+/* Entrance motion for the marketing surface.
+ *
+ * One easing curve, used everywhere: a decelerating cubic that settles rather
+ * than bounces. Movement is 12px - enough to read as motion, small enough not
+ * to feel like a slide deck. Disabled entirely under reduced-motion. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+}
+
+@layer base {
+  /* Match the rendering macOS applies to native controls. Without this, text at
+   * these sizes looks noticeably heavier in a browser than in a native window. */
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Figures in dense readouts - status codes, timings, sizes - must not reflow
+   * as their values change. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Overlay scrollbars, the way macOS draws them: no track, translucent thumb. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.26);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  /* Controls compress very slightly under a press, as they do on iOS. It should
+   * be barely perceptible - it reads as responsiveness, not as an animation. */
+  .press {
+    transition: transform var(--duration-fast) var(--ease-ios);
+  }
+
+  .press:active {
+    transform: scale(0.97);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    letter-spacing: -0.006em; /* SF is set marginally tight in system UI */
   }
 }

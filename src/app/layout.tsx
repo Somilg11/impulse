@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/components/query-provider";
 import { HotkeysProviders } from "@/components/hot-key-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -129,6 +130,8 @@ export default function RootLayout({
             <HotkeysProviders>
               {children}
             </HotkeysProviders>
+            {/* Mounted once, at the root: every toast in the app renders here. */}
+            <Toaster />
           </ThemeProvider>
         </QueryProvider>
       </body>

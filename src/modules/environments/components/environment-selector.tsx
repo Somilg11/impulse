@@ -15,6 +15,7 @@ import { useWorkspaceStore } from "@/modules/layout/store";
 import { useEnvironments } from "../hooks/environments";
 import { useEnvironmentStore } from "../store";
 import EnvironmentManager from "./environment-manager";
+import { useUiStore } from "@/modules/layout/store/ui";
 
 /**
  * Picks which environment supplies `{{variables}}` for outgoing requests.
@@ -26,7 +27,9 @@ const EnvironmentSelector = () => {
   const activeByWorkspace = useEnvironmentStore((s) => s.activeByWorkspace);
   const setActiveEnvironment = useEnvironmentStore((s) => s.setActiveEnvironment);
 
-  const [managerOpen, setManagerOpen] = useState(false);
+  // Shared, so the command palette can open the same dialog.
+  const managerOpen = useUiStore((s) => s.environmentsOpen);
+  const setManagerOpen = useUiStore((s) => s.setEnvironmentsOpen);
 
   const activeId = workspaceId ? activeByWorkspace[workspaceId] ?? null : null;
   const active = environments?.find((e) => e.id === activeId) ?? null;
@@ -38,7 +41,7 @@ const EnvironmentSelector = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
-            className="flex items-center gap-2 h-8 px-2.5 rounded-lg border border-[#1e2330] bg-[#161b26] text-xs text-zinc-300 hover:bg-[#1e2330] transition-colors max-w-[190px]"
+            className="flex items-center gap-2 h-8 px-2.5 rounded-lg border border-line bg-surface-raised text-[12px] text-zinc-300 hover:bg-line transition-colors duration-[--duration-fast] ease-[--ease-ios] max-w-[190px]"
             title="Active environment"
           >
             <Layers className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
@@ -50,7 +53,7 @@ const EnvironmentSelector = () => {
 
         <DropdownMenuContent
           align="end"
-          className="w-60 bg-[#161b26] border-[#1e2330] text-zinc-300"
+          className="w-60 rounded-xl border-line bg-surface-raised text-zinc-300"
         >
           <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-zinc-500">
             Environment
@@ -58,32 +61,32 @@ const EnvironmentSelector = () => {
 
           <DropdownMenuItem
             onClick={() => setActiveEnvironment(workspaceId, null)}
-            className="text-xs focus:bg-[#1e2330] cursor-pointer"
+            className="text-[12px] focus:bg-line cursor-pointer"
           >
             <span className="flex-1">No environment</span>
-            {!activeId && <Check className="h-3.5 w-3.5 text-blue-400" />}
+            {!activeId && <Check className="h-3.5 w-3.5 text-brand" />}
           </DropdownMenuItem>
 
-          {environments?.length ? <DropdownMenuSeparator className="bg-[#1e2330]" /> : null}
+          {environments?.length ? <DropdownMenuSeparator className="bg-line" /> : null}
 
           {environments?.map((environment) => (
             <DropdownMenuItem
               key={environment.id}
               onClick={() => setActiveEnvironment(workspaceId, environment.id)}
-              className="text-xs focus:bg-[#1e2330] cursor-pointer"
+              className="text-[12px] focus:bg-line cursor-pointer"
             >
               <span className="flex-1 truncate">{environment.name}</span>
               {activeId === environment.id && (
-                <Check className="h-3.5 w-3.5 text-blue-400" />
+                <Check className="h-3.5 w-3.5 text-brand" />
               )}
             </DropdownMenuItem>
           ))}
 
-          <DropdownMenuSeparator className="bg-[#1e2330]" />
+          <DropdownMenuSeparator className="bg-line" />
 
           <DropdownMenuItem
             onClick={() => setManagerOpen(true)}
-            className="text-xs focus:bg-[#1e2330] cursor-pointer"
+            className="text-[12px] focus:bg-line cursor-pointer"
           >
             {environments?.length ? (
               <>

@@ -13,7 +13,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Plus, Trash2, Check, X } from "lucide-react";
+import { Plus, Trash2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const keyValueSchema = z.object({
@@ -159,7 +159,7 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
         <div className="space-y-4">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-zinc-400">
+            <h3 className="text-[13px] font-medium text-zinc-400">
               Query Parameters
             </h3>
             <div className="flex items-center gap-2">
@@ -168,23 +168,33 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={addNewRow}
-                className="h-8 w-8 p-0 hover:bg-[#1e2330]"
+                className="h-8 w-8 p-0 hover:bg-line"
               >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          {/* Form Fields */}
-          <div className="space-y-2">
+          {/* Form Fields - one framed table, so rows read as a list rather than
+              floating text on the page background. */}
+          <div className="overflow-hidden rounded-[10px] border border-line bg-surface-raised">
+            <div className="grid grid-cols-12 items-center gap-2 border-b border-line bg-white/[0.02] px-1 py-1.5">
+              <span className="col-span-5 px-1.5 text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-600 md:col-span-4">
+                Key
+              </span>
+              <span className="col-span-5 px-1.5 text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-600 md:col-span-4">
+                Value
+              </span>
+            </div>
             {fields.map((field, index) => (
               <div
                 key={field.id}
                 className={cn(
-                  "grid grid-cols-12 gap-2 md:gap-3 p-2 md:p-3 rounded-lg border transition-all",
-                  form.watch(`items.${index}.enabled`)
-                    ? "bg-[#161b26] border-[#1e2330]"
-                    : "bg-[#161b26]/50 border-[#1e2330]/50 opacity-60"
+                  // A table row with a divider, not a card. Key/value pairs are a list
+                  // you scan down; boxing each one makes six headers look like six
+                  // separate sections.
+                  "grid grid-cols-12 items-center gap-2 border-b border-line px-1 transition-colors duration-[--duration-fast] ease-[--ease-ios] last:border-b-0 hover:bg-white/[0.02]",
+                  !form.watch(`items.${index}.enabled`) && "opacity-45"
                 )}
               >
                 {/* Key Input */}
@@ -198,11 +208,11 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
                           <Input
                             {...field}
                             placeholder={placeholder.key}
-                            className="bg-transparent border-0 focus:ring-0 focus:border-0 text-sm placeholder:text-zinc-500"
+                            className="h-8 rounded-none border-0 bg-transparent px-1.5 font-mono text-[12.5px] text-zinc-200 placeholder:font-sans placeholder:text-zinc-600 focus-visible:border-0"
                             disabled={!form.watch(`items.${index}.enabled`)}
                           />
                         </FormControl>
-                        <FormMessage className="text-xs" />
+                        <FormMessage className="text-[12px]" />
                       </FormItem>
                     )}
                   />
@@ -219,11 +229,11 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
                           <Input
                             {...field}
                             placeholder={placeholder.value}
-                            className="bg-transparent border-0 focus:ring-0 focus:border-0 text-sm placeholder:text-zinc-500"
+                            className="h-8 rounded-none border-0 bg-transparent px-1.5 font-mono text-[12.5px] text-zinc-200 placeholder:font-sans placeholder:text-zinc-600 focus-visible:border-0"
                             disabled={!form.watch(`items.${index}.enabled`)}
                           />
                         </FormControl>
-                        <FormMessage className="text-xs" />
+                        <FormMessage className="text-[12px]" />
                       </FormItem>
                     )}
                   />
@@ -237,24 +247,29 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
                       <FormItem>
                         <FormControl>
                           <div className="flex items-center justify-center">
-                            <Button
+                            {/* A row is either included in the request or it is
+                                not - a checkbox, not a green confirm button.
+                                Red for "off" read as an error rather than a
+                                state, so unchecked is simply empty. */}
+                            <button
                               type="button"
-                              variant="ghost"
-                              size="sm"
+                              role="checkbox"
+                              aria-checked={Boolean(checkboxField.value)}
+                              aria-label={
+                                checkboxField.value ? "Included in request" : "Excluded from request"
+                              }
                               onClick={() => toggleEnabled(index)}
                               className={cn(
-                                "h-5 w-5 p-0 rounded-sm border-2 transition-colors",
+                                "flex h-[15px] w-[15px] items-center justify-center rounded-[5px] border transition-colors duration-[--duration-fast] ease-[--ease-ios]",
                                 checkboxField.value
-                                  ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
-                                  : "border-red-500 text-red-500 hover:border-red-400"
+                                  ? "border-brand bg-brand text-white"
+                                  : "border-line-strong bg-transparent hover:border-zinc-500"
                               )}
                             >
-                              {checkboxField.value ? (
-                                <Check className="h-3 w-3" />
-                              ) : (
-                                <X className="h-3 w-3" />
+                              {checkboxField.value && (
+                                <Check className="h-2.5 w-2.5" strokeWidth={3} />
                               )}
-                            </Button>
+                            </button>
                           </div>
                         </FormControl>
                       </FormItem>
@@ -270,7 +285,7 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
                     onClick={() => removeRow(index)}
                     disabled={fields.length <= 1}
                     className={cn(
-                      "h-5 w-5 p-0 transition-colors",
+                      "h-5 w-5 p-0 transition-colors duration-[--duration-fast] ease-[--ease-ios]",
                       fields.length <= 1
                         ? "text-zinc-600 cursor-not-allowed"
                         : "text-red-400 hover:text-red-300 hover:bg-red-900/20"
@@ -285,7 +300,7 @@ const KeyValueFormEditor: React.FC<KeyValueFormEditorProps> = ({
 
           {/* Autosave enabled — changes are saved automatically */}
           <div className="flex justify-end pt-4">
-            <span className="text-xs text-zinc-500">
+            <span className="text-[12px] text-zinc-500">
               Changes saved automatically
             </span>
           </div>

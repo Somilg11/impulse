@@ -24,6 +24,8 @@ import {
 import { RotateCcw, Copy, Check, Code, AlignLeft, FileText, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useGenerateJsonBody } from '@/modules/ai/hooks/ai-suggestion'
+import { validateGeneratedJson } from '@/lib/ai-agents'
+import { toast } from 'sonner'
 
 import { useWorkspaceStore } from '@/modules/layout/store'
 import { useRequestPlaygroundStore } from '../store/useRequestStore'
@@ -36,6 +38,7 @@ import {
   type BodyType,
 } from '@/lib/body-types'
 import KeyValueFormEditor from './key-value-form'
+import { copyToClipboard } from '@/lib/clipboard'
 
 
 
@@ -95,7 +98,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
   const handleCopy = async () => {
     if (bodyValue) {
       try {
-        await navigator.clipboard.writeText(bodyValue)
+        await copyToClipboard(bodyValue, "Body copied")
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
       } catch (err) {
@@ -131,11 +134,25 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
 
       if (result?.jsonBody) {
         form.setValue('body', JSON.stringify(result.jsonBody, null, 2));
+
+        // A model can return JSON that parses but is not a usable request body
+        // - empty, or full of nulls. Say so now rather than letting the user
+        // discover it from a 400 later.
+        const check = validateGeneratedJson(
+          result.jsonBody as Record<string, unknown>
+        );
+        if (!check.isValid) {
+          toast.warning(check.errors[0] ?? 'The generated body looks incomplete');
+        } else if (check.suggestions.length) {
+          toast.info(check.suggestions[0]);
+        }
       }
       setShowGenerateDialog(false);
       setPrompt('');
     } catch (error) {
-      console.error('Failed to generate JSON body:', error);
+      toast.error(
+        error instanceof Error ? error.message : 'Could not generate a body'
+      );
     }
   }
 
@@ -159,26 +176,25 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
   return (
     <div className={cn("w-full", className)}>
       <Form {...form}>
-        <div className="border border-[#1e2330] rounded-lg overflow-hidden bg-[#0e1117]">
+        <div className="border border-line rounded-lg overflow-hidden bg-canvas">
           {/* Header */}
-          <div className="bg-[#0e1117] border-b border-[#1e2330] px-3 py-2.5 flex items-center justify-between">
+          <div className="bg-canvas border-b border-line px-3 py-2.5 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <h3 className="text-sm font-medium text-zinc-200">Raw Request Body</h3>
-              <div className="flex items-center gap-2 text-xs text-zinc-400">
-                <span>Type</span>
-                <Select
+              <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-zinc-600">Body</span>
+              <div className="flex items-center gap-2 text-[12px] text-zinc-400">
+                                <Select
                   value={bodyType}
                   onValueChange={(next) => onBodyTypeChange?.(next as BodyType)}
                 >
-                  <SelectTrigger className="w-[180px] h-7 bg-[#1e2330] border-[#2a3040] text-xs">
-                    <SelectValue />
+                  <SelectTrigger className="h-7 w-[132px] text-[12px]">
+                    {BODY_TYPES.find((o) => o.value === bodyType)?.label ?? bodyType}
                   </SelectTrigger>
-                  <SelectContent className="bg-[#161b26] border-[#1e2330]">
+                  <SelectContent className="bg-surface-raised border-line">
                     {BODY_TYPES.map((option) => (
                       <SelectItem
                         key={option.value}
                         value={option.value}
-                        className="text-xs hover:bg-[#1e2330] focus:bg-[#1e2330]"
+                        className="text-[12px] hover:bg-line focus:bg-line"
                       >
                         <div className="flex flex-col items-start">
                           <span>{option.label}</span>
@@ -199,7 +215,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                   size="sm"
                   onClick={handleGenerateClick}
                   disabled={isPending}
-                  className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-[#1e2330]"
+                  className="h-7 px-2 text-[12px] text-zinc-400 hover:text-zinc-200 hover:bg-line"
                   title="Generate JSON Body"
                 >
                   <Sparkles className={cn('h-3 w-3', isPending ? 'animate-spin text-zinc-400' : 'text-green-400')} />
@@ -211,7 +227,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={handleFormat}
-                  className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-[#1e2330]"
+                  className="h-7 px-2 text-[12px] text-zinc-400 hover:text-zinc-200 hover:bg-line"
                   title="Format JSON"
                 >
                   <AlignLeft className="h-3 w-3" />
@@ -221,7 +237,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleCopy}
-                className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-[#1e2330]"
+                className="h-7 px-2 text-[12px] text-zinc-400 hover:text-zinc-200 hover:bg-line"
                 title="Copy content"
               >
                 {copied ? <Check className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3" />}
@@ -231,7 +247,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleReset}
-                className="h-7 px-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-[#1e2330]"
+                className="h-7 px-2 text-[12px] text-zinc-400 hover:text-zinc-200 hover:bg-line"
                 title="Clear content"
               >
                 <RotateCcw className="h-3 w-3" />
@@ -242,7 +258,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
           {/* Editor - shape depends on the body type */}
           {bodyType === 'NONE' ? (
             <div className="h-40 flex items-center justify-center">
-              <p className="text-xs text-zinc-600 italic">
+              <p className="text-[12px] text-zinc-600 italic">
                 This request will be sent without a body.
               </p>
             </div>
@@ -310,15 +326,15 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
           )}
 
           {/* Footer */}
-          <div className="bg-[#0e1117] border-t border-[#1e2330] px-3 py-2.5 flex items-center justify-between">
-            <div className="text-xs text-zinc-400">
+          <div className="bg-canvas border-t border-line px-3 py-2.5 flex items-center justify-between">
+            <div className="text-[12px] text-zinc-400">
               Lines: {bodyValue?.split('\n').length || 0} | 
               Characters: {bodyValue?.length || 0}
             </div>
             <Button
               type="button"
               size="sm"
-              className="bg-blue-400 hover:bg-blue-500 text-white h-7"
+              className="bg-brand hover:bg-brand text-white h-7"
               onClick={() => form.handleSubmit(onSubmit)()}
             >
               Update Body
@@ -358,7 +374,7 @@ const BodyEditor: React.FC<BodyEditorProps> = ({
               type="submit"
               onClick={() => onGenerateBody(prompt)}
               disabled={!prompt.trim() || isPending}
-              className="bg-blue-500 hover:bg-blue-600"
+              className="bg-brand hover:bg-brand"
             >
               {isPending ? 'Generating...' : 'Generate'}
             </Button>

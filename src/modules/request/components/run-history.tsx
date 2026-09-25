@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import type { AssertionResult } from "@/lib/assertions";
 import { useRequestRuns } from "../hooks/request";
+import { formatBytes, statusText } from "@/lib/http-display";
 
 interface Props {
   requestId?: string;
@@ -27,22 +28,6 @@ export type HistoryRun = {
   createdAt: Date | string;
 };
 
-function statusColor(status: number): string {
-  if (status >= 200 && status < 300) return "text-green-400";
-  if (status >= 300 && status < 400) return "text-yellow-400";
-  if (status >= 400 && status < 500) return "text-orange-400";
-  if (status >= 500) return "text-red-400";
-  return "text-zinc-500";
-}
-
-function formatBytes(bytes?: number | null): string {
-  if (!bytes) return "—";
-  const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
-}
-
 /**
  * Past runs of a saved request.
  *
@@ -56,7 +41,7 @@ const RunHistory = ({ requestId, onSelect }: Props) => {
   if (!requestId) {
     return (
       <div className="p-6 text-center">
-        <p className="text-xs text-zinc-500">
+        <p className="text-[12px] text-zinc-500">
           Save this request to a collection to start recording history.
         </p>
       </div>
@@ -64,20 +49,20 @@ const RunHistory = ({ requestId, onSelect }: Props) => {
   }
 
   if (isLoading) {
-    return <div className="p-6 text-center text-xs text-zinc-500">Loading history…</div>;
+    return <div className="p-6 text-center text-[12px] text-zinc-500">Loading history…</div>;
   }
 
   if (!runs?.length) {
     return (
       <div className="p-6 text-center">
-        <p className="text-xs text-zinc-500">No runs recorded yet.</p>
+        <p className="text-[12px] text-zinc-500">No runs recorded yet.</p>
       </div>
     );
   }
 
   return (
-    <ScrollArea className="h-96">
-      <div className="divide-y divide-[#1e2330]">
+    <ScrollArea className="h-full">
+      <div className="divide-y divide-line">
         {runs.map((run) => {
           const results = Array.isArray(run.testResults)
             ? (run.testResults as unknown as AssertionResult[])
@@ -88,9 +73,9 @@ const RunHistory = ({ requestId, onSelect }: Props) => {
             <button
               key={run.id}
               onClick={() => onSelect?.(run as HistoryRun)}
-              className="w-full text-left px-4 py-3 hover:bg-[#1e2330]/40 transition-colors flex items-center gap-3"
+              className="w-full text-left px-4 py-3 hover:bg-line/40 transition-colors duration-[--duration-fast] ease-[--ease-ios] flex items-center gap-3"
             >
-              <span className={`text-sm font-bold w-10 shrink-0 ${statusColor(run.status)}`}>
+              <span className={`text-[13px] font-bold w-10 shrink-0 ${statusText(run.status)}`}>
                 {run.status || "—"}
               </span>
 

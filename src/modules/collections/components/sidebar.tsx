@@ -1,8 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react'
-import { useCollections } from '../hooks/collections'
+import { useCollections, useExportWorkspace } from '../hooks/collections'
+import { useUiStore } from '@/modules/layout/store/ui'
 import { MEMBER_ROLE } from '@prisma/client';
-import { Archive, Clock, Code, ExternalLink, HelpCircle, Loader, Plus, Search, Share2, Upload } from 'lucide-react';
+import { Download, Loader, Plus, Search, Upload } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import CreateCollection from './create-collection';
 import EmptyCollections from './empty-collections';
@@ -34,62 +41,113 @@ interface Props {
 }
 
 const TabbedSidebar = ({ currentWorkspace }: Props) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    // These two dialogs are also reachable from the command palette, so their
+    // open state is shared rather than local.
+    const isModalOpen = useUiStore((s) => s.createCollectionOpen);
+    const setIsModalOpen = useUiStore((s) => s.setCreateCollectionOpen);
+    const isImportModalOpen = useUiStore((s) => s.importOpen);
+    const setIsImportModalOpen = useUiStore((s) => s.setImportOpen);
+
     const [searchQuery, setSearchQuery] = useState('');
 
     const { data: collections, isLoading, isError } = useCollections(currentWorkspace?.id);
+    const exportWorkspace = useExportWorkspace(currentWorkspace?.id);
+
+    // The server returns a flat list; the tree is assembled here so nesting costs
+    // one query instead of a recursive include of unknown depth. Rendering the
+    // flat list directly would show every folder twice - once nested under its
+    // parent and once at the root.
+    const all = collections ?? [];
+    const childrenOf = (parentId: string) => all.filter((c) => c.parentId === parentId);
+
+    const query = searchQuery.trim().toLowerCase();
+    const roots = all.filter((c) => !c.parentId);
+
+    // While searching, match at any depth and show the hits as a flat list -
+    // keeping the hierarchy would hide matches inside collapsed folders.
+    const visible = query
+        ? all.filter((c) => c.name.toLowerCase().includes(query))
+        : roots;
 
     if (isLoading) return (
-        <div className="flex-1 flex items-center justify-center bg-[#0e1117]">
+        <div className="flex-1 flex items-center justify-center bg-canvas">
             <Loader className="w-5 h-5 text-zinc-500 animate-spin" />
         </div>
     );
 
     return (
-        <div className="flex flex-col h-full bg-[#0e1117] border-r border-[#1e2330] overflow-hidden">
+        <div className="flex flex-col h-full bg-canvas border-r border-line overflow-hidden">
             {/* Top actions: + New and Import */}
-            <div className="flex items-center gap-2 px-3 py-2.5 border-b border-[#1e2330]">
+            <div className="flex items-center gap-2 px-3 py-2.5 border-b border-line">
                 <button 
                     onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-1 text-xs text-zinc-300 hover:text-white transition-colors font-medium"
+                    className="flex items-center gap-1 text-[12px] text-zinc-300 hover:text-white transition-colors duration-[--duration-fast] ease-[--ease-ios] font-medium"
                 >
                     <Plus className="w-3.5 h-3.5" />
                     New
                 </button>
-                <button 
+                <button
                     onClick={() => setIsImportModalOpen(true)}
-                    className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-300 transition-colors font-medium"
+                    className="flex items-center gap-1 text-[12px] font-medium text-zinc-400 transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:text-zinc-300"
                 >
                     <Upload className="w-3 h-3" />
                     Import
                 </button>
+
+                {/* Export every collection at once - previously only reachable
+                    one collection at a time. */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <button
+                            disabled={!collections?.length}
+                            className="ml-auto flex items-center gap-1 text-[12px] font-medium text-zinc-400 transition-colors duration-[--duration-fast] ease-[--ease-ios] hover:text-zinc-300 disabled:opacity-40"
+                        >
+                            <Download className="w-3 h-3" />
+                            Export
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-52">
+                        <DropdownMenuItem onClick={() => exportWorkspace("postman")}>
+                            Export all &middot; Postman v2.1
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => exportWorkspace("impulse")}>
+                            Export all &middot; Impulse JSON
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             {/* Search */}
-            <div className="px-3 py-2 border-b border-[#1e2330]">
+            <div className="px-3 py-2 border-b border-line">
                 <div className="relative">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search..."
-                        className="w-full bg-[#161b26] border border-[#1e2330] rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-[#2a3040] transition-colors"
+                        placeholder="Search collections"
+                        className="h-7 w-full rounded-lg border border-line bg-surface-raised pl-8 pr-3 text-[12.5px] text-zinc-200 placeholder-zinc-600 outline-none transition-colors duration-[--duration-fast] ease-[--ease-ios] focus:border-line-strong"
                     />
                 </div>
             </div>
 
             {/* Collections list */}
             <div className="flex-1 overflow-y-auto px-1 py-1">
-                {collections && collections.length > 0 ? (
-                    collections
-                        .filter(c => !searchQuery || c.name.toLowerCase().includes(searchQuery.toLowerCase()))
-                        .map((collection) => (
-                            <CollectionFolder key={collection.id} collection={collection} />
-                        ))
+                {all.length === 0 ? (
+                    <EmptyCollections onImport={() => setIsImportModalOpen(true)} onCreate={() => setIsModalOpen(true)} />
+                ) : visible.length === 0 ? (
+                    <p className="px-3 py-6 text-center text-[12px] text-zinc-600">
+                        Nothing matches &ldquo;{searchQuery.trim()}&rdquo;.
+                    </p>
                 ) : (
-                    <EmptyCollections onImport={() => setIsImportModalOpen(true)} />
+                    visible.map((collection) => (
+                        <CollectionFolder
+                            key={collection.id}
+                            collection={collection}
+                            childrenOf={query ? undefined : childrenOf}
+                            allCollections={all}
+                        />
+                    ))
                 )}
             </div>
 

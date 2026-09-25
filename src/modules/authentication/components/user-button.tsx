@@ -134,7 +134,7 @@ export default function UserButton({
           {showBadge && (
             <Badge
               variant={badgeVariant}
-              className="absolute -bottom-1 -right-1 h-5 px-1 text-xs"
+              className="absolute -bottom-1 -right-1 h-5 px-1 text-[12px]"
             >
               {badgeText}
             </Badge>
@@ -151,16 +151,16 @@ export default function UserButton({
                   src={user.image || ""}
                   alt={user.name || "User avatar"}
                 />
-                <AvatarFallback className="bg-primary text-primary-foreground font-medium text-lg">
+                <AvatarFallback className="bg-primary text-primary-foreground font-medium text-[17px]">
                   {getUserInitials(user.name, user.email)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">
+                <p className="text-[13px] font-medium leading-none">
                   {user.name || "User"}
                 </p>
                 {showEmail && user.email && (
-                  <p className="text-xs leading-none text-muted-foreground">
+                  <p className="text-[12px] leading-none text-muted-foreground">
                     {user.email}
                   </p>
                 )}
@@ -172,7 +172,7 @@ export default function UserButton({
               </div>
             </div>
             {showMemberSince && (
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[12px] text-muted-foreground">
                 Member since {formatMemberSince(user.createdAt)}
               </p>
             )}
