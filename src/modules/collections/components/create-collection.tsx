@@ -11,31 +11,42 @@ const CreateCollection = ({
     workspaceId,
     isModalOpen,
     setIsModalOpen,
+    parentId = null,
+    parentName,
 }: {
     workspaceId: string;
     isModalOpen: boolean;
     setIsModalOpen: (open: boolean) => void;
+    /** When set, the new collection is created as a folder inside this one. */
+    parentId?: string | null;
+    parentName?: string;
 }) => {
     const [name, setName] = useState("");
-    const { mutateAsync, isPending } = useCreateCollection(workspaceId, name);
+    const { mutateAsync, isPending } = useCreateCollection(workspaceId, name, parentId);
 
     const handleSubmit = async () => {
         if (!name.trim()) return;
         try {
             await mutateAsync();
-            toast.success("Collection created successfully");
+            toast.success(parentId ? "Folder created" : "Collection created");
             setName("");
             setIsModalOpen(false);
         } catch (err) {
-            toast.error("Failed to create Collection");
-            console.error("Failed to create Collection:", err);
+            toast.error(
+                err instanceof Error ? err.message : "Failed to create collection"
+            );
+            console.error("Failed to create collection:", err);
         }
     };
 
     return (
         <Modal
-            title="Add New Collection"
-            description="Create a new Collection to organize your requests"
+            title={parentId ? "New Folder" : "Add New Collection"}
+            description={
+                parentId
+                    ? `Create a folder inside "${parentName ?? "this collection"}"`
+                    : "Create a new Collection to organize your requests"
+            }
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             onSubmit={handleSubmit}

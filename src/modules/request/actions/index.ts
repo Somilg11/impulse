@@ -157,3 +157,68 @@ export const getRequestRuns = async (requestId: string, take = 20) => {
     take,
   });
 };
+
+/**
+ * Every request in a collection and its subfolders, in run order.
+ *
+ * Used by the collection runner. Requests carry their auth, body type, and
+ * assertions so the runner composes them exactly as a manual send would.
+ */
+export const getRunnableRequests = async (collectionId: string) => {
+  await assertCollectionAccess(collectionId);
+
+  const collect = async (
+    id: string,
+    prefix: string
+  ): Promise<
+    {
+      id: string;
+      label: string;
+      name: string;
+      method: string;
+      url: string;
+      headers: unknown;
+      parameters: unknown;
+      body: unknown;
+      bodyType: string;
+      auth: unknown;
+      tests: unknown;
+    }[]
+  > => {
+    const [requests, folders] = await Promise.all([
+      db.request.findMany({
+        where: { collectionId: id },
+        orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+      }),
+      db.collection.findMany({
+        where: { parentId: id },
+        orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+        select: { id: true, name: true },
+      }),
+    ]);
+
+    const own = requests.map((request) => ({
+      id: request.id,
+      label: prefix ? `${prefix} / ${request.name}` : request.name,
+      name: request.name,
+      method: request.method as string,
+      url: request.url,
+      headers: request.headers,
+      parameters: request.parameters,
+      body: request.body,
+      bodyType: request.bodyType as string,
+      auth: request.auth,
+      tests: request.tests,
+    }));
+
+    const nested = await Promise.all(
+      folders.map((folder) =>
+        collect(folder.id, prefix ? `${prefix} / ${folder.name}` : folder.name)
+      )
+    );
+
+    return [...own, ...nested.flat()];
+  };
+
+  return await collect(collectionId, "");
+};

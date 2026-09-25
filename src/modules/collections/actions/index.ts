@@ -10,13 +10,27 @@ import {
     type ExportableCollection,
 } from "@/lib/postman";
 
-export const createCollection = async (workspaceId: string, name: string) => {
+export const createCollection = async (
+    workspaceId: string,
+    name: string,
+    parentId?: string | null
+) => {
     await assertWorkspaceMember(workspaceId, MEMBER_ROLE.EDITOR);
+
+    // A folder must live in the same workspace as its parent, otherwise a
+    // caller could graft a folder onto another team's tree.
+    if (parentId) {
+        const parent = await assertCollectionAccess(parentId, MEMBER_ROLE.EDITOR);
+        if (parent.workspaceId !== workspaceId) {
+            throw new Error("Parent collection belongs to a different workspace");
+        }
+    }
 
     return await db.collection.create({
         data: {
             name,
-            workspace: { connect: { id: workspaceId } },
+            workspaceId,
+            parentId: parentId ?? null,
         },
     });
 };
@@ -24,9 +38,55 @@ export const createCollection = async (workspaceId: string, name: string) => {
 export const getCollections = async (workspaceId: string) => {
     await assertWorkspaceMember(workspaceId);
 
+    // Flat list; the client assembles the tree from parentId. One query beats a
+    // recursive include of unknown depth.
     return await db.collection.findMany({
         where: { workspaceId },
-        orderBy: { createdAt: "asc" },
+        orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+    });
+};
+
+/**
+ * Re-parent a folder.
+ *
+ * Refuses to move a collection into its own subtree - that would detach the
+ * whole branch from the workspace and leave rows only reachable by id.
+ */
+export const moveCollection = async (
+    collectionId: string,
+    parentId: string | null
+) => {
+    const { workspaceId } = await assertCollectionAccess(collectionId, MEMBER_ROLE.EDITOR);
+
+    if (parentId) {
+        if (parentId === collectionId) throw new Error("A folder cannot contain itself");
+
+        const target = await assertCollectionAccess(parentId, MEMBER_ROLE.EDITOR);
+        if (target.workspaceId !== workspaceId) {
+            throw new Error("Cannot move a collection between workspaces");
+        }
+
+        // Walk up from the destination; if we meet the moving node, it is a cycle.
+        let cursor: string | null = parentId;
+        const seen = new Set<string>();
+        while (cursor) {
+            if (cursor === collectionId) {
+                throw new Error("Cannot move a folder into its own subtree");
+            }
+            if (seen.has(cursor)) break; // defensive: pre-existing cycle
+            seen.add(cursor);
+
+            const node: { parentId: string | null } | null = await db.collection.findUnique({
+                where: { id: cursor },
+                select: { parentId: true },
+            });
+            cursor = node?.parentId ?? null;
+        }
+    }
+
+    return await db.collection.update({
+        where: { id: collectionId },
+        data: { parentId },
     });
 };
 
@@ -131,13 +191,17 @@ export const importCollections = async (workspaceId: string, data: unknown) => {
             const colData = raw as RawCollection;
             const collection = await db.collection.create({
                 data: {
-                    name: colData.name || colData.info?.name || "Imported Collection",
+                    name: await uniqueSiblingName(
+                        workspaceId,
+                        null,
+                        colData.name || colData.info?.name || "Imported Collection"
+                    ),
                     workspaceId,
                 },
             });
 
             const items = colData.item ?? colData.requests ?? [];
-            await processItems(collection.id, items);
+            await processItems(collection.id, items, workspaceId);
         }
 
         return { success: true };
@@ -148,15 +212,26 @@ export const importCollections = async (workspaceId: string, data: unknown) => {
 };
 
 /**
- * Postman items are either requests or folders. The schema has no nested folder
- * model, so folders are flattened into the parent collection and their name is
- * prefixed onto each request so the grouping is not lost entirely.
+ * Postman items are either requests or folders. Folders now become real child
+ * collections rather than being flattened with a name prefix, which is what the
+ * schema's self-relation was added for.
  */
-async function processItems(collectionId: string, items: unknown, prefix = "") {
+async function processItems(
+    collectionId: string,
+    items: unknown,
+    workspaceId: string,
+    depth = 0
+) {
     if (!Array.isArray(items)) return;
+
+    // Guard against a malicious or malformed export nesting without end.
+    const MAX_DEPTH = 12;
+
+    let position = 0;
 
     for (const raw of items) {
         const item = raw as RawItem;
+
         if (item?.request) {
             const req = item.request;
             const rawMethod = String(req.method ?? "GET").toUpperCase();
@@ -167,17 +242,36 @@ async function processItems(collectionId: string, items: unknown, prefix = "") {
             await db.request.create({
                 data: {
                     collectionId,
-                    name: prefix + (item.name || "Untitled Request"),
+                    name: item.name || "Untitled Request",
                     method,
                     url: extractUrl(req.url),
                     headers: JSON.stringify(normalizeKeyValues(req.header)),
                     parameters: JSON.stringify(extractQuery(req.url)),
                     body: req.body?.raw ?? undefined,
+                    position: position++,
                 },
             });
         } else if (Array.isArray(item?.item)) {
-            const folderName = item.name ? `${prefix}${item.name} / ` : prefix;
-            await processItems(collectionId, item.item, folderName);
+            if (depth >= MAX_DEPTH) {
+                // Too deep to keep nesting - fall back to flattening the rest
+                // into the current folder rather than dropping it.
+                await processItems(collectionId, item.item, workspaceId, depth);
+                continue;
+            }
+
+            const folder = await db.collection.create({
+                data: {
+                    name: await uniqueSiblingName(
+                        workspaceId,
+                        collectionId,
+                        item.name || "Folder"
+                    ),
+                    workspaceId,
+                    parentId: collectionId,
+                    position: position++,
+                },
+            });
+            await processItems(folder.id, item.item, workspaceId, depth + 1);
         } else if (item?.url && item?.method) {
             const rawMethod = String(item.method).toUpperCase();
             const method = SUPPORTED_METHODS.has(rawMethod)
@@ -187,24 +281,42 @@ async function processItems(collectionId: string, items: unknown, prefix = "") {
             await db.request.create({
                 data: {
                     collectionId,
-                    name: prefix + (item.name || "Untitled Request"),
+                    name: item.name || "Untitled Request",
                     method,
                     url: extractUrl(item.url),
                     headers: JSON.stringify(normalizeKeyValues(item.headers)),
                     parameters: JSON.stringify(normalizeKeyValues(item.parameters)),
                     body: item.body ?? undefined,
+                    position: position++,
                 },
             });
         }
     }
 }
 
+/** Sibling names carry a unique index, so collisions get a numeric suffix. */
+async function uniqueSiblingName(
+    workspaceId: string,
+    parentId: string | null,
+    desired: string
+): Promise<string> {
+    const siblings = await db.collection.findMany({
+        where: { workspaceId, parentId },
+        select: { name: true },
+    });
+    const taken = new Set(siblings.map((s) => s.name));
+
+    if (!taken.has(desired)) return desired;
+    let n = 2;
+    while (taken.has(`${desired} ${n}`)) n++;
+    return `${desired} ${n}`;
+}
 
 /**
  * Serialize a collection and everything under it for download.
  *
- * The tree is read iteratively rather than with a fixed `include` depth, so a
- * folder hierarchy of any depth exports completely.
+ * The tree is walked level by level rather than with a fixed Prisma `include`
+ * depth, so a folder hierarchy of any depth exports completely.
  */
 export const exportCollection = async (
     collectionId: string,
@@ -214,15 +326,11 @@ export const exportCollection = async (
 
     const root = await db.collection.findUnique({
         where: { id: collectionId },
-        select: { id: true, name: true, workspaceId: true },
+        select: { id: true, name: true },
     });
     if (!root) throw new Error("Collection not found");
 
-    // One query per level, rather than one per node.
-    const build = async (
-        id: string,
-        name: string
-    ): Promise<ExportableCollection> => {
+    const build = async (id: string, name: string): Promise<ExportableCollection> => {
         const [requests, children] = await Promise.all([
             db.request.findMany({
                 where: { collectionId: id },
@@ -260,7 +368,7 @@ export const exportCollection = async (
     };
 };
 
-/** Export every root collection in a workspace as one document per collection. */
+/** Export every root collection in a workspace, one document each. */
 export const exportWorkspace = async (
     workspaceId: string,
     format: ExportFormat = "postman"

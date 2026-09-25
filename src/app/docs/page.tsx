@@ -208,21 +208,39 @@ export default function DocsPage() {
             from the sidebar, then save requests into it. Each saved request keeps its
             method, URL, query parameters, headers, and body.
           </p>
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6">
-            <h4 className="text-white font-bold mb-2">Importing from Postman</h4>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-4">
+            <h4 className="text-white font-bold mb-2">Folders</h4>
             <p className="text-sm text-zinc-500 leading-relaxed">
-              Paste or upload a Postman v2.1 collection export and Impulse recreates the
-              requests with their methods, URLs, query parameters, headers, and bodies.
-              Postman folders are flattened into the collection, with the folder name kept
-              as a prefix on each request name.
+              Collections nest. Use <strong className="text-zinc-300">New Folder</strong> on
+              a collection&apos;s menu to group requests by resource or API version, as
+              deeply as you need.
+            </p>
+          </div>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-4">
+            <h4 className="text-white font-bold mb-2">Import and export</h4>
+            <p className="text-sm text-zinc-500 leading-relaxed">
+              Paste or upload a Postman v2.1 export and Impulse recreates the requests with
+              their methods, URLs, query parameters, headers, and bodies &mdash; and
+              recreates the folder structure as real nested collections.
+              Export goes the other way, either as Postman v2.1 or as a native format that
+              round-trips without losing body types and auth schemes.
+            </p>
+          </div>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6">
+            <h4 className="text-white font-bold mb-2">Running a whole collection</h4>
+            <p className="text-sm text-zinc-500 leading-relaxed">
+              <strong className="text-zinc-300">Run collection</strong> executes every
+              request in a collection and its folders in order, showing status, duration,
+              and assertion results per request. Requests run one after another, not in
+              parallel, because collections routinely depend on each other&apos;s side
+              effects.
             </p>
           </div>
           <div className="border border-dashed border-white/10 rounded-2xl p-6 mb-8">
             <h4 className="text-zinc-300 font-bold mb-2 text-sm">Not yet supported</h4>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Collections are a single flat level &mdash; nested folders, collection-level
-              variables, shared headers, and pre-request scripts are not implemented yet.
-              Exporting a collection back out is also still on the roadmap.
+              Collection-level shared headers and pre-request scripts are not implemented.
+              Variables live on environments rather than on collections.
             </p>
           </div>
         </>
@@ -253,12 +271,25 @@ export default function DocsPage() {
                 them. Disabled rows are left out of the request.
               </p>
             </div>
-            <div className="border-l-2 border-purple-500 pl-6">
-              <h4 className="text-white font-bold mb-1">JSON body editor</h4>
+            <div className="border-l-2 border-cyan-500 pl-6">
+              <h4 className="text-white font-bold mb-1">Authorization</h4>
               <p className="text-sm text-zinc-500 leading-relaxed">
-                Powered by Monaco &mdash; the editor behind VS Code &mdash; so you get
-                syntax highlighting, folding, and invalid-JSON detection, plus a format
-                button. If you do not set a{" "}
+                Bearer token, Basic auth, or an API key sent as a header or a query
+                parameter &mdash; instead of hand-writing an{" "}
+                <code className="bg-white/10 px-1 rounded text-blue-400 text-xs">
+                  Authorization
+                </code>{" "}
+                header. A header you set yourself on the Headers tab always wins over the
+                scheme.
+              </p>
+            </div>
+            <div className="border-l-2 border-purple-500 pl-6">
+              <h4 className="text-white font-bold mb-1">Body editor</h4>
+              <p className="text-sm text-zinc-500 leading-relaxed">
+                JSON, text, XML, GraphQL, form-data, or url-encoded. Text-shaped bodies use
+                Monaco &mdash; the editor behind VS Code &mdash; with syntax highlighting
+                for the chosen type, folding, and invalid-JSON detection; form-data and
+                url-encoded use a key/value grid instead. If you do not set a{" "}
                 <code className="bg-white/10 px-1 rounded text-blue-400 text-xs">
                   Content-Type
                 </code>{" "}
@@ -278,14 +309,117 @@ export default function DocsPage() {
               </p>
             </div>
           </div>
+          <div className="space-y-6 mb-8">
+            <div className="border-l-2 border-emerald-500 pl-6">
+              <h4 className="text-white font-bold mb-1">Paste a cURL command</h4>
+              <p className="text-sm text-zinc-500 leading-relaxed">
+                Paste any <code className="bg-white/10 px-1 rounded text-blue-400 text-xs">curl</code>{" "}
+                command into the URL bar and the whole request is filled in &mdash; method,
+                URL, headers, query params, body, and basic auth.
+              </p>
+            </div>
+            <div className="border-l-2 border-pink-500 pl-6">
+              <h4 className="text-white font-bold mb-1">Export as code</h4>
+              <p className="text-sm text-zinc-500 leading-relaxed">
+                The <strong className="text-zinc-300">&lt;/&gt;</strong> button renders the
+                current request as cURL, fetch, axios, Python requests, or Go. Snippets are
+                generated after variables and auth are resolved, so they reproduce exactly
+                what Send puts on the wire.
+              </p>
+            </div>
+            <div className="border-l-2 border-yellow-500 pl-6">
+              <h4 className="text-white font-bold mb-1">Tests</h4>
+              <p className="text-sm text-zinc-500 leading-relaxed">
+                Assert on status, response time, size, headers, raw body, or a JSON field
+                addressed by path such as{" "}
+                <code className="bg-white/10 px-1 rounded text-blue-400 text-xs">
+                  data.items[0].id
+                </code>
+                . Assertions are declarative &mdash; no JavaScript is executed &mdash; and
+                results are saved with each run.
+              </p>
+            </div>
+            <div className="border-l-2 border-zinc-600 pl-6">
+              <h4 className="text-white font-bold mb-1">History</h4>
+              <p className="text-sm text-zinc-500 leading-relaxed">
+                Every send against a saved request is recorded with its status, duration,
+                size, which execution path was used, and assertion results. Selecting a past
+                run replays it into the response pane.
+              </p>
+            </div>
+          </div>
           <div className="border border-dashed border-white/10 rounded-2xl p-6 mb-8">
             <h4 className="text-zinc-300 font-bold mb-2 text-sm">Not yet supported</h4>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              The body editor handles JSON and plain text. Form-data, multipart, and file
-              uploads are not implemented yet, and there is no header autocomplete, cookie
-              jar, or test-assertion support.
+              File uploads, header autocomplete, and a cookie jar. Form-data carries text
+              fields only &mdash; a file cannot be serialized to the server proxy, so
+              offering it in browser mode alone would be worse than not offering it.
             </p>
           </div>
+        </>
+      ),
+    },
+    {
+      id: "environments",
+      title: "Environments",
+      icon: <Layers className="h-6 w-6 text-amber-400" />,
+      content: (
+        <>
+          <p className="text-zinc-400 leading-relaxed mb-6">
+            An environment is a named set of variables belonging to a workspace. Write{" "}
+            <code className="bg-white/10 px-1.5 py-0.5 rounded text-blue-400">
+              {"{{name}}"}
+            </code>{" "}
+            anywhere in a request &mdash; the URL, a header, a query parameter, an auth
+            field, or the body &mdash; and it is replaced with that environment&apos;s
+            value when the request is sent.
+          </p>
+          <div className="bg-[#1a1c23] border border-white/5 rounded-xl p-6 font-mono text-sm mb-6">
+            <div className="text-zinc-500">
+              <span className="text-blue-400">{"{{baseUrl}}"}</span>/users/
+              <span className="text-blue-400">{"{{userId}}"}</span>
+            </div>
+            <div className="text-zinc-600 text-xs mt-2">
+              becomes https://staging.api.example.com/users/42
+            </div>
+          </div>
+          <ul className="space-y-3 mb-6 text-sm">
+            <li className="flex items-start gap-3">
+              <div className="mt-1 bg-amber-500/10 rounded-full p-1">
+                <CheckCircle2 className="h-4 w-4 text-amber-500" />
+              </div>
+              <span className="text-zinc-500">
+                Switch environments from the picker in the header to point the same
+                collection at local, staging, or production
+              </span>
+            </li>
+            <li className="flex items-start gap-3">
+              <div className="mt-1 bg-amber-500/10 rounded-full p-1">
+                <CheckCircle2 className="h-4 w-4 text-amber-500" />
+              </div>
+              <span className="text-zinc-500">
+                Mark a variable <strong className="text-zinc-400">secret</strong> to mask it
+                in the UI. It is still sent in requests &mdash; this is display masking, not
+                encryption
+              </span>
+            </li>
+            <li className="flex items-start gap-3">
+              <div className="mt-1 bg-amber-500/10 rounded-full p-1">
+                <CheckCircle2 className="h-4 w-4 text-amber-500" />
+              </div>
+              <span className="text-zinc-500">
+                Which environment is active is per person, so teammates can work against
+                different ones at the same time
+              </span>
+            </li>
+          </ul>
+          <p className="text-xs text-zinc-500 leading-relaxed mb-8">
+            A variable with no value in the active environment is left in the request
+            literally rather than blanked, and the app warns which names went unresolved
+            &mdash; sending{" "}
+            <code className="bg-white/10 px-1 rounded text-zinc-400">https:///users</code>{" "}
+            silently would be far harder to debug.
+          </p>
         </>
       ),
     },

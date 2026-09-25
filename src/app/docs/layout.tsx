@@ -13,6 +13,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
     { name: "Workspaces", icon: <Layers className="h-4 w-4" />, href: "/docs#workspaces" },
     { name: "Collections", icon: <ScrollText className="h-4 w-4" />, href: "/docs#collections" },
     { name: "Sending Requests", icon: <Terminal className="h-4 w-4" />, href: "/docs#sending-requests" },
+    { name: "Environments", icon: <Layers className="h-4 w-4" />, href: "/docs#environments" },
     { name: "Execution Modes", icon: <Globe className="h-4 w-4" />, href: "/docs#execution-modes" },
     { name: "WebSockets", icon: <Radio className="h-4 w-4" />, href: "/docs#realtime" },
     { name: "AI Assistance", icon: <Cpu className="h-4 w-4" />, href: "/docs#ai-integration" },

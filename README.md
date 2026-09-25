@@ -11,7 +11,12 @@ Impulse is a high-performance, collaborative API development platform designed f
 - **Embedded Monaco Editor**: VS Code-grade editing for JSON bodies, with formatting and invalid-JSON detection.
 - **AI-Powered Suggestions**: Gemini suggests request names from a method and URL, and drafts JSON bodies from a description.
 - **Browser & Proxy Execution**: Send from your own machine to reach `localhost`, or through a hardened server proxy when CORS blocks you. See [Execution modes](#-execution-modes).
-- **Run History**: Every send against a saved request is recorded with its status, headers, body, and duration. *(Stored in the database; no UI to browse it yet.)*
+- **Environments & Variables**: `{{baseUrl}}` style substitution from workspace-scoped environments, resolved across the URL, headers, params, auth fields, and body.
+- **Authorization**: Bearer, Basic, and API key (header or query), instead of hand-writing an `Authorization` header.
+- **Body Types**: JSON, text, XML, GraphQL, form-data, and url-encoded. *(Text fields only — file uploads are not supported.)*
+- **Tests**: Declarative assertions on status, time, size, headers, body, and JSON fields by path. No JavaScript is executed.
+- **Run History**: Every send against a saved request is recorded with status, duration, size, execution path, and assertion results — browsable and replayable from the response pane.
+- **cURL Import & Code Export**: Paste a `curl` command to fill a request; export any request as cURL, fetch, axios, Python, or Go.
 
 ### 🔌 WebSocket Debugger
 - **Live Stream**: Monitor incoming and outgoing WebSocket frames in a structured log table.
@@ -24,8 +29,9 @@ Impulse is a high-performance, collaborative API development platform designed f
 - **Role-Based Access**: Admin, Editor, and Viewer roles, enforced server-side on every operation via `src/lib/authz.ts` — not just hidden in the UI.
 
 ### 📂 Collection Management & Import
-- **Postman Import**: Import existing collections from **Postman v2.1** exports, or native Impulse JSON. Postman folders are flattened, with the folder name kept as a prefix on each request.
-- **Collections**: Group requests into a collection within a workspace. *(A single flat level — nested folders are not implemented yet.)*
+- **Postman Import & Export**: Import from **Postman v2.1** exports or native Impulse JSON, folder structure preserved. Export back out in either format.
+- **Nested Folders**: Collections nest to any depth, so requests can be grouped by resource or API version.
+- **Collection Runner**: Run every request in a collection in order, with per-request status, duration, and assertion results.
 
 ### ⌨️ Developer Experience
 - **Command Palette (Cmd+K)**: Instant global search for documentation and collections.

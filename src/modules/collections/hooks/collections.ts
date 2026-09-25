@@ -12,10 +12,14 @@ export function useCollections(workspaceId?: string) {
     });
 }
 
-export function useCreateCollection(workspaceId: string, name: string) {
+export function useCreateCollection(
+    workspaceId: string,
+    name: string,
+    parentId?: string | null
+) {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async () => createCollection(workspaceId, name),
+        mutationFn: async () => createCollection(workspaceId, name, parentId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['collections', workspaceId] });
         },

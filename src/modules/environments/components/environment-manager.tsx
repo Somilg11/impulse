@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Copy, Eye, EyeOff, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -51,40 +51,34 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
   const duplicateEnvironment = useDuplicateEnvironment(workspaceId);
   const setActiveEnvironment = useEnvironmentStore((s) => s.setActiveEnvironment);
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [pickedId, setPickedId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Variable[]>([]);
   const [name, setName] = useState("");
   const [revealed, setRevealed] = useState<Record<number, boolean>>({});
   const [newName, setNewName] = useState("");
+
+  // Derived rather than stored: the selection falls back to the first
+  // environment once the list loads, with no effect needed to sync it.
+  const selectedId =
+    pickedId && environments?.some((e) => e.id === pickedId)
+      ? pickedId
+      : environments?.[0]?.id ?? null;
 
   const selected = useMemo(
     () => environments?.find((e) => e.id === selectedId) ?? null,
     [environments, selectedId]
   );
 
-  // Select the first environment once the list arrives, and load its variables
-  // into the draft whenever the selection changes.
-  useEffect(() => {
-    if (!isOpen) return;
-    if (!environments?.length) {
-      setSelectedId(null);
-      return;
-    }
-    setSelectedId((current) =>
-      current && environments.some((e) => e.id === current) ? current : environments[0].id
-    );
-  }, [isOpen, environments]);
-
-  useEffect(() => {
-    if (!selected) {
-      setDraft([]);
-      setName("");
-      return;
-    }
-    setDraft(parseVariables(selected.variables));
-    setName(selected.name);
+  // Load the selected environment into the editable draft. Comparing against
+  // the previously loaded id during render is React's documented alternative to
+  // mirroring props into state inside an effect.
+  const [loadedId, setLoadedId] = useState<string | null>(null);
+  if (selectedId !== loadedId) {
+    setLoadedId(selectedId);
+    setDraft(selected ? parseVariables(selected.variables) : []);
+    setName(selected?.name ?? "");
     setRevealed({});
-  }, [selected]);
+  }
 
   const dirty =
     Boolean(selected) &&
@@ -97,7 +91,7 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
     try {
       const created = await createEnvironment.mutateAsync(trimmed);
       setNewName("");
-      setSelectedId(created.id);
+      setPickedId(created.id);
       toast.success(`Created "${created.name}"`);
     } catch (error) {
       toast.error(
@@ -125,7 +119,7 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
     try {
       await deleteEnvironment.mutateAsync(selected.id);
       setActiveEnvironment(workspaceId, null);
-      setSelectedId(null);
+      setPickedId(null);
       toast.success("Environment deleted");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not delete");
@@ -178,7 +172,7 @@ const EnvironmentManager = ({ workspaceId, isOpen, onClose }: Props) => {
               environments.map((environment) => (
                 <button
                   key={environment.id}
-                  onClick={() => setSelectedId(environment.id)}
+                  onClick={() => setPickedId(environment.id)}
                   className={`text-left text-xs px-2.5 py-1.5 rounded transition-colors truncate ${
                     selectedId === environment.id
                       ? "bg-[#1e2330] text-white"

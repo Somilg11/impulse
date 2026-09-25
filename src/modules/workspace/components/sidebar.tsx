@@ -17,6 +17,12 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
 
   const {data:collections , isLoading, isError} = useCollections(currentWorkspace?.id);
 
+  // The server returns a flat list; assemble the tree here so nesting costs one
+  // query rather than a recursive include of unknown depth.
+  const rootCollections = (collections ?? []).filter((c) => !c.parentId);
+  const childrenOf = (parentId: string) =>
+    (collections ?? []).filter((c) => c.parentId === parentId);
+
   
  
   if(isLoading) return (
@@ -73,9 +79,9 @@ const TabbedSidebar = ({ currentWorkspace }: Props) => {
 
           {
             collections && collections.length > 0 ? (
-              collections.map((collection) => (
+              rootCollections.map((collection) => (
                 <div className='flex flex-col justify-start items-start p-3 border-b border-zinc-800 w-full' key={collection.id}>
-                <CollectionFolder  collection={collection} />
+                <CollectionFolder key={collection.id} collection={collection} childrenOf={childrenOf} />
                 </div>
               ))
             ) : (
