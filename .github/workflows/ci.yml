@@ -34,6 +34,7 @@ jobs:
         # so a placeholder is enough here.
         env:
           DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+          DIRECT_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
         run: npx prisma generate
 
       - name: Typecheck
@@ -52,6 +53,7 @@ jobs:
           SKIP_ENV_VALIDATION: "1"
           NEXT_PUBLIC_APP_URL: "http://localhost:3000"
           DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
+          DIRECT_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
         run: npm run build
 
   migrations:
@@ -72,6 +74,9 @@ jobs:
           --health-retries 5
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      # The schema declares `directUrl`, so Prisma requires the variable to
+      # exist even when it points at the same database.
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v7
 

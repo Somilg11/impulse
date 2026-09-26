@@ -175,6 +175,9 @@ npx prisma migrate dev   # apply migrations and generate the client
 npm run dev              # → http://localhost:3000
 ```
 
+Pointing `DATABASE_URL` at a hosted Postgres instead? Skip Docker and use
+`npm run dev`; `npm run dev:local` is the variant that starts the container.
+
 Sign in with GitHub or Google and a personal workspace is created automatically.
 
 > If sign-in returns a 500 with `P2021 table does not exist`, migrations were never
@@ -186,13 +189,28 @@ Sign in with GitHub or Google and a personal workspace is created automatically.
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Start Postgres and the dev server |
-| `npm run build` | Production build |
-| `npm test` | Unit suite (169 tests, ~0.5s) |
+| `npm run dev` | Dev server |
+| `npm run dev:local` | Start the Postgres container, then the dev server |
+| `npm run build` | `prisma generate` + production build |
+| `npm test` | Unit suite (203 tests, ~0.5s) |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
-| `npx prisma studio` | Browse the database |
-| `npx prisma migrate status` | Check the schema matches the migrations |
+| `npm run db:migrate` | Create and apply a migration (development) |
+| `npm run db:deploy` | Apply committed migrations (production) |
+| `npm run db:studio` | Browse the database |
+
+<br />
+
+## Deploy
+
+Vercel for the app, [Neon](https://neon.tech) for Postgres — both free tier.
+Full walkthrough in **[docs/deployment.md](docs/deployment.md)**, including the
+two connection strings Neon gives you and which one `prisma migrate` needs.
+
+One thing worth repeating here: leave `IMPULSE_ALLOW_PRIVATE_HOSTS` unset in
+production. It disables the SSRF address guard so proxy mode can reach loopback
+and private ranges — correct on your laptop, an open gateway to the host's
+internal network on a public deployment.
 
 <br />
 
