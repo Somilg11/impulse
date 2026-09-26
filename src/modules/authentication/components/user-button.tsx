@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 // Types for the user data
 interface UserData {
@@ -55,27 +56,27 @@ export default function UserButton({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-   const onSignOut = async()=>{
-    await authClient.signOut({
-      fetchOptions:{
-        onSuccess:()=>{
-          router.push("/")
-        }
-      }
-    })
-  }
-
   const handleLogout = async () => {
-  
-      setIsLoading(true);
-      try {
-        await onSignOut();
-      } catch (error) {
-        console.error("Logout error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    
+    setIsLoading(true);
+    try {
+      // Better Auth reports a failed sign-out in the result rather than by
+      // throwing, so the error case has to be read, not caught. Previously it
+      // was neither: a failure left the user signed in with nothing on screen.
+      const { error } = await authClient.signOut();
+      if (error) throw new Error(error.message ?? "Sign out failed");
+
+      // refresh() clears the cached server components that were rendered for
+      // the signed-in user; push() alone can leave stale markup behind.
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      toast.error("Could not sign out", {
+        description:
+          error instanceof Error ? error.message : "Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Get user initials for avatar fallback

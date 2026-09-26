@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ChevronLeft, Github, Loader2 } from "lucide-react";
 
 import { signIn } from "@/lib/auth-client";
+import { safeInternalPath } from "@/lib/app-url";
 
 type Provider = "github" | "google";
 
@@ -34,13 +36,17 @@ function GoogleMark({ className }: { className?: string }) {
 
 const LoginPage = () => {
   const [pending, setPending] = useState<Provider | null>(null);
+  const searchParams = useSearchParams();
+  // Set when an invite link sent a signed-out visitor here; they return to the
+  // invite once they have an account.
+  const next = safeInternalPath(searchParams.get("next"));
 
   const start = (provider: Provider) => {
     // The redirect leaves the page, so this spinner is never cleared on success -
     // only on failure, where the catch restores the buttons.
     setPending(provider);
     signIn
-      .social({ provider, callbackURL: "/workspace" })
+      .social({ provider, callbackURL: next })
       .catch(() => setPending(null));
   };
 
@@ -123,4 +129,14 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+/**
+ * useSearchParams needs a Suspense boundary, otherwise it opts the whole route
+ * out of static rendering during the build.
+ */
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-ink" />}>
+      <LoginPage />
+    </Suspense>
+  );
+}
