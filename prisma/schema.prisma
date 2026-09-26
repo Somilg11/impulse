@@ -10,7 +10,17 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+
+  // Pooled connection, used by the app at runtime. On a serverless host every
+  // function instance opens its own connection, which exhausts a plain
+  // Postgres connection limit - so this points at a pooler (PgBouncer, or
+  // Neon's pooled endpoint).
+  url = env("DATABASE_URL")
+
+  // Direct connection, used only by `prisma migrate`. Migrations take advisory
+  // locks and run DDL, neither of which survives a transaction pooler.
+  // Locally both variables can point at the same database.
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -104,6 +114,8 @@ model Workspace {
   updatedAt DateTime @default(now()) @updatedAt
 
   @@unique([name, ownerId])
+  // Leading column of the unique above is `name`, so owner lookups need this.
+  @@index([ownerId])
 }
 
 enum MEMBER_ROLE {
@@ -124,6 +136,11 @@ model WorkspaceInvite {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
+  // Postgres does not index foreign keys automatically; without these, a
+  // workspace or user delete sequentially scans this table.
+  @@index([workspaceId])
+  @@index([createdById])
 }
 
 model WorkspaceMember {
@@ -139,6 +156,9 @@ model WorkspaceMember {
   updatedAt DateTime @default(now()) @updatedAt
 
   @@unique([userId, workspaceId])
+  // The unique above leads with userId, so it cannot serve a lookup by
+  // workspace alone (the member list) or the cascade delete of a workspace.
+  @@index([workspaceId])
 }
 
 model Collection {
@@ -237,6 +257,11 @@ model RequestRun {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
+  // getRequestRuns filters on requestId and orders by createdAt desc. As a
+  // composite index this answers both without a sort step, and it is the table
+  // that grows fastest - one row per send.
+  @@index([requestId, createdAt])
 }
 
 /// Workspace-scoped variable sets. `{{name}}` appearing in a URL, header, query

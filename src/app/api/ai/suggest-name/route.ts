@@ -2,9 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { suggestRequestName } from '@/lib/ai-agents';
 import { requireUser } from '@/lib/authz';
 import { rateLimit } from '@/lib/rate-limit';
+import { isAiConfigured } from '@/lib/env';
 
 export async function POST(request: NextRequest) {
     try {
+        // The AI key is optional, so an instance deployed without one answers
+        // honestly instead of failing inside the provider SDK.
+        if (!isAiConfigured()) {
+            return NextResponse.json(
+                { error: 'AI suggestions are not configured on this deployment.' },
+                { status: 503 }
+            );
+        }
+
         // Unauthenticated callers would otherwise burn the shared Gemini quota.
         const user = await requireUser();
 

@@ -359,18 +359,27 @@ are sent" touches one directory instead of five.
 
 ## 8a. How it is verified
 
-169 unit tests cover the logic that decides what goes on the wire: key/value
+203 unit tests cover the logic that decides what goes on the wire: key/value
 normalization, variable substitution, auth schemes, body encoding, the
 composition pipeline, assertions, cURL parsing, code generation, collection
 export, and the SSRF address guard. Those modules were written free of React,
 Prisma, and network access specifically so they could be tested directly - no
 mocking, no test database, and the suite runs in about half a second.
 
-The suite was mutation-checked rather than assumed correct. Three deliberate
+The one exception is the authorization layer, which earns the mocking it needs.
+34 of those tests drive `lib/authz.ts` with Prisma and Better Auth stubbed,
+covering the full role-rank matrix (every role against every minimum) and the
+IDOR cases specifically: a real collection, environment, or request id belonging
+to a workspace the caller is not a member of. It is the one module where being
+wrong is a breach rather than a bug, so "I read the code" was not a good enough
+answer.
+
+The suite was mutation-checked rather than assumed correct. Four deliberate
 regressions were introduced and each was caught: letting an auth scheme
 overwrite a hand-set `Authorization` header, removing the link-local range from
-the SSRF blocklist, and blanking unresolved variables instead of leaving them
-literal.
+the SSRF blocklist, blanking unresolved variables instead of leaving them
+literal, and dropping the role-rank comparison in `assertWorkspaceMember`
+(which failed five authorization tests).
 
 Security behaviour was additionally verified against the running application -
 seeding two users, signing real session cookies, and calling server actions over
@@ -527,8 +536,8 @@ that trade-off entirely — one execution path with neither limitation. It is
 the last structural compromise in the product rather than a missing feature.
 
 **What's the weakest part of this codebase?**
-End-to-end coverage. 169 unit tests cover the request pipeline and the
-security guard, and CI gates typecheck, lint, build, and migration integrity
+End-to-end coverage. 203 unit tests cover the request pipeline, the
+authorization layer, and the SSRF guard, and CI gates typecheck, lint, build, and migration integrity
 — but UI paths are still verified by hand. That gap is not theoretical: a
 submenu rendered clipped because it was never portalled out of a scrolling
 parent, and a `${name}` in a toast silently resolved to the DOM's
@@ -545,19 +554,21 @@ the wrong trade when a two-line pin does it.
 
 ## 11. What is deliberately not built
 
-Being able to state this list is itself worth points — it shows the scope was
+Being able to state this list is itself worth points - it shows the scope was
 chosen rather than stumbled into.
 
-| Missing | Why it matters |
-|---|---|
-| Collection **export** | Import is one-way today. The most glaring asymmetry. |
-| Environments / `{{baseUrl}}` variables | The largest remaining gap versus Postman. |
-| Auth helper tabs (Bearer, Basic, OAuth2) | Currently a hand-written `Authorization` header. |
-| Run history UI | The rows are already written. Nothing renders them. |
-| Pre-request scripts, assertions, collection runner | What would turn this from a client into a testing tool. |
-| Nested folders, form-data uploads, cookie jar, GraphQL | Feature-parity items. |
-| Desktop app / local agent | Would remove both the CORS limit and the proxy at once. |
-| Automated tests | The real gap. See above. |
+| Missing | Why it matters | Why it is not built |
+|---|---|---|
+| Desktop app / local agent | Would remove the CORS limit and the proxy at once - one execution path instead of three. | The last structural compromise in the product. Mode C, deliberately out of scope. |
+| Cookie jar | Session-based APIs need one; today you paste the `Cookie` header yourself. | Needs per-workspace storage of credentials that are not environment variables, and a story for who on the team can read them. |
+| File uploads in form-data | Form-data carries text fields only. | A file cannot be serialized through the server proxy, so offering it in browser mode alone would silently work in one mode and fail in the other. Worse than not offering it. |
+| Collection-level shared headers, pre-request scripts | Chaining a login into subsequent requests still means copying the token into an environment by hand. | Scripting needs a sandbox. Running user JavaScript on the server is the same class of problem as the SSRF guard, and it was not worth opening on a solo timeline. |
+| Header name autocomplete | Small quality-of-life gap. | Cosmetic; never blocked a task. |
+
+Everything else on the original list - collection export, environments and
+`{{baseUrl}}` variables, auth helper tabs, run history, assertions, the
+collection runner, nested folders, cURL paste, and code export - shipped. The
+[roadmap in the README](../README.md) tracks what remains.
 
 Known weak spots, all documented in [`SECURITY.md`](SECURITY.md) rather than
 hidden: in-memory rate limiting, response bodies stored unencrypted, CSP still
